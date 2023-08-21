@@ -10,8 +10,8 @@ using TuongTLCBE.Data.Repositories;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-string dbConn = await VaultHelper.GetDBConnAsync();
-string jwtToken = await VaultHelper.GetJWTTokenAsync();
+string dbConn = await VaultHelper.GetSecrets("dbconn");
+string jwtToken = await VaultHelper.GetSecrets("jwt");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

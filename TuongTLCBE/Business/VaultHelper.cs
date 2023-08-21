@@ -12,7 +12,7 @@ namespace TuongTLCBE.Business
         private static readonly string endpoint = Environment.GetEnvironmentVariable("EndPoint", EnvironmentVariableTarget.Process)
            ?? throw new ArgumentException("Environment variable not found.");
         private static string vaultport = ":8200";
-        public static async Task<string> GetJWTTokenAsync()
+        public static async Task<string> GetSecrets(string secretType)
         {
             try
             {
@@ -24,34 +24,13 @@ namespace TuongTLCBE.Business
 
                 Secret<SecretData> kv2Secret = await vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: "tuongtlc");
 
-                string jwt = kv2Secret.Data.Data["jwt"].ToString() ?? throw new ArgumentException("Failed to retrieve JWT secret.");
+                string secret = kv2Secret.Data.Data[secretType].ToString() ?? throw new ArgumentException("Failed to retrieve secret.");
 
-                return jwt;
+                return secret;
             }
             catch
             {
-                throw new ArgumentException("Failed to retrieve JWT secret.");
-            }
-        }
-        public static async Task<string> GetDBConnAsync()
-        {
-            try
-            {
-                IAuthMethodInfo authMethod = new TokenAuthMethodInfo(token);
-
-                VaultClientSettings vaultClientSettings = new(endpoint + vaultport, authMethod);
-
-                IVaultClient vaultClient = new VaultClient(vaultClientSettings);
-
-                Secret<SecretData> kv2Secret = await vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: "tuongtlc");
-
-                string conn = kv2Secret.Data.Data["dbconn"].ToString() ?? throw new ArgumentException("Failed to retrieve DB connection string.");
-
-                return conn;
-            }
-            catch
-            {
-                throw new ArgumentException("Failed to retrieve DB connection string.");
+                throw new ArgumentException("Failed to retrieve secret.");
             }
         }
     }

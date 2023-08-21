@@ -90,7 +90,7 @@ namespace TuongTLCBE.Business
 
             };
 
-            SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(await VaultHelper.GetJWTTokenAsync()));
+            SymmetricSecurityKey key = new(Encoding.UTF8.GetBytes(await VaultHelper.GetSecrets("jwt")));
 
             SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha512Signature);
 
