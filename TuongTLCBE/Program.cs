@@ -42,7 +42,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-
 builder.Services.AddDbContext<TuongTlcdbContext>(
         options => options.UseSqlServer(dbConn));
 
