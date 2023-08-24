@@ -31,27 +31,17 @@ namespace TuongTLCBE.API
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<string>> Login(UserLoginModel request)
+        public async Task<ActionResult<UserLoginResModel>> Login(UserLoginReqModel request)
         {
-            UserModel? user = await _userService.Login(request);
-
-            if (user == null || user.Username != request.Username)
+            UserLoginResModel? userLoginResModel = await _userService.Login(request);
+            if (userLoginResModel != null)
             {
-                return BadRequest("User not found.");
+                return Ok(userLoginResModel);
             }
-
-            if (!_userService.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            else
             {
-                return BadRequest("Wrong password.");
+                return BadRequest("Username or password invalid!");
             }
-
-            string token = await _userService.CreateToken(user);
-
-            RefreshToken refreshToken = _userService.GenerateRefreshToken(user.Id);
-
-            _ = await _userService.SetRefreshToken(refreshToken);
-
-            return Ok(token);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace TuongTLCBE.Data.Repositories
         public UserRepo(TuongTlcdbContext context) : base(context)
         {
         }
-        public async Task<UserModel?> GetUser(UserLoginModel userReqModel)
+        public async Task<UserModel?> GetUser(UserLoginReqModel userReqModel)
         {
             try
             {

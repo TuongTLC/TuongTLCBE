@@ -44,17 +44,33 @@ namespace TuongTLCBE.Business
             }
 
         }
-        public async Task<UserModel?> Login(UserLoginModel request)
+        public async Task<UserLoginResModel?> Login(UserLoginReqModel request)
         {
-            try
+            UserModel? user = await _userRepo.GetUser(request);
+            if (user == null )
             {
-                UserModel? userModel = await _userRepo.GetUser(request);
-                return userModel;
+                return null;
             }
-            catch (Exception e)
+            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
             {
-                throw new ArgumentException(e.ToString());
+                return null;
             }
+            string token = await CreateToken(user);
+            UserLoginModel userLoginModel = new UserLoginModel
+            {
+                Username = user.Username,
+                RoleName = user.RoleName,
+                Fullname = user.Fullname,
+                Email = user.Email
+            };
+            UserLoginResModel userLoginResModel = new UserLoginResModel
+            {
+                Token = token,
+                UserInfo = userLoginModel
+            };
+            RefreshToken refreshToken = GenerateRefreshToken(user.Id);
+            _ = await SetRefreshToken(refreshToken);
+            return userLoginResModel;
         }
         public async Task<RefreshToken?> RefreshToken(RefreshToken refreshToken)
         {
@@ -72,12 +88,12 @@ namespace TuongTLCBE.Business
         {
             using HMACSHA512 hmac = new();
             passwordSalt = hmac.Key;
-            passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
         public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using HMACSHA512 hmac = new(passwordSalt);
-            byte[] computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            byte[] computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             return computedHash.SequenceEqual(passwordHash);
         }
         public async Task<string> CreateToken(UserModel user)
