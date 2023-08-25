@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TuongTLCBE.Business;
-using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Models;
 namespace TuongTLCBE.API
 {
@@ -18,15 +17,15 @@ namespace TuongTLCBE.API
         [HttpPost("register")]
         public async Task<ActionResult<UserLoginModel>> Register(UserReqModel request)
         {
-             object result = await _userService.Register(request);
-             return (result.GetType() == typeof(UserLoginModel)) ? Ok(result) : BadRequest(result);
+            object result = await _userService.Register(request);
+            return (result.GetType() == typeof(UserLoginModel)) ? Ok(result) : BadRequest(result);
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<UserLoginResModel>> Login(UserLoginReqModel request)
         {
             UserLoginResModel? userLoginResModel = await _userService.Login(request);
-            return (userLoginResModel != null ) ? Ok(userLoginResModel) : BadRequest("Username or password invalid!");
+            return (userLoginResModel != null) ? Ok(userLoginResModel) : BadRequest("Username or password invalid!");
         }
     }
 }

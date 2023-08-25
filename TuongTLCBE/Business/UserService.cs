@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -30,22 +29,22 @@ namespace TuongTLCBE.Business
             }
 
             UserModel? userCheck = await _userRepo.GetUser(reqModel.Username);
-            if (userCheck!=null)
+            if (userCheck != null)
             {
                 return "Duplicated username!";
             }
 
-            if (reqModel.Username.Length<6 )
+            if (reqModel.Username.Length < 6)
             {
                 return "Username length invalid!";
             }
-            Regex validatePasswordRegex = new Regex("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+            Regex validatePasswordRegex = new("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
             if (!validatePasswordRegex.IsMatch(reqModel.Password))
             {
                 return "Password invalid!";
             }
 
-            Regex validateEmailRegex = new Regex("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
+            Regex validateEmailRegex = new("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
             if (!validateEmailRegex.IsMatch(reqModel.Email))
             {
                 return "Email invalid!";
@@ -69,7 +68,7 @@ namespace TuongTLCBE.Business
                     UserModel? user = await _userRepo.GetUser(userInsert.Username);
                     if (user != null)
                     {
-                        UserLoginModel userLoginModel = new UserLoginModel
+                        UserLoginModel userLoginModel = new()
                         {
                             Username = user.Username,
                             RoleName = user.RoleName,
@@ -81,7 +80,7 @@ namespace TuongTLCBE.Business
                     else
                     {
                         return "Retrieve created user information failed!";
-                    }                    
+                    }
                 }
                 else
                 {
@@ -96,7 +95,7 @@ namespace TuongTLCBE.Business
         public async Task<UserLoginResModel?> Login(UserLoginReqModel request)
         {
             UserModel? user = await _userRepo.GetUser(request.Username);
-            if (user == null )
+            if (user == null)
             {
                 return null;
             }
@@ -105,14 +104,14 @@ namespace TuongTLCBE.Business
                 return null;
             }
             string token = await CreateToken(user);
-            UserLoginModel userLoginModel = new UserLoginModel
+            UserLoginModel userLoginModel = new()
             {
                 Username = user.Username,
                 RoleName = user.RoleName,
                 Fullname = user.Fullname,
                 Email = user.Email
             };
-            UserLoginResModel userLoginResModel = new UserLoginResModel
+            UserLoginResModel userLoginResModel = new()
             {
                 Token = token,
                 UserInfo = userLoginModel

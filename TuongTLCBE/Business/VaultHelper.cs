@@ -11,7 +11,7 @@ namespace TuongTLCBE.Business
             ?? throw new ArgumentException("Environment variable not found.");
         private static readonly string endpoint = Environment.GetEnvironmentVariable("EndPoint", EnvironmentVariableTarget.Process)
            ?? throw new ArgumentException("Environment variable not found.");
-        private static string vaultport = ":8200";
+        private static readonly string vaultport = ":8200";
         public static async Task<string> GetSecrets(string secretType)
         {
             try
