@@ -9,14 +9,14 @@ namespace TuongTLCBE.Data.Repositories
         public UserRepo(TuongTlcdbContext context) : base(context)
         {
         }
-        public async Task<UserModel?> GetUser(UserLoginReqModel userReqModel)
+        public async Task<UserModel?> GetUser(string userName)
         {
             try
             {
                 var query = from u in context.Users
                             join ur in context.UserRoles
                             on u.RoleId equals ur.Id
-                            where u.Username.ToLower().Trim().Equals(userReqModel.Username.ToLower().Trim())
+                            where u.Username.Equals(userName)
                             select new { u, ur };
                 UserModel? userModel = await query.Select(x => new UserModel()
                 {

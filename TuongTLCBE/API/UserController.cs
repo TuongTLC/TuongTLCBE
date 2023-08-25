@@ -16,32 +16,17 @@ namespace TuongTLCBE.API
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register(UserReqModel request)
+        public async Task<ActionResult<UserLoginModel>> Register(UserReqModel request)
         {
-            try
-            {
-                string result = await _userService.Register(request);
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-
-                return BadRequest(e.ToString());
-            }
+             object result = await _userService.Register(request);
+             return (result.GetType() == typeof(UserLoginModel)) ? Ok(result) : BadRequest(result);
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<UserLoginResModel>> Login(UserLoginReqModel request)
         {
             UserLoginResModel? userLoginResModel = await _userService.Login(request);
-            if (userLoginResModel != null)
-            {
-                return Ok(userLoginResModel);
-            }
-            else
-            {
-                return BadRequest("Username or password invalid!");
-            }
+            return (userLoginResModel != null ) ? Ok(userLoginResModel) : BadRequest("Username or password invalid!");
         }
     }
 }
