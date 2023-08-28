@@ -25,7 +25,7 @@ namespace TuongTLCBE.Business
         {
             if (reqModel.Username.IsNullOrEmpty() || reqModel.Password.IsNullOrEmpty() || reqModel.Fullname.IsNullOrEmpty() || reqModel.Email.IsNullOrEmpty())
             {
-                return "Please fillin all the informations!!";
+                return "Please fill-in all the informations!!";
             }
 
             UserModel? userCheck = await _userRepo.GetUser(reqModel.Username);

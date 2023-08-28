@@ -1,4 +1,7 @@
-﻿namespace TuongTLCBE.Data.Entities;
+﻿using System;
+using System.Collections.Generic;
+
+namespace TuongTLCBE.Data.Entities;
 
 public partial class RefreshToken
 {
