@@ -53,7 +53,9 @@ public partial class TuongTlcdbContext : DbContext
             entity.Property(e => e.RoleId)
                 .HasDefaultValueSql("('38b3d081-a7bc-4ed2-a394-f47d01263e0e')")
                 .HasColumnName("RoleID");
-            entity.Property(e => e.Username).HasMaxLength(50);
+            entity.Property(e => e.Username)
+                .HasMaxLength(50)
+                .UseCollation("Latin1_General_BIN");
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)

@@ -60,7 +60,6 @@ namespace TuongTLCBE.Business
                     PasswordSalt = passwordSalt,
                     FullName = reqModel.Fullname,
                     Email = reqModel.Email,
-                    RoleId = Guid.Parse("38b3d081-a7bc-4ed2-a394-f47d01263e0e")
                 };
                 User? userInsert = await _userRepo.Insert(userModel);
                 if (userInsert != null)
