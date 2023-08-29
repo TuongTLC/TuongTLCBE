@@ -11,34 +11,12 @@ public partial class TuongTlcdbContext : DbContext
     {
     }
 
-    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
-
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<RefreshToken>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__RefreshT__3214EC2717B9365F");
-
-            entity.ToTable("RefreshToken");
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("(newid())")
-                .HasColumnName("ID");
-            entity.Property(e => e.Created).HasColumnType("datetime");
-            entity.Property(e => e.Expires).HasColumnType("datetime");
-            entity.Property(e => e.Token).HasMaxLength(200);
-            entity.Property(e => e.UserId).HasColumnName("UserID");
-
-            entity.HasOne(d => d.User).WithMany(p => p.RefreshTokens)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("UserID_RefreshToken");
-        });
-
         modelBuilder.Entity<User>(entity =>
         {
             entity.ToTable("User");

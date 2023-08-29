@@ -7,7 +7,7 @@ public partial class User
 {
     public Guid Id { get; set; }
 
-    public string Username { get; set; }
+    public string? Username { get; set; }
 
     public byte[] PasswordHash { get; set; } = null!;
 
@@ -18,8 +18,6 @@ public partial class User
     public string Email { get; set; } = null!;
 
     public Guid? RoleId { get; set; }
-
-    public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
     public virtual UserRole? Role { get; set; }
 }

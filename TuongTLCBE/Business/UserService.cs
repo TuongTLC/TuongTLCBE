@@ -13,12 +13,9 @@ namespace TuongTLCBE.Business
     public class UserService
     {
         private readonly UserRepo _userRepo;
-        private readonly RefreshTokenRepo _refreshTokenRepo;
-
-        public UserService(RefreshTokenRepo refreshTokenRepo, UserRepo userRepo)
+        public UserService(UserRepo userRepo)
         {
             _userRepo = userRepo;
-            _refreshTokenRepo = refreshTokenRepo;
         }
 
         public async Task<object> Register(UserReqModel reqModel)
@@ -115,21 +112,7 @@ namespace TuongTLCBE.Business
                 Token = token,
                 UserInfo = userLoginModel
             };
-            RefreshToken refreshToken = GenerateRefreshToken(user.Id);
-            _ = await SetRefreshToken(refreshToken);
             return userLoginResModel;
-        }
-        public async Task<RefreshToken?> RefreshToken(RefreshToken refreshToken)
-        {
-            try
-            {
-                RefreshToken? result = await _refreshTokenRepo.Insert(refreshToken);
-                return result;
-            }
-            catch (Exception e)
-            {
-                throw new ArgumentException(e.ToString());
-            }
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
@@ -166,30 +149,7 @@ namespace TuongTLCBE.Business
 
             return jwt;
         }
-        public RefreshToken GenerateRefreshToken(Guid userID)
-        {
-            RefreshToken refreshToken = new()
-            {
-                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
-                Expires = DateTime.Now.AddMinutes(30),
-                Created = DateTime.Now,
-                UserId = userID
-            };
 
-            return refreshToken;
-        }
-        public async Task<RefreshToken?> SetRefreshToken(RefreshToken newRefreshToken)
-        {
-            RefreshToken refreshToken = new()
-            {
-                Token = newRefreshToken.Token,
-                Created = newRefreshToken.Created,
-                Expires = newRefreshToken.Expires,
-                UserId = newRefreshToken.UserId
-            };
-            RefreshToken? result = await RefreshToken(refreshToken);
-            return result;
-        }
 
     }
 }

@@ -50,7 +50,6 @@ builder.Services.AddCors(p => p.AddPolicy("AllowOrigin", builder =>
     _ = builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
 builder.Services.AddScoped<UserService>();
-builder.Services.AddTransient<RefreshTokenRepo>();
 builder.Services.AddTransient<UserRepo>();
 WebApplication app = builder.Build();
 
