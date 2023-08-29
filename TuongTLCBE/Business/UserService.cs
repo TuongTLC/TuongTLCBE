@@ -130,6 +130,7 @@ namespace TuongTLCBE.Business
         {
             List<Claim> claims = new()
             {
+                new Claim(ClaimTypes.Role, user.RoleName),
                 new Claim("userID", user.Id.ToString()),
                 new Claim("name", user.Fullname),
                 new Claim("role", user.RoleName),
@@ -149,8 +150,6 @@ namespace TuongTLCBE.Business
 
             return jwt;
         }
-
-
     }
 }
 

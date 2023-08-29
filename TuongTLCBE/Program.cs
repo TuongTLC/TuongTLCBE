@@ -18,30 +18,32 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("Auth", new OpenApiSecurityScheme
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
     {
         Description = "Standard Authorization header using the Bearer scheme.",
         In = ParameterLocation.Header,
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey
     });
-
     options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
                 .GetBytes(jwtToken)),
+            //ValidateLifetime = true,
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false,
+            //ValidIssuer ="https://tuongtlc.ddns.net:8081",
+            //ValidAudience = "https://tuongtlc.ddns.net"
         };
     });
 
+builder.Services.AddAuthorization();
 builder.Services.AddDbContext<TuongTlcdbContext>(
         options => options.UseSqlServer(dbConn));
 

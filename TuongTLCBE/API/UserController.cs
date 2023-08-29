@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TuongTLCBE.Business;
 using TuongTLCBE.Data.Models;
 namespace TuongTLCBE.API
@@ -15,6 +16,7 @@ namespace TuongTLCBE.API
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<ActionResult<UserLoginModel>> Register(UserReqModel request)
         {
             object result = await _userService.Register(request);
@@ -22,10 +24,17 @@ namespace TuongTLCBE.API
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<ActionResult<UserLoginResModel>> Login(UserLoginReqModel request)
         {
             UserLoginResModel? userLoginResModel = await _userService.Login(request);
             return (userLoginResModel != null) ? Ok(userLoginResModel) : BadRequest("Username or password invalid!");
+        }
+        [HttpGet("test")]
+        [Authorize(Roles = "User")]
+        public string Test()
+        {
+            return "abc def";
         }
     }
 }
