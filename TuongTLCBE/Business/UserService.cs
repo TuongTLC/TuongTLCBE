@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Models;
 using TuongTLCBE.Data.Repositories;
-
 namespace TuongTLCBE.Business
 {
     public class UserService
@@ -130,7 +129,6 @@ namespace TuongTLCBE.Business
         {
             List<Claim> claims = new()
             {
-                new Claim(ClaimTypes.Role, user.RoleName),
                 new Claim("userID", user.Id.ToString()),
                 new Claim("name", user.Fullname),
                 new Claim("role", user.RoleName),
@@ -143,6 +141,8 @@ namespace TuongTLCBE.Business
 
             JwtSecurityToken token = new(
                 claims: claims,
+                audience: "https://tuongtlc.ddns.net",
+                issuer: "https://tuongtlc.ddns.net",
                 expires: DateTime.Now.AddMinutes(30),
                 signingCredentials: creds);
 

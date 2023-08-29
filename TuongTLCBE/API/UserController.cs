@@ -30,11 +30,12 @@ namespace TuongTLCBE.API
             UserLoginResModel? userLoginResModel = await _userService.Login(request);
             return (userLoginResModel != null) ? Ok(userLoginResModel) : BadRequest("Username or password invalid!");
         }
-        [HttpGet("test")]
+
+        [HttpGet("weather")]
         [Authorize(Roles = "User")]
-        public string Test()
+        public IActionResult Get()
         {
-            return "abc def";
+            return Ok("Swashbuckle.AspNetCore.SwaggerGen");
         }
     }
 }

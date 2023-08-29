@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
-using System.Text;
 using TuongTLCBE.Business;
 using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Repositories;
@@ -15,35 +16,64 @@ string jwtToken = await VaultHelper.GetSecrets("jwt");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddTransient<UserRepo>();
+builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen(option =>
 {
-    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    option.EnableAnnotations();
+
+    option.SwaggerDoc("v1", new OpenApiInfo
     {
-        Description = "Standard Authorization header using the Bearer scheme.",
-        In = ParameterLocation.Header,
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey
+        Version = "v1",
+        Title = "TuongTLCBE",
+        Description = "APIs for TuongTLC Website"
     });
-    options.OperationFilter<SecurityRequirementsOperationFilter>();
+
+    OpenApiSecurityScheme securityScheme = new()
+    {
+        Description = "JWT Authorization header using the Bearer scheme",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        Reference = new OpenApiReference()
+        {
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
+        }
+    };
+    option.AddSecurityDefinition("Bearer", securityScheme);
+
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        securityScheme,
+                        new string[]{ }
+                    }
+                });
+
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
+            ValidIssuer = "https://tuongtlc.ddns.net",
+            ValidAudience = "https://tuongtlc.ddns.net",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
                 .GetBytes(jwtToken)),
-            //ValidateLifetime = true,
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            //ValidIssuer ="https://tuongtlc.ddns.net:8081",
-            //ValidAudience = "https://tuongtlc.ddns.net"
+
         };
     });
 
-builder.Services.AddAuthorization();
 builder.Services.AddDbContext<TuongTlcdbContext>(
         options => options.UseSqlServer(dbConn));
 
@@ -51,8 +81,7 @@ builder.Services.AddCors(p => p.AddPolicy("AllowOrigin", builder =>
 {
     _ = builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
 }));
-builder.Services.AddScoped<UserService>();
-builder.Services.AddTransient<UserRepo>();
+
 WebApplication app = builder.Build();
 
 

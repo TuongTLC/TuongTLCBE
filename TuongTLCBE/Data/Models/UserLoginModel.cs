@@ -1,8 +1,12 @@
-﻿namespace TuongTLCBE.Data.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TuongTLCBE.Data.Models
 {
     public class UserLoginReqModel
     {
+        [Required(ErrorMessage = "Required")]
         public string Username { get; set; }
+        [Required(ErrorMessage = "Required")]
         public string Password { get; set; }
     }
     public class UserLoginModel
