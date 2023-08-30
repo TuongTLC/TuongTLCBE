@@ -1,0 +1,46 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TuongTLCBE.Data.Models
+{
+    public class UserModel
+    {
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public byte[] PasswordHash { get; set; }
+        public byte[] PasswordSalt { get; set; }
+        public string RoleName { get; set; }
+        public string Fullname { get; set; }
+        public string Email { get; set; }
+    }
+    public class UserRegisterRequestModel
+    {
+        [Required(ErrorMessage = "Required")]
+        public string Username { get; set; }
+        [Required(ErrorMessage = "Required")]
+        public string Password { get; set; }
+        [Required(ErrorMessage = "Required")]
+        public string Fullname { get; set; }
+        [Required(ErrorMessage = "Required")]
+        public string Email { get; set; }
+    }
+    public class UserLoginRequestModel
+    {
+        [Required(ErrorMessage = "Required")]
+        public string Username { get; set; }
+        [Required(ErrorMessage = "Required")]
+        public string Password { get; set; }
+    }
+    public class UserInfoModel
+    {
+        public string Username { get; set; }
+        public string RoleName { get; set; }
+        public string Fullname { get; set; }
+        public string Email { get; set; }
+    }
+    public class UserLoginResponseModel
+    {
+        public string Token { get; set; }
+        public UserInfoModel UserInfo { get; set; }
+    }
+}
+

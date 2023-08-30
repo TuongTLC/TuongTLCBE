@@ -17,7 +17,7 @@ namespace TuongTLCBE.Business
             _userRepo = userRepo;
         }
 
-        public async Task<object> Register(UserReqModel reqModel)
+        public async Task<object> Register(UserRegisterRequestModel reqModel)
         {
             if (reqModel.Username.IsNullOrEmpty() || reqModel.Password.IsNullOrEmpty() || reqModel.Fullname.IsNullOrEmpty() || reqModel.Email.IsNullOrEmpty())
             {
@@ -63,7 +63,7 @@ namespace TuongTLCBE.Business
                     UserModel? user = await _userRepo.GetUser(userInsert.Username);
                     if (user != null)
                     {
-                        UserLoginModel userLoginModel = new()
+                        UserInfoModel userLoginModel = new()
                         {
                             Username = user.Username,
                             RoleName = user.RoleName,
@@ -87,7 +87,7 @@ namespace TuongTLCBE.Business
                 return ex.ToString();
             }
         }
-        public async Task<UserLoginResModel?> Login(UserLoginReqModel request)
+        public async Task<UserLoginResponseModel?> Login(UserLoginRequestModel request)
         {
             UserModel? user = await _userRepo.GetUser(request.Username);
             if (user == null)
@@ -99,14 +99,14 @@ namespace TuongTLCBE.Business
                 return null;
             }
             string token = await CreateToken(user);
-            UserLoginModel userLoginModel = new()
+            UserInfoModel userLoginModel = new()
             {
                 Username = user.Username,
                 RoleName = user.RoleName,
                 Fullname = user.Fullname,
                 Email = user.Email
             };
-            UserLoginResModel userLoginResModel = new()
+            UserLoginResponseModel userLoginResModel = new()
             {
                 Token = token,
                 UserInfo = userLoginModel

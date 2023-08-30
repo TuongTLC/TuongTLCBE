@@ -17,17 +17,17 @@ namespace TuongTLCBE.API
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<ActionResult<UserLoginModel>> Register(UserReqModel request)
+        public async Task<ActionResult<UserInfoModel>> Register(UserRegisterRequestModel request)
         {
             object result = await _userService.Register(request);
-            return (result.GetType() == typeof(UserLoginModel)) ? Ok(result) : BadRequest(result);
+            return (result.GetType() == typeof(UserInfoModel)) ? Ok(result) : BadRequest(result);
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<ActionResult<UserLoginResModel>> Login(UserLoginReqModel request)
+        public async Task<ActionResult<UserLoginResponseModel>> Login(UserLoginRequestModel request)
         {
-            UserLoginResModel? userLoginResModel = await _userService.Login(request);
+            UserLoginResponseModel? userLoginResModel = await _userService.Login(request);
             return (userLoginResModel != null) ? Ok(userLoginResModel) : BadRequest("Username or password invalid!");
         }
 
@@ -39,4 +39,3 @@ namespace TuongTLCBE.API
         }
     }
 }
-
