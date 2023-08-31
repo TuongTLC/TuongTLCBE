@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Filters;
 using TuongTLCBE.Business;
 using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Repositories;
@@ -17,6 +16,7 @@ string jwtToken = await VaultHelper.GetSecrets("jwt");
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<DecodeToken>();
 builder.Services.AddTransient<UserRepo>();
 builder.Services.AddHttpContextAccessor();
 

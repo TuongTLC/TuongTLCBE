@@ -11,6 +11,8 @@ namespace TuongTLCBE.Data.Models
         public string RoleName { get; set; }
         public string Fullname { get; set; }
         public string Email { get; set; }
+        public DateTime? Birthday { get; set; }
+        public string? Phone { get; set; }
     }
     public class UserRegisterRequestModel
     {
@@ -22,6 +24,8 @@ namespace TuongTLCBE.Data.Models
         public string Fullname { get; set; }
         [Required(ErrorMessage = "Required")]
         public string Email { get; set; }
+        public DateTime? Birthday { get; set; }
+        public string? Phone { get; set; }
     }
     public class UserLoginRequestModel
     {
@@ -36,11 +40,29 @@ namespace TuongTLCBE.Data.Models
         public string RoleName { get; set; }
         public string Fullname { get; set; }
         public string Email { get; set; }
+        public DateTime? Birthday { get; set; }
+        public string? Phone { get; set; }
     }
     public class UserLoginResponseModel
     {
         public string Token { get; set; }
         public UserInfoModel UserInfo { get; set; }
+    }
+    public class UserUpdateRequestModel
+    {
+        public string Fullname { get; set; }
+        public string Email { get; set; }
+        public DateTime Birthday { get; set; }
+        public string Phone { get; set; }
+    }
+    public class UserChangePasswordRequestModel
+    {
+        [Required(ErrorMessage = "Required")]
+        public string Username { get; set; }
+        [Required(ErrorMessage = "Required")]
+        public string OldPassword { get; set; }
+        [Required(ErrorMessage = "Required")]
+        public string NewPassword { get; set; }
     }
 }
 

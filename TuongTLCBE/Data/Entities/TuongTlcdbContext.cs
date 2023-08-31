@@ -21,13 +21,17 @@ public partial class TuongTlcdbContext : DbContext
         {
             entity.ToTable("User");
 
+            entity.HasIndex(e => e.Email, "EmailUnique").IsUnique();
+
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("ID");
+            entity.Property(e => e.Birthday).HasColumnType("date");
             entity.Property(e => e.Email).HasMaxLength(200);
             entity.Property(e => e.FullName).HasMaxLength(200);
             entity.Property(e => e.PasswordHash).HasMaxLength(2048);
             entity.Property(e => e.PasswordSalt).HasMaxLength(2048);
+            entity.Property(e => e.Phone).HasMaxLength(30);
             entity.Property(e => e.RoleId)
                 .HasDefaultValueSql("('38b3d081-a7bc-4ed2-a394-f47d01263e0e')")
                 .HasColumnName("RoleID");

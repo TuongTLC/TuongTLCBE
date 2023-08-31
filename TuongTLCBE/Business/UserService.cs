@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Azure.Core;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -12,8 +13,10 @@ namespace TuongTLCBE.Business
     public class UserService
     {
         private readonly UserRepo _userRepo;
-        public UserService(UserRepo userRepo)
+        private readonly DecodeToken _decodeToken;
+        public UserService(UserRepo userRepo, DecodeToken decodeToken)
         {
+            _decodeToken = decodeToken;
             _userRepo = userRepo;
         }
 
@@ -56,6 +59,8 @@ namespace TuongTLCBE.Business
                     PasswordSalt = passwordSalt,
                     FullName = reqModel.Fullname,
                     Email = reqModel.Email,
+                    Birthday = reqModel.Birthday,
+                    Phone = reqModel.Phone
                 };
                 User? userInsert = await _userRepo.Insert(userModel);
                 if (userInsert != null)
@@ -68,7 +73,9 @@ namespace TuongTLCBE.Business
                             Username = user.Username,
                             RoleName = user.RoleName,
                             Fullname = user.Fullname,
-                            Email = user.Email
+                            Email = user.Email,
+                            Birthday = user.Birthday,
+                            Phone = user.Phone
                         };
                         return userLoginModel;
                     }
@@ -87,31 +94,114 @@ namespace TuongTLCBE.Business
                 return ex.ToString();
             }
         }
-        public async Task<UserLoginResponseModel?> Login(UserLoginRequestModel request)
+        public async Task<object> Login(UserLoginRequestModel request)
         {
-            UserModel? user = await _userRepo.GetUser(request.Username);
-            if (user == null)
+            try
             {
-                return null;
+                UserModel? user = await _userRepo.GetUser(request.Username);
+                if (user == null)
+                {
+                    return "Username or password incorrect!";
+                }
+                if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+                {
+                    return "Username or password incorrect!";
+                }
+                string token = await CreateToken(user);
+                UserInfoModel userLoginModel = new()
+                {
+                    Username = user.Username,
+                    RoleName = user.RoleName,
+                    Fullname = user.Fullname,
+                    Email = user.Email,
+                    Birthday = user.Birthday,
+                    Phone = user.Phone
+                };
+                UserLoginResponseModel userLoginResModel = new()
+                {
+                    Token = token,
+                    UserInfo = userLoginModel
+                };
+                return userLoginResModel;
             }
-            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            catch (Exception ex)
             {
-                return null;
+                return ex;
             }
-            string token = await CreateToken(user);
-            UserInfoModel userLoginModel = new()
+        }
+        public async Task<object> Update(UserUpdateRequestModel userUpdateRequestModel, string token)
+        {
+            try
             {
-                Username = user.Username,
-                RoleName = user.RoleName,
-                Fullname = user.Fullname,
-                Email = user.Email
-            };
-            UserLoginResponseModel userLoginResModel = new()
+                Regex validateEmailRegex = new("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
+                if (!validateEmailRegex.IsMatch(userUpdateRequestModel.Email))
+                {
+                    return "Email invalid!";
+                }
+                if (userUpdateRequestModel.Birthday==DateTime.MinValue)
+                {
+                    return "Birthday invalid";
+                }
+                string username = _decodeToken.Decode(token, "username");
+                bool update = await _userRepo.UpdateUser(userUpdateRequestModel, username);
+                if (update == true)
+                {
+                    UserModel? user = await _userRepo.GetUser(username);
+                    if (user != null)
+                    {
+                        UserInfoModel userInfoModel = new()
+                        {
+                            Username = user.Username,
+                            RoleName = user.RoleName,
+                            Fullname = user.Fullname,
+                            Email = user.Email,
+                            Birthday = user.Birthday,
+                            Phone = user.Phone
+                        };
+                        return userInfoModel;
+                    }
+                    else
+                    {
+                        return "Failed to get user information";
+                    }
+                }
+                else
+                {
+                    return "Update user information failed!";
+                }
+            }
+            catch (Exception ex)
             {
-                Token = token,
-                UserInfo = userLoginModel
-            };
-            return userLoginResModel;
+                return ex;
+            }            
+        }
+        public async Task<object> UpdatePassword(UserChangePasswordRequestModel passwordRequestModel, string token)
+        {
+            try
+            {
+                string username = _decodeToken.Decode(token, "username");
+                UserModel? user = await _userRepo.GetUser(passwordRequestModel.Username);
+                if (user == null || !username.Equals(user.Username))
+                {
+                    return "Username or password incorrect!";
+                }
+                if (!VerifyPasswordHash(passwordRequestModel.OldPassword, user.PasswordHash, user.PasswordSalt))
+                {
+                    return "Username or password incorrect!";
+                }
+                Regex validatePasswordRegex = new("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
+                if (!validatePasswordRegex.IsMatch(passwordRequestModel.NewPassword))
+                {
+                    return "New password invalid!";
+                }
+                CreatePasswordHash(passwordRequestModel.NewPassword,out byte[] newPasswordHash,out byte[] newPasswordSalt);
+                bool update = await _userRepo.UpdatePassword(username, newPasswordHash, newPasswordSalt);
+                return update;
+            }
+            catch (Exception ex)
+            {
+                return ex;
+            }
         }
         private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
@@ -129,8 +219,9 @@ namespace TuongTLCBE.Business
         {
             List<Claim> claims = new()
             {
-                new Claim("userID", user.Id.ToString()),
-                new Claim("name", user.Fullname),
+                new Claim("userid", user.Id.ToString()),
+                new Claim("username", user.Username),
+                new Claim("fullname", user.Fullname),
                 new Claim("role", user.RoleName),
 
             };

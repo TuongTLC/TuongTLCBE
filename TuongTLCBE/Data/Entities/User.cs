@@ -1,10 +1,13 @@
-﻿namespace TuongTLCBE.Data.Entities;
+﻿using System;
+using System.Collections.Generic;
+
+namespace TuongTLCBE.Data.Entities;
 
 public partial class User
 {
     public Guid Id { get; set; }
 
-    public string Username { get; set; }
+    public string Username { get; set; } = null!;
 
     public byte[] PasswordHash { get; set; } = null!;
 
@@ -15,6 +18,10 @@ public partial class User
     public string Email { get; set; } = null!;
 
     public Guid? RoleId { get; set; }
+
+    public string? Phone { get; set; }
+
+    public DateTime? Birthday { get; set; }
 
     public virtual UserRole? Role { get; set; }
 }
