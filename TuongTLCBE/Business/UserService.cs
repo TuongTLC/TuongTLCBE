@@ -32,7 +32,12 @@ namespace TuongTLCBE.Business
             {
                 return "Duplicated username!";
             }
-
+            bool emailDup = await _userRepo.CheckEmail(reqModel.Email);
+            if (emailDup == true)
+            {
+                return "Duplicated email!";
+            }
+            
             if (reqModel.Username.Length < 6)
             {
                 return "Username length invalid!";

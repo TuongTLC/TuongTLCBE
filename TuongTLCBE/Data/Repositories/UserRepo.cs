@@ -39,6 +39,24 @@ namespace TuongTLCBE.Data.Repositories
                 return null;
             }
         }
+        public async Task<bool> CheckEmail(string email)
+        {
+            try
+            {
+                User? user = await context.Users.Where(x => x.Email.Equals(email)).FirstOrDefaultAsync();
+                if (user != null)
+                {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            catch
+            {
+                return true;
+            }
+        }
         public async Task<bool> UpdateUser(UserUpdateRequestModel userUpdateRequestModel, string username)
         {
             try
