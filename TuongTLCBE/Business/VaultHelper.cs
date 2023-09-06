@@ -32,7 +32,7 @@ namespace TuongTLCBE.Business
             catch
             {
                 var unseal = await UnsealVaultAsync();
-                if (unseal==true)
+                if (unseal == true)
                 {
                     return await GetSecrets(secretType);
                 }

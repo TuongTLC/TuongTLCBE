@@ -48,7 +48,8 @@ namespace TuongTLCBE.Data.Repositories
                 {
                     return true;
                 }
-                else {
+                else
+                {
                     return false;
                 }
             }
