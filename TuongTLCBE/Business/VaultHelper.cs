@@ -8,11 +8,14 @@ namespace TuongTLCBE.Business
 {
     public static class VaultHelper
     {
-        private static readonly string token = Environment.GetEnvironmentVariable("VaultToken", EnvironmentVariableTarget.Process)
+        private static readonly string token =
+            Environment.GetEnvironmentVariable("VaultToken", EnvironmentVariableTarget.Process)
             ?? throw new ArgumentException("Environment variable not found.");
-        private static readonly string endpoint = Environment.GetEnvironmentVariable("EndPoint", EnvironmentVariableTarget.Process)
-           ?? throw new ArgumentException("Environment variable not found.");
+        private static readonly string endpoint =
+            Environment.GetEnvironmentVariable("EndPoint", EnvironmentVariableTarget.Process)
+            ?? throw new ArgumentException("Environment variable not found.");
         private static readonly string vaultport = ":8200";
+
         public static async Task<string> GetSecrets(string secretType)
         {
             try
@@ -23,16 +26,19 @@ namespace TuongTLCBE.Business
 
                 IVaultClient vaultClient = new VaultClient(vaultClientSettings);
 
-                Secret<SecretData> kv2Secret = await vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: "tuongtlc");
+                Secret<SecretData> kv2Secret =
+                    await vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync(path: "tuongtlc");
 
-                string secret = kv2Secret.Data.Data[secretType].ToString() ?? throw new ArgumentException("Failed to retrieve secret.");
+                string secret =
+                    kv2Secret.Data.Data[secretType].ToString()
+                    ?? throw new ArgumentException("Failed to retrieve secret.");
 
                 return secret;
             }
             catch
             {
                 var unseal = await UnsealVaultAsync();
-                if (unseal==true)
+                if (unseal == true)
                 {
                     return await GetSecrets(secretType);
                 }
@@ -42,14 +48,18 @@ namespace TuongTLCBE.Business
                 }
             }
         }
+
         private static async Task<bool> UnsealVaultAsync()
         {
             var unsealEndpoint = $"{endpoint}{vaultport}/v1/sys/unseal";
             var unsealKeys = new[]
             {
-            Environment.GetEnvironmentVariable("VaultKey1", EnvironmentVariableTarget.Process) ?? throw new ArgumentException("Environment variable not found."),
-            Environment.GetEnvironmentVariable("VaultKey2", EnvironmentVariableTarget.Process) ?? throw new ArgumentException("Environment variable not found."),
-            Environment.GetEnvironmentVariable("VaultKey3", EnvironmentVariableTarget.Process) ?? throw new ArgumentException("Environment variable not found.")
+                Environment.GetEnvironmentVariable("VaultKey1", EnvironmentVariableTarget.Process)
+                    ?? throw new ArgumentException("Environment variable not found."),
+                Environment.GetEnvironmentVariable("VaultKey2", EnvironmentVariableTarget.Process)
+                    ?? throw new ArgumentException("Environment variable not found."),
+                Environment.GetEnvironmentVariable("VaultKey3", EnvironmentVariableTarget.Process)
+                    ?? throw new ArgumentException("Environment variable not found.")
             };
             bool success = false;
             foreach (var key in unsealKeys)
@@ -67,4 +77,3 @@ namespace TuongTLCBE.Business
         }
     }
 }
-

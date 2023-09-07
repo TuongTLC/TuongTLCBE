@@ -1,5 +1,4 @@
-﻿
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -24,40 +23,40 @@ builder.Services.AddSwaggerGen(option =>
 {
     option.EnableAnnotations();
 
-    option.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Version = "v1",
-        Title = "TuongTLCBE",
-        Description = "APIs for TuongTLC Website"
-    });
-
-    OpenApiSecurityScheme securityScheme = new()
-    {
-        Description = "JWT Authorization header using the Bearer scheme",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        Reference = new OpenApiReference()
+    option.SwaggerDoc(
+        "v1",
+        new OpenApiInfo
         {
-            Type = ReferenceType.SecurityScheme,
-            Id = "Bearer"
+            Version = "v1",
+            Title = "TuongTLCBE",
+            Description = "APIs for TuongTLC Website"
         }
-    };
+    );
+
+    OpenApiSecurityScheme securityScheme =
+        new()
+        {
+            Description = "JWT Authorization header using the Bearer scheme",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer",
+            BearerFormat = "JWT",
+            Reference = new OpenApiReference()
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+            }
+        };
     option.AddSecurityDefinition("Bearer", securityScheme);
 
-    option.AddSecurityRequirement(new OpenApiSecurityRequirement()
-                {
-                    {
-                        securityScheme,
-                        new string[]{ }
-                    }
-                });
-
+    option.AddSecurityRequirement(
+        new OpenApiSecurityRequirement() { { securityScheme, new string[] { } } }
+    );
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -68,27 +67,26 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidIssuer = "https://tuongtlc.ddns.net",
             ValidAudience = "https://tuongtlc.ddns.net",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
-                .GetBytes(jwtToken)),
-
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtToken)),
         };
     });
 
-builder.Services.AddDbContext<TuongTlcdbContext>(
-        options => options.UseSqlServer(dbConn));
+builder.Services.AddDbContext<TuongTlcdbContext>(options => options.UseSqlServer(dbConn));
 
-builder.Services.AddCors(p => p.AddPolicy("AllowOrigin", builder =>
-{
-    _ = builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
-}));
+builder.Services.AddCors(
+    p =>
+        p.AddPolicy(
+            "AllowOrigin",
+            builder =>
+            {
+                _ = builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+            }
+        )
+);
 
 WebApplication app = builder.Build();
 
-
-if (app.Environment.IsDevelopment())
-{
-
-}
+if (app.Environment.IsDevelopment()) { }
 
 app.UseSwagger();
 
@@ -105,4 +103,3 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-

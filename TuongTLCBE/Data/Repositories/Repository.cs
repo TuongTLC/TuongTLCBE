@@ -3,7 +3,8 @@ using TuongTLCBE.Data.Entities;
 
 namespace TuongTLCBE.Data.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T>
+        where T : class
     {
         protected readonly TuongTlcdbContext context;
         private readonly DbSet<T> _entities;
@@ -32,4 +33,3 @@ namespace TuongTLCBE.Data.Repositories
         }
     }
 }
-
