@@ -23,5 +23,11 @@ public partial class User
 
     public DateTime? Birthday { get; set; }
 
+    public bool Status { get; set; }
+
+    public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
+
+    public virtual Post? Post { get; set; }
+
     public virtual UserRole? Role { get; set; }
 }

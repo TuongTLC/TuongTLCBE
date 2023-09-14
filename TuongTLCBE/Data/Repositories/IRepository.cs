@@ -6,5 +6,7 @@
         Task<T?> Get(Guid id);
         Task<T?> Insert(T entity);
         Task Update();
+        Task<List<T>> GetList();
+        Task Delete(T entity);
     }
 }

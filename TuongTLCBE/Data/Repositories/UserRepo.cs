@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Runtime.InteropServices.ComTypes;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Models;
@@ -32,7 +33,8 @@ namespace TuongTLCBE.Data.Repositories
                                 Fullname = x.u.FullName,
                                 Email = x.u.Email,
                                 Birthday = x.u.Birthday,
-                                Phone = x.u.Phone
+                                Phone = x.u.Phone,
+                                Status = x.u.Status
                             }
                     )
                     .FirstOrDefaultAsync();
@@ -100,14 +102,13 @@ namespace TuongTLCBE.Data.Repositories
                         user.Phone = userUpdateRequestModel.Phone;
                     }
                     if (
-                        userUpdateRequestModel.Birthday != null
-                        && !userUpdateRequestModel.Birthday.Equals(user.Birthday)
+                        !userUpdateRequestModel.Birthday.Equals(user.Birthday)
                     )
                     {
                         user.Birthday = userUpdateRequestModel.Birthday;
                     }
                     _ = context.Update(user);
-                    _ = context.SaveChanges();
+                    _ = await context.SaveChangesAsync();
                     return true;
                 }
                 else
@@ -123,8 +124,8 @@ namespace TuongTLCBE.Data.Repositories
 
         public async Task<bool> UpdatePassword(
             string username,
-            byte[] PasswordHash,
-            byte[] PasswordSalt
+            byte[] passwordHash,
+            byte[] passwordSalt
         )
         {
             try
@@ -134,10 +135,10 @@ namespace TuongTLCBE.Data.Repositories
                     .FirstOrDefaultAsync();
                 if (user != null)
                 {
-                    user.PasswordHash = PasswordHash;
-                    user.PasswordSalt = PasswordSalt;
+                    user.PasswordHash = passwordHash;
+                    user.PasswordSalt = passwordSalt;
                     _ = context.Update(user);
-                    _ = context.SaveChanges();
+                    _ = await context.SaveChangesAsync();
                     return true;
                 }
                 else
@@ -149,6 +150,30 @@ namespace TuongTLCBE.Data.Repositories
             {
                 return false;
             }
+        }
+
+        public async Task<bool> ChangeAccountStatus(Guid userId, bool status)
+        {
+            try
+            {
+                User? user = await context.Users.Where(x => x.Id.Equals(userId)).FirstOrDefaultAsync();
+                if (user!= null)
+                {
+                    user.Status = status;
+                    _ = context.Update(user);
+                    _ = await context.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                
+            }
+            catch
+            {
+                return false;
+            }   
         }
     }
 }

@@ -51,7 +51,7 @@ namespace TuongTLCBE.API
         {
             string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
             object result = await _userService.UpdatePassword(request, token);
-            if (result.GetType() == typeof(bool))
+            if (result is bool)
             {
                 return (bool)result == true
                     ? Ok("Change password success.")
@@ -61,6 +61,13 @@ namespace TuongTLCBE.API
             {
                 return BadRequest(result);
             }
+        }
+        [HttpPost("change-account-status")]
+        [Authorize(Roles = " Admin")]
+        public async Task<ActionResult<object>> DisableAccount(Guid userId, bool status)
+        {
+            object result = await _userService.ChangeAccoutnStatus(userId, status);
+            return (result is bool) ? Ok("User disabled!") : BadRequest(result);
         }
     }
 }

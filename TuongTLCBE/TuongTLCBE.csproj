@@ -40,10 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data\" />
-    <Folder Include="API\" />
-    <Folder Include="Business\" />
-    <Folder Include="Data\Repositories\" />
     <Folder Include="Data\Entities\" />
-    <Folder Include="Data\Models\" />
   </ItemGroup>
 </Project>

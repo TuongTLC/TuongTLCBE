@@ -31,5 +31,18 @@ namespace TuongTLCBE.Data.Repositories
         {
             _ = await context.SaveChangesAsync();
         }
+
+        public async Task<List<T>> GetList()
+        {
+            return await _entities.ToListAsync();
+        }
+
+        public async Task Delete(T entity)
+        {
+            _ = _entities.Remove(entity);
+            await Update();
+            await context.SaveChangesAsync();
+
+        }
     }
 }

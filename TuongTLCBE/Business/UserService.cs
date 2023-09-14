@@ -30,7 +30,7 @@ namespace TuongTLCBE.Business
                 || reqModel.Email.IsNullOrEmpty()
             )
             {
-                return "Please fill-in all the informations!!";
+                return "Please fill-in all the information!!";
             }
 
             UserModel? userCheck = await _userRepo.GetUser(reqModel.Username);
@@ -39,7 +39,7 @@ namespace TuongTLCBE.Business
                 return "Duplicated username!";
             }
             bool emailDup = await _userRepo.CheckEmail(reqModel.Email);
-            if (emailDup == true)
+            if (emailDup)
             {
                 return "Duplicated email!";
             }
@@ -125,6 +125,11 @@ namespace TuongTLCBE.Business
                 {
                     return "Username or password incorrect!";
                 }
+
+                if (!user.Status)
+                {
+                    return "User account is disabled!";
+                }
                 if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
                 {
                     return "Username or password incorrect!";
@@ -171,7 +176,7 @@ namespace TuongTLCBE.Business
                 }
                 string username = _decodeToken.Decode(token, "username");
                 bool update = await _userRepo.UpdateUser(userUpdateRequestModel, username);
-                if (update == true)
+                if (update)
                 {
                     UserModel? user = await _userRepo.GetUser(username);
                     if (user != null)
@@ -251,6 +256,25 @@ namespace TuongTLCBE.Business
             }
         }
 
+        public async Task<object> ChangeAccoutnStatus(Guid userId, bool status)
+        {
+            try
+            {
+                bool result = await _userRepo.ChangeAccountStatus(userId,status);
+                if (result)
+                {
+                    return true;
+                }
+                else
+                {
+                    return "Disable account failed!";
+                }
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
         private void CreatePasswordHash(
             string password,
             out byte[] passwordHash,
@@ -262,14 +286,14 @@ namespace TuongTLCBE.Business
             passwordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         }
 
-        public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using HMACSHA512 hmac = new(passwordSalt);
             byte[] computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             return computedHash.SequenceEqual(passwordHash);
         }
 
-        public async Task<string> CreateToken(UserModel user)
+        private async Task<string> CreateToken(UserModel user)
         {
             List<Claim> claims =
                 new()
