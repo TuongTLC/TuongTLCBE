@@ -5,42 +5,42 @@ using TuongTLCBE.Data.Repositories;
 
 namespace TuongTLCBE.Business;
 
-public class CategoryService
+public class TagService
 {
-    private readonly CategoryRepo _categoryRepo;
+    private readonly TagRepo _tagRepo;
     private readonly DecodeToken _decodeToken;
 
-    public CategoryService(CategoryRepo categoryRepo, DecodeToken decodeToken)
+    public TagService(TagRepo tagRepo, DecodeToken decodeToken)
     {
-        _categoryRepo = categoryRepo;
+        _tagRepo = tagRepo;
         _decodeToken = decodeToken;
     }
 
-    public async Task<object> CreateCategory(CategoryInsertModel categoryInsertModel, string token)
+    public async Task<object> CreateTag(TagInsertModel tagInsertModel, string token)
     {
         try
         {
             string userId = _decodeToken.Decode(token, "userid");
-            if (categoryInsertModel.CategoryName.IsNullOrEmpty())
+            if (tagInsertModel.TagName.IsNullOrEmpty())
             {
-                return "Category name invalid!";
+                return "Tag name invalid!";
             }
 
-            Category insertCategory = new()
+            Tag insertTag = new()
             {
                 Id = Guid.NewGuid(),
-                CategoryName = categoryInsertModel.CategoryName,
-                Description = categoryInsertModel.Description,
+                TagName = tagInsertModel.TagName,
+                Description = tagInsertModel.Description,
                 CreatedBy = Guid.Parse(userId),
                 CreatedDate = DateTime.Now
             };
-            Category? insert = await _categoryRepo.Insert(insertCategory);
+            Tag? insert = await _tagRepo.Insert(insertTag);
             if (insert != null)
             {
-                CategoryModel res = new()
+                TagModel res = new()
                 {
                     Id = insert.Id,
-                    CategoryName = insert.CategoryName,
+                    TagName = insert.TagName,
                     Description = insert.Description,
                     CreatedBy = insert.CreatedBy,
                     CreatedDate = insert.CreatedDate,
@@ -50,7 +50,7 @@ public class CategoryService
             }
             else
             {
-                return "Create category failed!";
+                return "Create tag failed!";
             }
         }
         catch (Exception e)
@@ -58,20 +58,20 @@ public class CategoryService
             return e;
         }
     }
-    public async Task<object> UpdateCategory(CategoryUpdateModel categoryUpdateModel)
+    public async Task<object> UpdateTag(TagUpdateModel tagUpdateModel)
     {
         try
         {
-            bool update = await _categoryRepo.UpdateCategory(categoryUpdateModel);
+            bool update = await _tagRepo.UpdateTag(tagUpdateModel);
             if (update)
             {
-                Category? res = await _categoryRepo.Get(categoryUpdateModel.Id);
+                Tag? res = await _tagRepo.Get(tagUpdateModel.Id);
                 if (res != null)
                 {
-                    CategoryModel resCate = new()
+                    TagModel resCate = new()
                     {
                         Id = res.Id,
-                        CategoryName = res.CategoryName,
+                        TagName = res.TagName,
                         Description = res.Description,
                         CreatedBy = res.CreatedBy,
                         CreatedDate = res.CreatedDate,
@@ -81,12 +81,12 @@ public class CategoryService
                 }
                 else
                 {
-                    return "Failed to retrieve updated category!";
+                    return "Failed to retrieve updated tag!";
                 }
             }
             else
             {
-                return "Failed to update category!";
+                return "Failed to update tag!";
             }
         }
         catch (Exception e)
@@ -95,18 +95,18 @@ public class CategoryService
         }
     }
 
-    public async Task<object> ChangeCategoryStatus(Guid categoryId, bool status)
+    public async Task<object> ChangeTagStatus(Guid tagId, bool status)
     {
         try
         {
-            bool result = await _categoryRepo.ChangeCategoryStatus(categoryId, status);
+            bool result = await _tagRepo.ChangeTagStatus(tagId, status);
             if (result)
             {
                 return true;
             }
             else
             {
-                return "Change category status failed!";
+                return "Change tag status failed!";
             }
         }
         catch (Exception e)
@@ -114,26 +114,26 @@ public class CategoryService
             return e;
         }
     }
-    public async Task<object> DeleteCategory(Guid categoryId)
+    public async Task<object> DeleteTag(Guid tagId)
     {
         try
         {
-            Category? getCate = await _categoryRepo.Get(categoryId);
+            Tag? getCate = await _tagRepo.Get(tagId);
             if (getCate != null)
             {
-                int result = await _categoryRepo.Delete(getCate);
+                int result = await _tagRepo.Delete(getCate);
                 if (result>0)
                 {
                     return true;
                 }
                 else
                 {
-                    return "Delete category failed!";
+                    return "Delete tag failed!";
                 }
             }
             else
             {
-                return "Category not exist!";
+                return "Tag not exist!";
             }
         }
         catch (Exception e)
@@ -142,18 +142,18 @@ public class CategoryService
         }
     }
 
-    public async Task<object> GetACategory(Guid categoryId)
+    public async Task<object> GetATag(Guid tagId)
     {
         try
         {
-            CategoryModel? categoryModel = await _categoryRepo.GetACategory(categoryId);
-            if (categoryModel != null)
+            TagModel? tagModel = await _tagRepo.GetATag(tagId);
+            if (tagModel != null)
             {
-                return categoryModel;
+                return tagModel;
             }
             else
             {
-                return "Category not found!";
+                return "Tag not found!";
             }
         }
         catch (Exception e)
@@ -161,14 +161,14 @@ public class CategoryService
             return e;
         }
     }
-    public async Task<object> GetCategories(string? status)
+    public async Task<object> GetTags(string? status)
     {
         try
         {
-            List<CategoryModel>? categoryModel = await _categoryRepo.GetCategories(status);
-            if (categoryModel != null)
+            List<TagModel>? tagModel = await _tagRepo.GetTags(status);
+            if (tagModel != null)
             {
-                return categoryModel;
+                return tagModel;
             }
             else
             {

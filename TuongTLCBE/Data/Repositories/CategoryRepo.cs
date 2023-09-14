@@ -57,7 +57,6 @@ public class CategoryRepo: Repository<Category>
             return false;
         }
     }
-
     public async Task<CategoryModel?> GetACategory(Guid categoryId)
     {
         try
@@ -120,7 +119,8 @@ public class CategoryRepo: Repository<Category>
                     CategoryName = x.c.CategoryName,
                     Description = x.c.Description,
                     CreatedBy = x.c.CreatedBy,
-                    CreatedDate = x.c.CreatedDate
+                    CreatedDate = x.c.CreatedDate,
+                    Status = x.c.Status
                 }).ToListAsync();
                 return categoryModel;
             }
