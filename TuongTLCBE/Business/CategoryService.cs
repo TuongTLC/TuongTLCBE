@@ -20,7 +20,7 @@ public class CategoryService
     {
         try
         {
-            string userID = _decodeToken.Decode(token, "userid");
+            string userId = _decodeToken.Decode(token, "userid");
             if (categoryInsertModel.CategoryName.IsNullOrEmpty())
             {
                 return "Category name invalid!";
@@ -31,7 +31,7 @@ public class CategoryService
                 Id = Guid.NewGuid(),
                 CategoryName = categoryInsertModel.CategoryName,
                 Description = categoryInsertModel.Description,
-                CreatedBy = Guid.Parse(userID),
+                CreatedBy = Guid.Parse(userId),
                 CreatedDate = DateTime.Now
             };
             Category? insert = await _categoryRepo.Insert(insertCategory);
@@ -57,39 +57,6 @@ public class CategoryService
             return e;
         }
     }
-    public async Task<object> GetCategories()
-    {
-        try
-        {
-            var categoryList = await _categoryRepo.GetList();
-            if (categoryList.Any())
-            {
-                List<CategoryModel> resList = new();
-                foreach (var cate in categoryList)
-                { 
-                    CategoryModel resCate = new()
-                    {
-                        Id = cate.Id,
-                        CategoryName = cate.CategoryName,
-                        Description = cate.Description,
-                        CreatedBy = cate.CreatedBy,
-                        CreatedDate = cate.CreatedDate
-                    };
-                    resList.Add(resCate);
-                } 
-                return resList;
-            }
-            else
-            {
-                return "Get list categories failed!";
-            }
-        }
-        catch (Exception e)
-        {
-            return e;
-        }
-    }
-
     public async Task<object> UpdateCategory(CategoryUpdateModel categoryUpdateModel)
     {
         try
@@ -118,6 +85,92 @@ public class CategoryService
             else
             {
                 return "Failed to update category!";
+            }
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+
+    public async Task<object> ChangeCategoryStatus(Guid categoryId, bool status)
+    {
+        try
+        {
+            bool result = await _categoryRepo.ChangeCategoryStatus(categoryId, status);
+            if (result)
+            {
+                return true;
+            }
+            else
+            {
+                return "Change category status failed!";
+            }
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+    public async Task<object> DeleteCategory(Guid categoryId)
+    {
+        try
+        {
+            Category? getCate = await _categoryRepo.Get(categoryId);
+            if (getCate != null)
+            {
+                int result = await _categoryRepo.Delete(getCate);
+                if (result>0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return "Delete category failed!";
+                }
+            }
+            else
+            {
+                return "Category not exist!";
+            }
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+
+    public async Task<object> GetACategory(Guid categoryId)
+    {
+        try
+        {
+            CategoryModel? categoryModel = await _categoryRepo.GetACategory(categoryId);
+            if (categoryModel != null)
+            {
+                return categoryModel;
+            }
+            else
+            {
+                return "Category not found!";
+            }
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+    public async Task<object> GetCategories(string? status)
+    {
+        try
+        {
+            List<CategoryModel>? categoryModel = await _categoryRepo.GetCategories(status);
+            if (categoryModel != null)
+            {
+                return categoryModel;
+            }
+            else
+            {
+                return "Error while getting categories!";
             }
         }
         catch (Exception e)

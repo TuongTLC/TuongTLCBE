@@ -11,7 +11,39 @@ namespace TuongTLCBE.Data.Repositories
         public UserRepo(TuongTlcdbContext context)
             : base(context) { }
 
-        public async Task<UserModel?> GetUser(string username)
+        public async Task<UserInfoModel?> GetUserInfo(Guid userId)
+        {
+            try
+            {
+                var query =
+                    from u in context.Users
+                    join ur in context.UserRoles on u.RoleId equals ur.Id
+                    where u.Id.Equals(userId)
+                    select new { u, ur };
+                UserInfoModel? userModel = await query
+                    .Select(
+                        x =>
+                            new UserInfoModel()
+                            {
+                                Id = x.u.Id,
+                                Username = x.u.Username,
+                                RoleName = x.ur.RoleName,
+                                Fullname = x.u.FullName,
+                                Email = x.u.Email,
+                                Birthday = x.u.Birthday,
+                                Phone = x.u.Phone,
+                                Status = x.u.Status
+                            }
+                    )
+                    .FirstOrDefaultAsync();
+                return userModel;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        public async Task<UserModel?> GetUserByUsername(string username)
         {
             try
             {
@@ -46,6 +78,74 @@ namespace TuongTLCBE.Data.Repositories
             }
         }
 
+        public async Task<List<UserInfoModel>> GetUsers(string? status)
+        {
+            try
+            {
+                if (!status.IsNullOrEmpty())
+                {
+                    bool statusIn = true;
+                    if (status != null && status.Equals("active"))
+                    {
+                        statusIn = true;
+                    }
+                    if (status != null && status.Equals("inactive"))
+                    {
+                        statusIn = false;
+                    }
+                    var query =
+                        from u in context.Users
+                        join ur in context.UserRoles on u.RoleId equals ur.Id
+                        where u.Status.Equals(statusIn)
+                        select new { u, ur };
+                    List<UserInfoModel> userModel = await query
+                        .Select(
+                            x =>
+                                new UserInfoModel()
+                                {
+                                    Id = x.u.Id,
+                                    Username = x.u.Username,
+                                    RoleName = x.ur.RoleName,
+                                    Fullname = x.u.FullName,
+                                    Email = x.u.Email,
+                                    Birthday = x.u.Birthday,
+                                    Phone = x.u.Phone,
+                                    Status = x.u.Status
+                                }
+                        )
+                        .ToListAsync();
+                    return userModel;
+                }
+                else
+                {
+                    var query =
+                        from u in context.Users
+                        join ur in context.UserRoles on u.RoleId equals ur.Id
+                        select new { u, ur };
+                    List<UserInfoModel> userModel = await query
+                        .Select(
+                            x =>
+                                new UserInfoModel()
+                                {
+                                    Id = x.u.Id,
+                                    Username = x.u.Username,
+                                    RoleName = x.ur.RoleName,
+                                    Fullname = x.u.FullName,
+                                    Email = x.u.Email,
+                                    Birthday = x.u.Birthday,
+                                    Phone = x.u.Phone,
+                                    Status = x.u.Status
+                                }
+                        )
+                        .ToListAsync();
+                    return userModel;
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
         public async Task<bool> CheckEmail(string email)
         {
             try
@@ -107,7 +207,6 @@ namespace TuongTLCBE.Data.Repositories
                     {
                         user.Birthday = userUpdateRequestModel.Birthday;
                     }
-                    _ = context.Update(user);
                     _ = await context.SaveChangesAsync();
                     return true;
                 }
@@ -137,7 +236,6 @@ namespace TuongTLCBE.Data.Repositories
                 {
                     user.PasswordHash = passwordHash;
                     user.PasswordSalt = passwordSalt;
-                    _ = context.Update(user);
                     _ = await context.SaveChangesAsync();
                     return true;
                 }
@@ -160,7 +258,6 @@ namespace TuongTLCBE.Data.Repositories
                 if (user!= null)
                 {
                     user.Status = status;
-                    _ = context.Update(user);
                     _ = await context.SaveChangesAsync();
                     return true;
                 }
@@ -175,5 +272,6 @@ namespace TuongTLCBE.Data.Repositories
                 return false;
             }   
         }
+        
     }
 }

@@ -39,7 +39,9 @@ public partial class TuongTlcdbContext : DbContext
             entity.Property(e => e.CategoryName).HasMaxLength(200);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasDefaultValueSql("((1))");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Categories)
                 .HasForeignKey(d => d.CreatedBy)
@@ -62,7 +64,6 @@ public partial class TuongTlcdbContext : DbContext
             entity.Property(e => e.Dislike).HasDefaultValueSql("((0))");
             entity.Property(e => e.Like).HasDefaultValueSql("((0))");
             entity.Property(e => e.PostName).HasMaxLength(200);
-            entity.Property(e => e.Status).HasDefaultValueSql("((0))");
             entity.Property(e => e.Sumary).HasMaxLength(200);
             entity.Property(e => e.Thumbnail).HasMaxLength(2048);
 
@@ -129,7 +130,9 @@ public partial class TuongTlcdbContext : DbContext
                 .HasColumnName("ID");
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasDefaultValueSql("((1))");
             entity.Property(e => e.TagName).HasMaxLength(200);
         });
 

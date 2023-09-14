@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TuongTLCBE.Data.Entities;
+using TuongTLCBE.Data.Models;
 
 namespace TuongTLCBE.Data.Repositories
 {
@@ -23,25 +24,13 @@ namespace TuongTLCBE.Data.Repositories
         public async Task<T?> Insert(T entity)
         {
             _ = await _entities.AddAsync(entity);
-            await Update();
+            await context.SaveChangesAsync();
             return entity;
         }
-
-        public async Task Update()
-        {
-            _ = await context.SaveChangesAsync();
-        }
-
-        public async Task<List<T>> GetList()
-        {
-            return await _entities.ToListAsync();
-        }
-
-        public async Task Delete(T entity)
+        public async Task<int> Delete(T entity)
         {
             _ = _entities.Remove(entity);
-            await Update();
-            await context.SaveChangesAsync();
+            return await context.SaveChangesAsync();
 
         }
     }

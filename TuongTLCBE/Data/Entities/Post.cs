@@ -21,7 +21,7 @@ public partial class Post
 
     public string? Thumbnail { get; set; }
 
-    public bool? Status { get; set; }
+    public bool Status { get; set; }
 
     public virtual User AuthorNavigation { get; set; } = null!;
 

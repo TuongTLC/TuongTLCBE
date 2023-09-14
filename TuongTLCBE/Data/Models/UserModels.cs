@@ -44,12 +44,15 @@ namespace TuongTLCBE.Data.Models
 
     public class UserInfoModel
     {
+        public Guid Id { get; set; }
         public string Username { get; set; }
         public string RoleName { get; set; }
         public string Fullname { get; set; }
         public string Email { get; set; }
         public DateTime? Birthday { get; set; }
         public string? Phone { get; set; }
+        
+        public bool Status { get; set; }
     }
 
     public class UserLoginResponseModel

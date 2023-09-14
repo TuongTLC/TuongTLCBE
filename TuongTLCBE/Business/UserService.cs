@@ -21,6 +21,47 @@ namespace TuongTLCBE.Business
             _userRepo = userRepo;
         }
 
+        public async Task<object> GetUser(Guid userId)
+        {
+            try
+            {
+                User? user = await _userRepo.Get(userId);
+                if (user!= null)
+                {
+                    UserInfoModel userInfoModel = await _userRepo.GetUserInfo(userId);
+                    if (userInfoModel != null)
+                    {
+                        return userInfoModel;
+                    }
+                    else
+                    {
+                        return "Get user failed!";
+                    }
+                }
+                else
+                {
+                    return "User not exist!";
+                }
+                
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
+        public async Task<object> GetUsers(string? status)
+        {
+            try
+            {
+                List<UserInfoModel> users = await _userRepo.GetUsers(status);
+                return users;
+
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
         public async Task<object> Register(UserRegisterRequestModel reqModel)
         {
             if (
@@ -33,7 +74,7 @@ namespace TuongTLCBE.Business
                 return "Please fill-in all the information!!";
             }
 
-            UserModel? userCheck = await _userRepo.GetUser(reqModel.Username);
+            UserModel? userCheck = await _userRepo.GetUserByUsername(reqModel.Username);
             if (userCheck != null)
             {
                 return "Duplicated username!";
@@ -85,18 +126,20 @@ namespace TuongTLCBE.Business
                 User? userInsert = await _userRepo.Insert(userModel);
                 if (userInsert != null)
                 {
-                    UserModel? user = await _userRepo.GetUser(userInsert.Username);
+                    UserModel? user = await _userRepo.GetUserByUsername(userInsert.Username);
                     if (user != null)
                     {
                         UserInfoModel userLoginModel =
                             new()
                             {
+                                Id = user.Id,
                                 Username = user.Username,
                                 RoleName = user.RoleName,
                                 Fullname = user.Fullname,
                                 Email = user.Email,
                                 Birthday = user.Birthday,
-                                Phone = user.Phone
+                                Phone = user.Phone,
+                                Status = user.Status
                             };
                         return userLoginModel;
                     }
@@ -120,7 +163,7 @@ namespace TuongTLCBE.Business
         {
             try
             {
-                UserModel? user = await _userRepo.GetUser(request.Username);
+                UserModel? user = await _userRepo.GetUserByUsername(request.Username);
                 if (user == null)
                 {
                     return "Username or password incorrect!";
@@ -138,12 +181,14 @@ namespace TuongTLCBE.Business
                 UserInfoModel userLoginModel =
                     new()
                     {
+                        Id = user.Id,
                         Username = user.Username,
                         RoleName = user.RoleName,
                         Fullname = user.Fullname,
                         Email = user.Email,
                         Birthday = user.Birthday,
-                        Phone = user.Phone
+                        Phone = user.Phone,
+                        Status = user.Status
                     };
                 UserLoginResponseModel userLoginResModel =
                     new() { Token = token, UserInfo = userLoginModel };
@@ -178,18 +223,20 @@ namespace TuongTLCBE.Business
                 bool update = await _userRepo.UpdateUser(userUpdateRequestModel, username);
                 if (update)
                 {
-                    UserModel? user = await _userRepo.GetUser(username);
+                    UserModel? user = await _userRepo.GetUserByUsername(username);
                     if (user != null)
                     {
                         UserInfoModel userInfoModel =
                             new()
                             {
+                                Id = user.Id,
                                 Username = user.Username,
                                 RoleName = user.RoleName,
                                 Fullname = user.Fullname,
                                 Email = user.Email,
                                 Birthday = user.Birthday,
-                                Phone = user.Phone
+                                Phone = user.Phone,
+                                Status = user.Status
                             };
                         return userInfoModel;
                     }
@@ -217,7 +264,7 @@ namespace TuongTLCBE.Business
             try
             {
                 string username = _decodeToken.Decode(token, "username");
-                UserModel? user = await _userRepo.GetUser(passwordRequestModel.Username);
+                UserModel? user = await _userRepo.GetUserByUsername(passwordRequestModel.Username);
                 if (user == null || !username.Equals(user.Username))
                 {
                     return "Username or password incorrect!";
@@ -256,7 +303,7 @@ namespace TuongTLCBE.Business
             }
         }
 
-        public async Task<object> ChangeAccoutnStatus(Guid userId, bool status)
+        public async Task<object> ChangeAccountStatus(Guid userId, bool status)
         {
             try
             {
@@ -267,7 +314,35 @@ namespace TuongTLCBE.Business
                 }
                 else
                 {
-                    return "Disable account failed!";
+                    return "Change account status failed!";
+                }
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
+
+        public async Task<object> DeleteAccount(Guid userId)
+        {
+            try
+            {
+                User? user = await _userRepo.Get(userId);
+                if (user != null)
+                {
+                    int deleteResult = await _userRepo.Delete(user);
+                    if (deleteResult >0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return "Delete user failed!";
+                    }
+                }
+                else
+                {
+                    return "User does not exist!";
                 }
             }
             catch (Exception e)

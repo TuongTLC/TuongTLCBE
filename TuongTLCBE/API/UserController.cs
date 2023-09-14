@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using TuongTLCBE.Business;
 using TuongTLCBE.Data.Models;
 
@@ -35,6 +36,7 @@ namespace TuongTLCBE.API
         }
 
         [HttpPost("update")]
+        [SwaggerOperation(Summary = "Update user information except password")]
         [Authorize(Roles = "User, Admin")]
         public async Task<ActionResult<object>> Update(UserUpdateRequestModel request)
         {
@@ -44,6 +46,7 @@ namespace TuongTLCBE.API
         }
 
         [HttpPost("change-password")]
+        [SwaggerOperation(Summary = "Change user password")]
         [Authorize(Roles = "User, Admin")]
         public async Task<ActionResult<object>> ChangePassword(
             UserChangePasswordRequestModel request
@@ -63,11 +66,38 @@ namespace TuongTLCBE.API
             }
         }
         [HttpPost("change-account-status")]
-        [Authorize(Roles = " Admin")]
+        [SwaggerOperation(Summary = "Admin ban/unban account")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<object>> DisableAccount(Guid userId, bool status)
         {
-            object result = await _userService.ChangeAccoutnStatus(userId, status);
+            object result = await _userService.ChangeAccountStatus(userId, status);
             return (result is bool) ? Ok("User disabled!") : BadRequest(result);
         }
+        [HttpGet("get-user")]
+        [SwaggerOperation(Summary = "Admin get a account")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<object>> GetUser(Guid userId)
+        {
+            object result = await _userService.GetUser(userId);
+            return (result.GetType() == typeof(UserInfoModel)) ? Ok(result) : BadRequest(result);
+        }
+        [HttpGet("get-users")]
+        
+        [SwaggerOperation(Summary = "Admin get account by status: active/inactive/all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<object>> GetUsers(string? status)
+        {
+            object result = await _userService.GetUsers(status);
+            return (result.GetType() == typeof(UserModel)) ? Ok(result) : BadRequest(result);
+        }
+        [HttpDelete("delete-account")]
+        [SwaggerOperation(Summary = "Admin delete account")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<object>> DeleteAccount(Guid userId)
+        {
+            object result = await _userService.DeleteAccount(userId);
+            return (result is bool) ? Ok("User account deleted!") : BadRequest(result);
+        }
+
     }
 }
