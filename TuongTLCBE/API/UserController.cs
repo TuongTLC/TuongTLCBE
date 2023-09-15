@@ -56,7 +56,7 @@ namespace TuongTLCBE.API
             object result = await _userService.UpdatePassword(request, token);
             if (result is bool)
             {
-                return (bool)result == true
+                return (bool)result
                     ? Ok("Change password success.")
                     : BadRequest("Change password failed.");
             }

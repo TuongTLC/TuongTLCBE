@@ -28,7 +28,7 @@ namespace TuongTLCBE.Business
                 User? user = await _userRepo.Get(userId);
                 if (user!= null)
                 {
-                    UserInfoModel userInfoModel = await _userRepo.GetUserInfo(userId);
+                    UserInfoModel? userInfoModel = await _userRepo.GetUserInfo(userId);
                     if (userInfoModel != null)
                     {
                         return userInfoModel;

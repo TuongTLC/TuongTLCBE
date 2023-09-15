@@ -8,21 +8,22 @@ namespace TuongTLCBE.Business
 {
     public static class VaultHelper
     {
-        private static readonly string token =
+        private static readonly string Token =
             Environment.GetEnvironmentVariable("VaultToken", EnvironmentVariableTarget.Process)
             ?? throw new ArgumentException("Environment variable not found.");
-        private static readonly string endpoint =
+        private static readonly string Endpoint =
             Environment.GetEnvironmentVariable("EndPoint", EnvironmentVariableTarget.Process)
             ?? throw new ArgumentException("Environment variable not found.");
-        private static readonly string vaultport = ":8200";
+
+        private const string VaultPort = ":8200";
 
         public static async Task<string> GetSecrets(string secretType)
         {
             try
             {
-                IAuthMethodInfo authMethod = new TokenAuthMethodInfo(token);
+                IAuthMethodInfo authMethod = new TokenAuthMethodInfo(Token);
 
-                VaultClientSettings vaultClientSettings = new(endpoint + vaultport, authMethod);
+                VaultClientSettings vaultClientSettings = new(Endpoint + VaultPort, authMethod);
 
                 IVaultClient vaultClient = new VaultClient(vaultClientSettings);
 
@@ -38,7 +39,7 @@ namespace TuongTLCBE.Business
             catch
             {
                 var unseal = await UnsealVaultAsync();
-                if (unseal == true)
+                if (unseal)
                 {
                     return await GetSecrets(secretType);
                 }
@@ -51,7 +52,7 @@ namespace TuongTLCBE.Business
 
         private static async Task<bool> UnsealVaultAsync()
         {
-            var unsealEndpoint = $"{endpoint}{vaultport}/v1/sys/unseal";
+            var unsealEndpoint = $"{Endpoint}{VaultPort}/v1/sys/unseal";
             var unsealKeys = new[]
             {
                 Environment.GetEnvironmentVariable("VaultKey1", EnvironmentVariableTarget.Process)
