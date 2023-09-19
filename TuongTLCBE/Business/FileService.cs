@@ -103,14 +103,14 @@ public class FileService
         try
         {
             string userid = _decodeToken.Decode(token, "userid");
-            string deletePath = "https://tuongtlc.ddns.net:8080/FileStorage/Pictures/"+userid;
+            string deletePath = "https://tuongtlc.ddns.net:8080/FileStorage/Pictures/"+userid+"/";
             int startIndex = imgUrl.IndexOf(deletePath, StringComparison.Ordinal);
 
             if (startIndex >= 0)
             {
                 int length = deletePath.Length;
                 string output =  imgUrl.Remove(startIndex, length) ;
-                string filePath = @"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\" + userid + output;
+                string filePath = @"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\" + userid + "\\" + output;
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
