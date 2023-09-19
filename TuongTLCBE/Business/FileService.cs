@@ -41,7 +41,7 @@ public class FileService
                 string urlPath = Endpoint + ":8080/FileStorage/Pictures/";
                 Guid id = Guid.NewGuid();
                 string filename = id + Path.GetExtension(file.FileName);
-                urls.Add( urlPath + userId + filename);
+                urls.Add( urlPath + userId +"/"+ filename);
                 bool checkFolder = System.IO.Directory.Exists(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\"+userId);
                 if (!checkFolder)
                 {
@@ -52,7 +52,7 @@ public class FileService
                 FileUpload fileIn = new()
                 {
                     Id = id,
-                    Path = urlPath + userId + filename,
+                    Path = urlPath + userId + "/" + filename,
                     UploadedBy = Guid.Parse(userId)
                 };
                 _ = await _fileRepo.Insert(fileIn);
