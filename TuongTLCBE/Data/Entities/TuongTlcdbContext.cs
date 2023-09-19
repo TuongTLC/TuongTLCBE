@@ -13,6 +13,8 @@ public partial class TuongTlcdbContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
 
+    public virtual DbSet<FileUpload> FileUploads { get; set; }
+
     public virtual DbSet<Post> Posts { get; set; }
 
     public virtual DbSet<PostCategory> PostCategories { get; set; }
@@ -45,6 +47,22 @@ public partial class TuongTlcdbContext : DbContext
                 .HasForeignKey(d => d.CreatedBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Category_User_ID_fk");
+        });
+
+        modelBuilder.Entity<FileUpload>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("File_pk");
+
+            entity.ToTable("FileUpload");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("(newid())")
+                .HasColumnName("ID");
+            entity.Property(e => e.Path).HasMaxLength(2048);
+
+            entity.HasOne(d => d.UploadedByNavigation).WithMany(p => p.FileUploads)
+                .HasForeignKey(d => d.UploadedBy)
+                .HasConstraintName("File_User_ID_fk");
         });
 
         modelBuilder.Entity<Post>(entity =>

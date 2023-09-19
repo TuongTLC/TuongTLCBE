@@ -20,12 +20,14 @@ builder.Services.AddScoped<PostCategoryService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<DecodeToken>();
 builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<FileService>();
 builder.Services.AddTransient<UserRepo>();
 builder.Services.AddTransient<CategoryRepo>();
 builder.Services.AddTransient<TagRepo>();
 builder.Services.AddTransient<PostCategoryRepo>();
 builder.Services.AddTransient<PostTagRepo>();
 builder.Services.AddTransient<PostRepo>();
+builder.Services.AddTransient<FileRepo>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(option =>
