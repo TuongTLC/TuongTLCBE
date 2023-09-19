@@ -41,13 +41,18 @@ public class FileService
                 string urlPath = Endpoint + ":8080/FileStorage/Pictures/";
                 Guid id = Guid.NewGuid();
                 string filename = id + Path.GetExtension(file.FileName);
-                urls.Add( urlPath + filename);
+                urls.Add( urlPath + userId + filename);
+                bool checkFolder = System.IO.Directory.Exists(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\"+userId);
+                if (!checkFolder)
+                {
+                    System.IO.Directory.CreateDirectory(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\"+userId);
+                }
                 string desPath = Path.Combine(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures", userId, filename);
                 await file.CopyToAsync(new FileStream(desPath, FileMode.Create));
                 FileUpload fileIn = new()
                 {
                     Id = id,
-                    Path = urlPath + filename,
+                    Path = urlPath + userId + filename,
                     UploadedBy = Guid.Parse(userId)
                 };
                 _ = await _fileRepo.Insert(fileIn);
@@ -104,8 +109,8 @@ public class FileService
             if (startIndex >= 0)
             {
                 int length = deletePath.Length;
-                string output = imgUrl.Remove(startIndex, length);
-                string filePath = @"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\"+userid + output;
+                string output =  imgUrl.Remove(startIndex, length) ;
+                string filePath = @"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\" + userid + output;
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
