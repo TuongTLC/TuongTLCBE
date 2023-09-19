@@ -57,8 +57,7 @@ public class FileService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            return e;
         }
     }
 

@@ -22,7 +22,7 @@ public class FileController : ControllerBase
     public async Task<IActionResult> UploadFile(List<IFormFile> files)
     {
         string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        object result = await _fileService.UploadFile(files,token);
+        object result = await _fileService.UploadFile(files, token);
         return result.GetType() == typeof(List<string>) ? Ok(result) : BadRequest(result);
     }
     [HttpGet("get-files")]
