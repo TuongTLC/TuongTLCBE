@@ -52,12 +52,11 @@ public class FileService
                 };
                 _ = await _fileRepo.Insert(fileIn);
             }
-
             return urls;
         }
         catch (Exception e)
         {
-            return e;
+            return e.ToString();
         }
     }
 
