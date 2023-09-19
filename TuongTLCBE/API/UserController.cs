@@ -87,8 +87,8 @@ namespace TuongTLCBE.API
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<object>> GetUsers(string? status)
         {
-            object result = await _userService.GetUsers(status);
-            return (result.GetType() == typeof(UserModel)) ? Ok(result) : BadRequest(result);
+            object? result = await _userService.GetUsers(status);
+            return (result?.GetType() == typeof(UserModel)) ? Ok(result) : BadRequest(result);
         }
         [HttpDelete("delete-account")]
         [SwaggerOperation(Summary = "Admin delete account")]

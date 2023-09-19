@@ -13,7 +13,7 @@ namespace TuongTLCBE.Data.Models
         public string Email { get; set; }
         public DateTime? Birthday { get; set; }
         public string? Phone { get; set; }
-        public bool Status { get; set; }
+        public bool? Status { get; set; }
     }
 
     public class UserRegisterRequestModel
@@ -52,7 +52,7 @@ namespace TuongTLCBE.Data.Models
         public DateTime? Birthday { get; set; }
         public string? Phone { get; set; }
         
-        public bool Status { get; set; }
+        public bool? Status { get; set; }
     }
 
     public class UserLoginResponseModel

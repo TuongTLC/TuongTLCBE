@@ -15,7 +15,7 @@ public partial class Category
 
     public DateTime CreatedDate { get; set; }
 
-    public bool Status { get; set; }
+    public bool? Status { get; set; }
 
     public virtual User CreatedByNavigation { get; set; } = null!;
 

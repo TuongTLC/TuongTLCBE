@@ -87,11 +87,11 @@ public class CategoryRepo: Repository<Category>
             if (!status.IsNullOrEmpty())
             {
                 bool statusIn = true;
-                if (status != null && status.Equals("active"))
+                if (status != null && status.Trim().ToLower().Equals("active"))
                 {
                     statusIn = true;
                 }
-                if (status != null && status.Equals("inactive"))
+                if (status != null && status.Trim().ToLower().Equals("inactive"))
                 {
                     statusIn = false;
                 }

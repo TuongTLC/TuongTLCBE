@@ -9,7 +9,7 @@ public partial class Post
 
     public string PostName { get; set; } = null!;
 
-    public string? Sumary { get; set; }
+    public string? Summary { get; set; }
 
     public DateTime CreateDate { get; set; }
 
@@ -22,6 +22,8 @@ public partial class Post
     public string? Thumbnail { get; set; }
 
     public bool Status { get; set; }
+
+    public string Content { get; set; } = null!;
 
     public virtual User AuthorNavigation { get; set; } = null!;
 

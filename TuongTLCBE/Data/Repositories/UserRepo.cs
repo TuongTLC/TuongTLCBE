@@ -78,7 +78,7 @@ namespace TuongTLCBE.Data.Repositories
             }
         }
 
-        public async Task<List<UserInfoModel>> GetUsers(string? status)
+        public async Task<List<UserInfoModel>?> GetUsers(string? status)
         {
             try
             {
@@ -141,7 +141,7 @@ namespace TuongTLCBE.Data.Repositories
                     return userModel;
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 return null;
             }

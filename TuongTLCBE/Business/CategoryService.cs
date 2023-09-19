@@ -136,9 +136,9 @@ public class CategoryService
                 return "Category not exist!";
             }
         }
-        catch (Exception e)
+        catch
         {
-            return e;
+            return "Category still in use!";
         }
     }
 

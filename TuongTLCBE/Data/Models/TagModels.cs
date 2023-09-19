@@ -12,7 +12,7 @@ public class TagModel
 
     public DateTime CreatedDate { get; set; }
     
-    public bool Status { get; set; }
+    public bool? Status { get; set; }
 }
 public class TagInsertModel
 {
@@ -27,4 +27,10 @@ public class TagUpdateModel
     public string TagName { get; set; } = null!;
 
     public string? Description { get; set; }
+}
+
+public class PostTagRequestModel
+{
+    public Guid PostId { get; set; }
+    public List<Guid> TagsIds { get; set; }
 }

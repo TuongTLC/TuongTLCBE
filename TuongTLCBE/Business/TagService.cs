@@ -136,9 +136,9 @@ public class TagService
                 return "Tag not exist!";
             }
         }
-        catch (Exception e)
+        catch
         {
-            return e;
+            return "Tag still in use!";
         }
     }
 

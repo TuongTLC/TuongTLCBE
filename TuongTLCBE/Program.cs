@@ -16,11 +16,16 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<PostCategoryService>();
 builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<DecodeToken>();
+builder.Services.AddScoped<PostService>();
 builder.Services.AddTransient<UserRepo>();
 builder.Services.AddTransient<CategoryRepo>();
 builder.Services.AddTransient<TagRepo>();
+builder.Services.AddTransient<PostCategoryRepo>();
+builder.Services.AddTransient<PostTagRepo>();
+builder.Services.AddTransient<PostRepo>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(option =>
@@ -81,9 +86,9 @@ builder.Services.AddCors(
     p =>
         p.AddPolicy(
             "AllowOrigin",
-            builder =>
+            policyBuilder =>
             {
-                _ = builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+                _ = policyBuilder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
             }
         )
 );

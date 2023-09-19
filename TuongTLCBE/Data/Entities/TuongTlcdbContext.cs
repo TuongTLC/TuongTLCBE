@@ -39,9 +39,7 @@ public partial class TuongTlcdbContext : DbContext
             entity.Property(e => e.CategoryName).HasMaxLength(200);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.Status)
-                .IsRequired()
-                .HasDefaultValueSql("((1))");
+            entity.Property(e => e.Status).HasDefaultValueSql("((1))");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.Categories)
                 .HasForeignKey(d => d.CreatedBy)
@@ -55,8 +53,6 @@ public partial class TuongTlcdbContext : DbContext
 
             entity.ToTable("Post");
 
-            entity.HasIndex(e => e.Author, "Post_pk2").IsUnique();
-
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("ID");
@@ -64,11 +60,11 @@ public partial class TuongTlcdbContext : DbContext
             entity.Property(e => e.Dislike).HasDefaultValueSql("((0))");
             entity.Property(e => e.Like).HasDefaultValueSql("((0))");
             entity.Property(e => e.PostName).HasMaxLength(200);
-            entity.Property(e => e.Sumary).HasMaxLength(200);
+            entity.Property(e => e.Summary).HasMaxLength(200);
             entity.Property(e => e.Thumbnail).HasMaxLength(2048);
 
-            entity.HasOne(d => d.AuthorNavigation).WithOne(p => p.Post)
-                .HasForeignKey<Post>(d => d.Author)
+            entity.HasOne(d => d.AuthorNavigation).WithMany(p => p.Posts)
+                .HasForeignKey(d => d.Author)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Post_User_ID_fk");
         });
@@ -130,9 +126,7 @@ public partial class TuongTlcdbContext : DbContext
                 .HasColumnName("ID");
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.Status)
-                .IsRequired()
-                .HasDefaultValueSql("((1))");
+            entity.Property(e => e.Status).HasDefaultValueSql("((1))");
             entity.Property(e => e.TagName).HasMaxLength(200);
         });
 

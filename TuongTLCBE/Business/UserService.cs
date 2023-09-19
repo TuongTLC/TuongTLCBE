@@ -49,15 +49,15 @@ namespace TuongTLCBE.Business
                 return e;
             }
         }
-        public async Task<object> GetUsers(string? status)
+        public async Task<object?> GetUsers(string? status)
         {
             try
             {
-                List<UserInfoModel> users = await _userRepo.GetUsers(status);
+                List<UserInfoModel>? users = await _userRepo.GetUsers(status);
                 return users;
 
             }
-            catch (Exception e)
+            catch (Exception? e)
             {
                 return e;
             }
@@ -169,7 +169,7 @@ namespace TuongTLCBE.Business
                     return "Username or password incorrect!";
                 }
 
-                if (!user.Status)
+                if (user.Status ==null)
                 {
                     return "User account is disabled!";
                 }

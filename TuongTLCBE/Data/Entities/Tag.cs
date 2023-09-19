@@ -15,7 +15,7 @@ public partial class Tag
 
     public DateTime CreatedDate { get; set; }
 
-    public bool Status { get; set; }
+    public bool? Status { get; set; }
 
     public virtual ICollection<PostTag> PostTags { get; set; } = new List<PostTag>();
 }
