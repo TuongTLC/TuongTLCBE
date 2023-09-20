@@ -41,6 +41,13 @@ public class FileController : ControllerBase
     {
         string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
         object result = await _fileService.DeleteFile(fileUrl,token);
-        return result.GetType() == typeof(List<string>) ? Ok(result) : BadRequest(result);
+        if (result is bool)
+        {
+            return (bool)result ? Ok(result) : BadRequest(result);
+        }
+        else
+        {
+            return BadRequest(result);
+        }
     }
 }
