@@ -42,10 +42,10 @@ public class FileService
                 Guid id = Guid.NewGuid();
                 string filename = id + Path.GetExtension(file.FileName);
                 urls.Add( urlPath + userId +"/"+ filename);
-                bool checkFolder = System.IO.Directory.Exists(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\"+userId);
+                bool checkFolder = Directory.Exists(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\"+userId);
                 if (!checkFolder)
                 {
-                    System.IO.Directory.CreateDirectory(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\"+userId);
+                    Directory.CreateDirectory(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\"+userId);
                 }
                 string desPath = Path.Combine(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures", userId, filename);
                 await file.CopyToAsync(new FileStream(desPath, FileMode.Create));
@@ -97,7 +97,8 @@ public class FileService
             return e;
         }
     }
-    public bool DeleteImgInStorage(string imgUrl, string token)
+
+    private bool DeleteImgInStorage(string imgUrl, string token)
     {
 
         try
