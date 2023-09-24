@@ -48,8 +48,8 @@ public class TagController : Controller
         object result = await _tagService.GetATag(tagId);
         return (result.GetType()==typeof(TagModel)) ? Ok(result) : BadRequest(result);
     }
-    [HttpGet("get-categories")]
-    [SwaggerOperation(Summary = "Get categories by status: active/inactive/all")]
+    [HttpGet("get-tags")]
+    [SwaggerOperation(Summary = "Get tags by status: active/inactive/all")]
 
     [AllowAnonymous]
     public async Task<ActionResult> GateTags(string? status)
