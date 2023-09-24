@@ -11,7 +11,7 @@ public class FileRepo: Repository<FileUpload>
 
     public async Task<List<FileUpload>> GetFilesByUser(Guid userId)
     {
-        return await context.FileUploads.Where(x => x.UploadedBy.Equals(userId)).ToListAsync();
+        return await context.FileUploads.Where(x => x.UploadedBy.Equals(userId)).OrderByDescending(y => y.UploadDate).ToListAsync();
     }
 
     public async Task<FileUpload?> GetFileByPath(string path)
