@@ -11,5 +11,7 @@ public partial class FileUpload
 
     public Guid? UploadedBy { get; set; }
 
+    public DateTime? UploadDate { get; set; }
+
     public virtual User? UploadedByNavigation { get; set; }
 }

@@ -53,7 +53,8 @@ public class FileService
                 {
                     Id = id,
                     Path = urlPath + userId + "/" + filename,
-                    UploadedBy = Guid.Parse(userId)
+                    UploadedBy = Guid.Parse(userId),
+                    UploadDate = DateTime.Now
                 };
                 _ = await _fileRepo.Insert(fileIn);
             }

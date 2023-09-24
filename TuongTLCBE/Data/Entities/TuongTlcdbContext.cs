@@ -59,6 +59,7 @@ public partial class TuongTlcdbContext : DbContext
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("ID");
             entity.Property(e => e.Path).HasMaxLength(2048);
+            entity.Property(e => e.UploadDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.UploadedByNavigation).WithMany(p => p.FileUploads)
                 .HasForeignKey(d => d.UploadedBy)
