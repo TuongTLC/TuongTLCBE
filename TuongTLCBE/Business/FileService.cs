@@ -48,7 +48,14 @@ public class FileService
                     Directory.CreateDirectory(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\"+userId);
                 }
                 string desPath = Path.Combine(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures", userId, filename);
+                /*
                 await file.CopyToAsync(new FileStream(desPath, FileMode.Create));
+                */
+                using (var sourceStream = file.OpenReadStream())
+                using (var destinationStream = new FileStream(desPath, FileMode.Create))
+                {
+                    await sourceStream.CopyToAsync(destinationStream);
+                }
                 FileUpload fileIn = new()
                 {
                     Id = id,
@@ -78,20 +85,15 @@ public class FileService
                 {
                     return "This file isn't your to delete!";
                 }
-                int deleteInDb = await _fileRepo.Delete(fileUploadGet);
-                if (deleteInDb > 0)
+                bool deleteInDb = DeleteImgInStorage(url, token);
+                if (deleteInDb)
                 {
-                    return DeleteImgInStorage(url, token);
+                   return (await _fileRepo.Delete(fileUploadGet)) > 0;
                 }
-                else
-                {
-                    return "Failed to delete file in Database!";
-                }
+
+                return "Failed to delete file in storage!";
             }
-            else
-            {
-                return "File not found!";
-            }
+            return "File not found!";
         }
         catch (Exception e)
         {
@@ -105,14 +107,14 @@ public class FileService
         try
         {
             string userid = _decodeToken.Decode(token, "userid");
-            string deletePath = "https://tuongtlc.ddns.net:8080/FileStorage/Pictures/"+userid+"/";
+            string deletePath = "https://tuongtlc.ddns.net:8080/FileStorage/Pictures/"+userid.ToLower()+"/";
             int startIndex = imgUrl.IndexOf(deletePath, StringComparison.Ordinal);
 
             if (startIndex >= 0)
             {
                 int length = deletePath.Length;
                 string output =  imgUrl.Remove(startIndex, length) ;
-                string filePath = @"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\" + userid + "\\" + output;
+                string filePath = @"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures\" + userid.ToLower() + "\\" + output.ToLower();
                 if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
