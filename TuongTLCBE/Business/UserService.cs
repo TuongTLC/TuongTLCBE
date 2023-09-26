@@ -389,7 +389,7 @@ namespace TuongTLCBE.Business
                     claims: claims,
                     audience: "https://tuongtlc.ddns.net",
                     issuer: "https://tuongtlc.ddns.net",
-                    expires: DateTime.Now.AddMinutes(30),
+                    expires: DateTime.Now.AddHours(24),
                     signingCredentials: creds
                 );
 
