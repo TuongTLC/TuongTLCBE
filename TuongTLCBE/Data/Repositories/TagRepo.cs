@@ -84,28 +84,46 @@ public class TagRepo: Repository<Tag>
         {
             if (!status.IsNullOrEmpty())
             {
-                bool statusIn = true;
-                if (status != null && status.Trim().ToLower().Equals("active"))
+                if (status != null && status.Trim().ToLower().Equals("all"))
                 {
-                    statusIn = true;
+                    var query = from c in context.Tags
+                        select new { c };
+                    List<TagModel> tagModel = await query.Select(x => new TagModel()
+                    {
+                        Id = x.c.Id,
+                        TagName = x.c.TagName,
+                        Description = x.c.Description,
+                        CreatedBy = x.c.CreatedBy,
+                        CreatedDate = x.c.CreatedDate,
+                        Status = x.c.Status
+                    }).ToListAsync();
+                    return tagModel;
                 }
-                if (status != null && status.Trim().ToLower().Equals("inactive"))
+                else
                 {
-                    statusIn = false;
+                    bool statusIn = true;
+                    if (status != null && status.Trim().ToLower().Equals("active"))
+                    {
+                        statusIn = true;
+                    }
+                    if (status != null && status.Trim().ToLower().Equals("inactive"))
+                    {
+                        statusIn = false;
+                    }
+                    var query = from c in context.Tags
+                        where c.Status.Equals(statusIn)
+                        select new { c };
+                    List<TagModel> tagModel = await query.Select(x => new TagModel()
+                    {
+                        Id = x.c.Id,
+                        TagName = x.c.TagName,
+                        Description = x.c.Description,
+                        CreatedBy = x.c.CreatedBy,
+                        CreatedDate = x.c.CreatedDate,
+                        Status = x.c.Status
+                    }).ToListAsync();
+                    return tagModel;
                 }
-                var query = from c in context.Tags
-                    where c.Status.Equals(statusIn)
-                    select new { c };
-                List<TagModel> tagModel = await query.Select(x => new TagModel()
-                {
-                    Id = x.c.Id,
-                    TagName = x.c.TagName,
-                    Description = x.c.Description,
-                    CreatedBy = x.c.CreatedBy,
-                    CreatedDate = x.c.CreatedDate,
-                    Status = x.c.Status
-                }).ToListAsync();
-                return tagModel;
             }
             else
             {
