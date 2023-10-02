@@ -49,6 +49,34 @@ namespace TuongTLCBE.Business
                 return e;
             }
         }
+        public async Task<object> GetAuthor(Guid userId)
+        {
+            try
+            {
+                User? user = await _userRepo.Get(userId);
+                if (user!= null)
+                {
+                    AuthorModel? authorInfo = await _userRepo.GetAuthorInfo(userId);
+                    if (authorInfo != null)
+                    {
+                        return authorInfo;
+                    }
+                    else
+                    {
+                        return "Get author failed!";
+                    }
+                }
+                else
+                {
+                    return "User not exist!";
+                }
+                
+            }
+            catch (Exception e)
+            {
+                return e;
+            }
+        }
         public async Task<object?> GetUsers(string? status)
         {
             try
