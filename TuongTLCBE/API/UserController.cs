@@ -81,14 +81,6 @@ namespace TuongTLCBE.API
             object result = await _userService.GetUser(userId);
             return (result.GetType() == typeof(UserInfoModel)) ? Ok(result) : BadRequest(result);
         }
-        [HttpGet("get-author")]
-        [SwaggerOperation(Summary = "Get post author")]
-        [AllowAnonymous]
-        public async Task<ActionResult<object>> GetAuthor(Guid userId)
-        {
-            object result = await _userService.GetAuthor(userId);
-            return (result.GetType() == typeof(AuthorModel)) ? Ok(result) : BadRequest(result);
-        }
         [HttpGet("get-users")]
         
         [SwaggerOperation(Summary = "Admin get account by status: active/inactive/all")]
@@ -96,7 +88,7 @@ namespace TuongTLCBE.API
         public async Task<ActionResult<object>> GetUsers(string? status)
         {
             object? result = await _userService.GetUsers(status);
-            return (result?.GetType() == typeof(AuthorModel)) ? Ok(result) : BadRequest(result);
+            return (result?.GetType() == typeof(UserModel)) ? Ok(result) : BadRequest(result);
         }
         [HttpDelete("delete-account")]
         [SwaggerOperation(Summary = "Admin delete account")]

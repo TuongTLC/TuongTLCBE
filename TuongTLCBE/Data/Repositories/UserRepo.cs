@@ -43,34 +43,6 @@ namespace TuongTLCBE.Data.Repositories
                 return null;
             }
         }
-        public async Task<AuthorModel?> GetAuthorInfo(Guid userId)
-        {
-            try
-            {
-                var query =
-                    from u in context.Users
-                    join ur in context.UserRoles on u.RoleId equals ur.Id
-                    where u.Id.Equals(userId)
-                    select new { u, ur };
-                AuthorModel? userModel = await query
-                    .Select(
-                        x =>
-                            new AuthorModel()
-                            {
-                                Id = x.u.Id,
-                                Username = x.u.Username,
-                                RoleName = x.ur.RoleName,
-                                Fullname = x.u.FullName
-                            }
-                    )
-                    .FirstOrDefaultAsync();
-                return userModel;
-            }
-            catch
-            {
-                return null;
-            }
-        }
         public async Task<UserModel?> GetUserByUsername(string username)
         {
             try

@@ -51,16 +51,10 @@ namespace TuongTLCBE.Data.Models
         public string Email { get; set; }
         public DateTime? Birthday { get; set; }
         public string? Phone { get; set; }
+        
         public bool? Status { get; set; }
     }
 
-    public class AuthorModel
-    {
-        public Guid Id { get; set; }
-        public string Username { get; set; }
-        public string RoleName { get; set; }
-        public string Fullname { get; set; }
-    }
     public class UserLoginResponseModel
     {
         public string Token { get; set; }
