@@ -11,12 +11,14 @@ public class PostRepo: Repository<Post>
     private readonly PostTagRepo _postTagRepo;
     private readonly CategoryRepo _categoryRepo;
     private readonly TagRepo _tagRepo;
-    public PostRepo(TuongTlcdbContext context, PostCategoryRepo postCategoryRepo, PostTagRepo postTagRepo, CategoryRepo categoryRepo, TagRepo tagRepo) : base(context)
+    private readonly UserRepo _userRepo;
+    public PostRepo(TuongTlcdbContext context, PostCategoryRepo postCategoryRepo, PostTagRepo postTagRepo, CategoryRepo categoryRepo, TagRepo tagRepo, UserRepo userRepo) : base(context)
     {
         _postCategoryRepo = postCategoryRepo;
         _postTagRepo = postTagRepo;
         _categoryRepo = categoryRepo;
         _tagRepo = tagRepo;
+        _userRepo = userRepo;
     }
 
     public async Task<PostInfoModel?> GetPostInfo(Guid postId) 
@@ -26,6 +28,7 @@ public class PostRepo: Repository<Post>
             Post? post = await context.Posts.Where(x => x.Id.Equals(postId)).FirstOrDefaultAsync();
             if (post != null)
             {
+                PostAuthor? author = await _userRepo.GetAuthor(post.Author);
                 PostModel postModel = new()
                 {
                     Id = post.Id,
@@ -33,7 +36,7 @@ public class PostRepo: Repository<Post>
                     Summary = post.Summary,
                     Content = post.Content,
                     CreateDate = post.CreateDate,
-                    Author = post.Author,
+                    Author = author,
                     Like = post.Like,
                     Dislike = post.Dislike,
                     Thumbnail = post.Thumbnail,
@@ -107,6 +110,7 @@ public class PostRepo: Repository<Post>
                 List<PostInfoModel> listPosts = new();
                 foreach (var post in posts.Results)
                 {
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
@@ -114,7 +118,7 @@ public class PostRepo: Repository<Post>
                         Summary = post.Summary,
                         Content = post.Content,
                         CreateDate = post.CreateDate,
-                        Author = post.Author,
+                        Author = author,
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,

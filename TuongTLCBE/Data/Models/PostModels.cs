@@ -6,7 +6,6 @@ public class PostRequestModel
     public string? Summary { get; set; }
     public string Content { get; set; }
     public string? Thumbnail { get; set; }
-    
     public List<Guid> CategoriesIds { get; set; }
     public List<Guid> TagsIds { get; set; }
 }
@@ -17,13 +16,19 @@ public class PostModel
     public string? Summary { get; set; }
     public string Content { get; set; }
     public DateTime CreateDate { get; set; }
-    public Guid Author { get; set; }
+    public PostAuthor? Author { get; set; }
     public int? Like { get; set; }
     public int? Dislike { get; set; }
     public string? Thumbnail { get; set; }
     public bool Status { get; set; }
 }
 
+public class PostAuthor
+{
+    public Guid Id { get; set; }
+    public string  Fullname { get; set; }
+    public string RoleName { get; set; }
+}
 public class PostCategoryModel
 {
     public Guid Id { get; set; }
