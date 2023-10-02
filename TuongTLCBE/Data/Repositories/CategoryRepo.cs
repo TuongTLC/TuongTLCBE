@@ -86,28 +86,46 @@ public class CategoryRepo: Repository<Category>
         {
             if (!status.IsNullOrEmpty())
             {
-                bool statusIn = true;
-                if (status != null && status.Trim().ToLower().Equals("active"))
+                if (status != null && status.Trim().ToLower().Equals("all"))
                 {
-                    statusIn = true;
+                    var query = from c in context.Categories
+                        select new { c };
+                    List<CategoryModel> categoryModel = await query.Select(x => new CategoryModel()
+                    {
+                        Id = x.c.Id,
+                        CategoryName = x.c.CategoryName,
+                        Description = x.c.Description,
+                        CreatedBy = x.c.CreatedBy,
+                        CreatedDate = x.c.CreatedDate,
+                        Status = x.c.Status
+                    }).ToListAsync();
+                    return categoryModel;
                 }
-                if (status != null && status.Trim().ToLower().Equals("inactive"))
+                else
                 {
-                    statusIn = false;
+                    bool statusIn = true;
+                    if (status != null && status.Trim().ToLower().Equals("active"))
+                    {
+                        statusIn = true;
+                    }
+                    if (status != null && status.Trim().ToLower().Equals("inactive"))
+                    {
+                        statusIn = false;
+                    }
+                    var query = from c in context.Categories
+                        where c.Status.Equals(statusIn)
+                        select new { c };
+                    List<CategoryModel> categoryModel = await query.Select(x => new CategoryModel()
+                    {
+                        Id = x.c.Id,
+                        CategoryName = x.c.CategoryName,
+                        Description = x.c.Description,
+                        CreatedBy = x.c.CreatedBy,
+                        CreatedDate = x.c.CreatedDate,
+                        Status = x.c.Status
+                    }).ToListAsync();
+                    return categoryModel;
                 }
-                var query = from c in context.Categories
-                    where c.Status.Equals(statusIn)
-                    select new { c };
-                List<CategoryModel> categoryModel = await query.Select(x => new CategoryModel()
-                {
-                    Id = x.c.Id,
-                    CategoryName = x.c.CategoryName,
-                    Description = x.c.Description,
-                    CreatedBy = x.c.CreatedBy,
-                    CreatedDate = x.c.CreatedDate,
-                    Status = x.c.Status
-                }).ToListAsync();
-                return categoryModel;
             }
             else
             {
