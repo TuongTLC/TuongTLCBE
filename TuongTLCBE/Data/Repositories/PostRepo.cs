@@ -1,18 +1,21 @@
 using EntityFrameworkPaginateCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Models;
 
 namespace TuongTLCBE.Data.Repositories;
 
-public class PostRepo: Repository<Post>
+public class PostRepo : Repository<Post>
 {
     private readonly PostCategoryRepo _postCategoryRepo;
     private readonly PostTagRepo _postTagRepo;
     private readonly CategoryRepo _categoryRepo;
     private readonly TagRepo _tagRepo;
     private readonly UserRepo _userRepo;
-    public PostRepo(TuongTlcdbContext context, PostCategoryRepo postCategoryRepo, PostTagRepo postTagRepo, CategoryRepo categoryRepo, TagRepo tagRepo, UserRepo userRepo) : base(context)
+
+    public PostRepo(TuongTlcdbContext context, PostCategoryRepo postCategoryRepo, PostTagRepo postTagRepo,
+        CategoryRepo categoryRepo, TagRepo tagRepo, UserRepo userRepo) : base(context)
     {
         _postCategoryRepo = postCategoryRepo;
         _postTagRepo = postTagRepo;
@@ -21,14 +24,14 @@ public class PostRepo: Repository<Post>
         _userRepo = userRepo;
     }
 
-    public async Task<PostInfoModel?> GetPostInfo(Guid postId) 
+    public async Task<PostInfoModel?> GetPostInfo(Guid postId)
     {
         try
         {
-            Post? post = await context.Posts.Where(x => x.Id.Equals(postId)).FirstOrDefaultAsync();
+            var post = await context.Posts.Where(x => x.Id.Equals(postId)).FirstOrDefaultAsync();
             if (post != null)
             {
-                PostAuthor? author = await _userRepo.GetAuthor(post.Author);
+                var author = await _userRepo.GetAuthor(post.Author);
                 PostModel postModel = new()
                 {
                     Id = post.Id,
@@ -42,16 +45,15 @@ public class PostRepo: Repository<Post>
                     Thumbnail = post.Thumbnail,
                     Status = post.Status
                 };
-                List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(postId);
+                var postCategories = await _postCategoryRepo.GetPostCategories(postId);
                 List<PostCategoryModel> postCategoryModels = new();
                 if (postCategories.Any())
-                {
                     foreach (var cate in postCategories)
                     {
-                        Category? category = await _categoryRepo.Get(cate.CategoryId);
+                        var category = await _categoryRepo.Get(cate.CategoryId);
                         if (category != null)
                         {
-                            PostCategoryModel model= new()
+                            PostCategoryModel model = new()
                             {
                                 Id = category.Id,
                                 CategoryName = category.CategoryName,
@@ -60,17 +62,16 @@ public class PostRepo: Repository<Post>
                             postCategoryModels.Add(model);
                         }
                     }
-                }
-                List<PostTag> postTags = await _postTagRepo.GetPostTags(postId);
+
+                var postTags = await _postTagRepo.GetPostTags(postId);
                 List<PostTagModel> postTagModels = new();
                 if (postTags.Any())
-                {
                     foreach (var postTag in postTags)
                     {
-                        Tag? tag = await _tagRepo.Get(postTag.TagId);
+                        var tag = await _tagRepo.Get(postTag.TagId);
                         if (tag != null)
                         {
-                            PostTagModel model= new()
+                            PostTagModel model = new()
                             {
                                 Id = tag.Id,
                                 TagName = tag.TagName,
@@ -79,9 +80,8 @@ public class PostRepo: Repository<Post>
                             postTagModels.Add(model);
                         }
                     }
-                }
 
-                PostInfoModel postInfo = new PostInfoModel()
+                var postInfo = new PostInfoModel
                 {
                     PostInfo = postModel,
                     PostCategories = postCategoryModels,
@@ -89,104 +89,268 @@ public class PostRepo: Repository<Post>
                 };
                 return postInfo;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
-        catch 
+        catch
         {
             return null;
         }
     }
-    public async Task<object?> GetPostsInfo(int pageNumber, int pageSize)
+
+    public async Task<object?> GetPostsInfo(int pageNumber, int pageSize, string? status)
     {
         try
         {
-            Page<Post> posts = await context.Posts.OrderByDescending(x => x.CreateDate)
-                .PaginateAsync(pageNumber, pageSize);
-            if (posts != null)
+            if (!status.IsNullOrEmpty())
             {
-                List<PostInfoModel> listPosts = new();
-                foreach (var post in posts.Results)
+                if (status != null && status.Trim().ToLower().Equals("all"))
                 {
-                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
-                    PostModel postModel = new()
+                    var posts = await context.Posts.OrderByDescending(x => x.CreateDate)
+                        .PaginateAsync(pageNumber, pageSize);
+                    if (posts != null)
                     {
-                        Id = post.Id,
-                        PostName = post.PostName,
-                        Summary = post.Summary,
-                        Content = post.Content,
-                        CreateDate = post.CreateDate,
-                        Author = author,
-                        Like = post.Like,
-                        Dislike = post.Dislike,
-                        Thumbnail = post.Thumbnail,
-                        Status = post.Status
-                    };
-                    List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
-                    List<PostCategoryModel> postCategoryModels = new();
-                    if (postCategories.Any())
-                    {
-                        foreach (var cate in postCategories)
+                        List<PostInfoModel> listPosts = new();
+                        foreach (var post in posts.Results)
                         {
-                            Category? category = await _categoryRepo.Get(cate.CategoryId);
-                            if (category != null)
+                            var author = await _userRepo.GetAuthor(post.Author);
+                            PostModel postModel = new()
                             {
-                                PostCategoryModel postCategoryModel= new()
+                                Id = post.Id,
+                                PostName = post.PostName,
+                                Summary = post.Summary,
+                                Content = post.Content,
+                                CreateDate = post.CreateDate,
+                                Author = author,
+                                Like = post.Like,
+                                Dislike = post.Dislike,
+                                Thumbnail = post.Thumbnail,
+                                Status = post.Status
+                            };
+                            var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
+                            List<PostCategoryModel> postCategoryModels = new();
+                            if (postCategories.Any())
+                                foreach (var cate in postCategories)
                                 {
-                                    Id = category.Id,
-                                    CategoryName = category.CategoryName,
-                                    Description = category.Description
-                                };
-                                postCategoryModels.Add(postCategoryModel);
-                            }
+                                    var category = await _categoryRepo.Get(cate.CategoryId);
+                                    if (category != null)
+                                    {
+                                        PostCategoryModel postCategoryModel = new()
+                                        {
+                                            Id = category.Id,
+                                            CategoryName = category.CategoryName,
+                                            Description = category.Description
+                                        };
+                                        postCategoryModels.Add(postCategoryModel);
+                                    }
+                                }
+
+                            var postTags = await _postTagRepo.GetPostTags(post.Id);
+                            List<PostTagModel> postTagModels = new();
+                            if (postTags.Any())
+                                foreach (var postTag in postTags)
+                                {
+                                    var tag = await _tagRepo.Get(postTag.TagId);
+                                    if (tag != null)
+                                    {
+                                        PostTagModel postTagModel = new()
+                                        {
+                                            Id = tag.Id,
+                                            TagName = tag.TagName,
+                                            Description = tag.Description
+                                        };
+                                        postTagModels.Add(postTagModel);
+                                    }
+                                }
+
+                            var postInfo = new PostInfoModel
+                            {
+                                PostInfo = postModel,
+                                PostCategories = postCategoryModels,
+                                PostTags = postTagModels
+                            };
+                            listPosts.Add(postInfo);
                         }
-                    }
-                    List<PostTag> postTags = await _postTagRepo.GetPostTags(post.Id);
-                    List<PostTagModel> postTagModels = new();
-                    if (postTags.Any())
-                    {
-                        foreach (var postTag in postTags)
+
+                        var paging = new PaginationResponseModel().CurPage(posts.CurrentPage)
+                            .PageSize(posts.PageSize).PageCount(posts.PageCount).RecordCount(posts.RecordCount);
+                        PostPagingResponseModel model = new()
                         {
-                            Tag? tag = await _tagRepo.Get(postTag.TagId);
-                            if (tag != null)
-                            {
-                                PostTagModel postTagModel= new()
-                                {
-                                    Id = tag.Id,
-                                    TagName = tag.TagName,
-                                    Description = tag.Description
-                                };
-                                postTagModels.Add(postTagModel);
-                            }
-                        }
+                            Paging = paging,
+                            ListPosts = listPosts
+                        };
+                        return model;
                     }
 
-                    PostInfoModel postInfo = new PostInfoModel()
+                    return null;
+                }
+                else
+                {
+                    bool statusIn = true;
+                    if (status != null && status.Trim().ToLower().Equals("active")) statusIn = true;
+                    if (status != null && status.Trim().ToLower().Equals("inactive")) statusIn = false;
+                    var posts = await context.Posts.Where(y => y.Status.Equals(statusIn))
+                        .OrderByDescending(x => x.CreateDate)
+                        .PaginateAsync(pageNumber, pageSize);
+                    if (posts != null)
                     {
-                        PostInfo = postModel,
-                        PostCategories = postCategoryModels,
-                        PostTags = postTagModels
+                        List<PostInfoModel> listPosts = new();
+                        foreach (var post in posts.Results)
+                        {
+                            var author = await _userRepo.GetAuthor(post.Author);
+                            PostModel postModel = new()
+                            {
+                                Id = post.Id,
+                                PostName = post.PostName,
+                                Summary = post.Summary,
+                                Content = post.Content,
+                                CreateDate = post.CreateDate,
+                                Author = author,
+                                Like = post.Like,
+                                Dislike = post.Dislike,
+                                Thumbnail = post.Thumbnail,
+                                Status = post.Status
+                            };
+                            var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
+                            List<PostCategoryModel> postCategoryModels = new();
+                            if (postCategories.Any())
+                                foreach (var cate in postCategories)
+                                {
+                                    var category = await _categoryRepo.Get(cate.CategoryId);
+                                    if (category != null)
+                                    {
+                                        PostCategoryModel postCategoryModel = new()
+                                        {
+                                            Id = category.Id,
+                                            CategoryName = category.CategoryName,
+                                            Description = category.Description
+                                        };
+                                        postCategoryModels.Add(postCategoryModel);
+                                    }
+                                }
+
+                            var postTags = await _postTagRepo.GetPostTags(post.Id);
+                            List<PostTagModel> postTagModels = new();
+                            if (postTags.Any())
+                                foreach (var postTag in postTags)
+                                {
+                                    var tag = await _tagRepo.Get(postTag.TagId);
+                                    if (tag != null)
+                                    {
+                                        PostTagModel postTagModel = new()
+                                        {
+                                            Id = tag.Id,
+                                            TagName = tag.TagName,
+                                            Description = tag.Description
+                                        };
+                                        postTagModels.Add(postTagModel);
+                                    }
+                                }
+
+                            var postInfo = new PostInfoModel
+                            {
+                                PostInfo = postModel,
+                                PostCategories = postCategoryModels,
+                                PostTags = postTagModels
+                            };
+                            listPosts.Add(postInfo);
+                        }
+
+                        var paging = new PaginationResponseModel().CurPage(posts.CurrentPage)
+                            .PageSize(posts.PageSize).PageCount(posts.PageCount).RecordCount(posts.RecordCount);
+                        PostPagingResponseModel model = new()
+                        {
+                            Paging = paging,
+                            ListPosts = listPosts
+                        };
+                        return model;
+                    }
+
+                    return null;
+                }
+            }
+
+            {
+                var posts = await context.Posts.OrderByDescending(x => x.CreateDate)
+                    .PaginateAsync(pageNumber, pageSize);
+                if (posts != null)
+                {
+                    List<PostInfoModel> listPosts = new();
+                    foreach (var post in posts.Results)
+                    {
+                        var author = await _userRepo.GetAuthor(post.Author);
+                        PostModel postModel = new()
+                        {
+                            Id = post.Id,
+                            PostName = post.PostName,
+                            Summary = post.Summary,
+                            Content = post.Content,
+                            CreateDate = post.CreateDate,
+                            Author = author,
+                            Like = post.Like,
+                            Dislike = post.Dislike,
+                            Thumbnail = post.Thumbnail,
+                            Status = post.Status
+                        };
+                        var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
+                        List<PostCategoryModel> postCategoryModels = new();
+                        if (postCategories.Any())
+                            foreach (var cate in postCategories)
+                            {
+                                var category = await _categoryRepo.Get(cate.CategoryId);
+                                if (category != null)
+                                {
+                                    PostCategoryModel postCategoryModel = new()
+                                    {
+                                        Id = category.Id,
+                                        CategoryName = category.CategoryName,
+                                        Description = category.Description
+                                    };
+                                    postCategoryModels.Add(postCategoryModel);
+                                }
+                            }
+
+                        var postTags = await _postTagRepo.GetPostTags(post.Id);
+                        List<PostTagModel> postTagModels = new();
+                        if (postTags.Any())
+                            foreach (var postTag in postTags)
+                            {
+                                var tag = await _tagRepo.Get(postTag.TagId);
+                                if (tag != null)
+                                {
+                                    PostTagModel postTagModel = new()
+                                    {
+                                        Id = tag.Id,
+                                        TagName = tag.TagName,
+                                        Description = tag.Description
+                                    };
+                                    postTagModels.Add(postTagModel);
+                                }
+                            }
+
+                        var postInfo = new PostInfoModel
+                        {
+                            PostInfo = postModel,
+                            PostCategories = postCategoryModels,
+                            PostTags = postTagModels
+                        };
+                        listPosts.Add(postInfo);
+                    }
+
+                    var paging = new PaginationResponseModel().CurPage(posts.CurrentPage)
+                        .PageSize(posts.PageSize).PageCount(posts.PageCount).RecordCount(posts.RecordCount);
+                    PostPagingResponseModel model = new()
+                    {
+                        Paging = paging,
+                        ListPosts = listPosts
                     };
-                    listPosts.Add(postInfo);
+                    return model;
                 }
 
-                PaginationResponseModel paging = new PaginationResponseModel().CurPage(posts.CurrentPage)
-                    .PageSize(posts.PageSize).PageCount(posts.PageCount).RecordCount(posts.RecordCount);
-                PostPagingResponseModel model = new()
-                {
-                    Paging = paging,
-                    ListPosts = listPosts
-                };
-                return model;
-            }
-            else
-            {
                 return null;
             }
         }
-        catch 
+        catch
         {
             return null;
         }
@@ -197,31 +361,24 @@ public class PostRepo: Repository<Post>
         try
         {
             bool stat;
-            if ( status.Trim().ToLower().Equals("active"))
-            {
+            if (status.Trim().ToLower().Equals("active"))
                 stat = true;
-            }else if ( status.Trim().ToLower().Equals("inactive"))
-            {
+            else if (status.Trim().ToLower().Equals("inactive"))
                 stat = true;
-            }
             else
-            {
                 return false;
-            }
 
-            Post? post = await context.Posts.Where(x => x.Id.Equals(postId)).FirstOrDefaultAsync();
+            var post = await context.Posts.Where(x => x.Id.Equals(postId)).FirstOrDefaultAsync();
             if (post != null)
             {
                 post.Status = stat;
                 _ = await context.SaveChangesAsync();
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
-        catch 
+        catch
         {
             return false;
         }
@@ -231,7 +388,7 @@ public class PostRepo: Repository<Post>
     {
         try
         {
-            Post? post = await context.Posts.Where(x => x.Id.Equals(postUpdateModel.Id)).FirstOrDefaultAsync();
+            var post = await context.Posts.Where(x => x.Id.Equals(postUpdateModel.Id)).FirstOrDefaultAsync();
             if (post != null)
             {
                 post.PostName = postUpdateModel.PostName;
@@ -241,10 +398,8 @@ public class PostRepo: Repository<Post>
                 _ = await context.SaveChangesAsync();
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
         catch
         {

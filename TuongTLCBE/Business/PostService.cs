@@ -121,11 +121,11 @@ public class PostService
             return e;
         }
     }
-    public async Task<object> GetPosts(int pageNumber, int pageSize)
+    public async Task<object> GetPosts(int pageNumber, int pageSize, string? status)
     {
         try
         {
-            object? posts = await _postRepo.GetPostsInfo(pageNumber, pageSize);
+            object? posts = await _postRepo.GetPostsInfo(pageNumber, pageSize, status);
             return posts ?? "Something went wrong!";
         }
         catch (Exception e)

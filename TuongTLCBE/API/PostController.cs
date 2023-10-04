@@ -34,9 +34,9 @@ public class PostController: Controller
     }
     [HttpGet("get-posts")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetPosts(int pageNumber, int pageSize)
+    public async Task<IActionResult> GetPosts(int pageNumber, int pageSize, string status)
     {
-        object result = await _postService.GetPosts(pageNumber, pageSize);
+        object result = await _postService.GetPosts(pageNumber, pageSize, status);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
     [HttpPost("update-post")]
