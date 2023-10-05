@@ -216,7 +216,7 @@ public class PostRepo : Repository<Post>
                     }
                     break;
                 case "active":
-                    posts = await context.Posts.Where(x => x.Status.Equals(true)).OrderByDescending(x => x.CreateDate).ToListAsync();
+                    posts = await context.Posts.Where(x=> x.Status.Equals(true)).OrderByDescending(x => x.CreateDate).ToListAsync();
                     if (posts.Any())
                     {
                         List<PostInfoModel> listPosts = new();
@@ -288,8 +288,11 @@ public class PostRepo : Repository<Post>
                             {   
                                 foreach (var postCate in post.PostCategories)
                                 {
-                                    newListPosts.Add(post);
-                                    break;
+                                    if (postCate.Id.Equals(categoryId))
+                                    {
+                                        newListPosts.Add(post);
+                                        break;
+                                    }
                                 }
                             }
                             listPosts = newListPosts;
@@ -322,7 +325,7 @@ public class PostRepo : Repository<Post>
                     }
                     break;
                 case "inactive":
-                    posts = await context.Posts.Where(x => x.Status.Equals(false)).OrderByDescending(x => x.CreateDate).ToListAsync();
+                    posts = await context.Posts.Where(x=> x.Status.Equals(false)).OrderByDescending(x => x.CreateDate).ToListAsync();
                     if (posts.Any())
                     {
                         List<PostInfoModel> listPosts = new();
@@ -394,8 +397,11 @@ public class PostRepo : Repository<Post>
                             {   
                                 foreach (var postCate in post.PostCategories)
                                 {
-                                    newListPosts.Add(post);
-                                    break;
+                                    if (postCate.Id.Equals(categoryId))
+                                    {
+                                        newListPosts.Add(post);
+                                        break;
+                                    }
                                 }
                             }
                             listPosts = newListPosts;
