@@ -125,7 +125,7 @@ public class PostService
     {
         try
         {
-            object? posts = await _postRepo.GetPostsInfo(pageNumber, pageSize, status, categoryId, tagId);
+            object posts = await _postRepo.GetPostsInfo(pageNumber, pageSize, status, categoryId, tagId);
             return posts;
         }
         catch (Exception e)

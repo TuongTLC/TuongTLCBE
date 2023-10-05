@@ -97,7 +97,7 @@ public class PostRepo : Repository<Post>
         }
     }
 
-    public async Task<object?> GetPostsInfo(int pageNumber, int pageSize, string? status, Guid? categoryId, Guid? tagId)
+    public async Task<object> GetPostsInfo(int pageNumber, int pageSize, string? status, Guid? categoryId, Guid? tagId)
     {
         try
         {            
@@ -212,7 +212,7 @@ public class PostRepo : Repository<Post>
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                             .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
-                        responseModel.ListPosts = listPosts;
+                        responseModel.ListPosts = postPaged;
                     }
                     break;
                 case "active":
@@ -321,7 +321,7 @@ public class PostRepo : Repository<Post>
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                             .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
-                        responseModel.ListPosts = listPosts;
+                        responseModel.ListPosts = postPaged;
                     }
                     break;
                 case "inactive":
@@ -430,7 +430,7 @@ public class PostRepo : Repository<Post>
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                             .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
-                        responseModel.ListPosts = listPosts;
+                        responseModel.ListPosts = postPaged;
                     }
                     break;
             }
