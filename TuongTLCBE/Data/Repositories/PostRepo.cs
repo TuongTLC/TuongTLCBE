@@ -212,7 +212,7 @@ public class PostRepo : Repository<Post>
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                             .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
-                        responseModel.ListPosts = postPaged;
+                        responseModel.ListPosts = postPaged.Results;
                     }
                     break;
                 case "active":
@@ -321,7 +321,7 @@ public class PostRepo : Repository<Post>
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                             .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
-                        responseModel.ListPosts = postPaged;
+                        responseModel.ListPosts = postPaged.Results;
                     }
                     break;
                 case "inactive":
@@ -430,7 +430,7 @@ public class PostRepo : Repository<Post>
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                             .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
-                        responseModel.ListPosts = postPaged;
+                        responseModel.ListPosts = postPaged.Results;
                     }
                     break;
             }
