@@ -210,7 +210,7 @@ public class PostRepo : Repository<Post>
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
 
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                             .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
@@ -323,7 +323,7 @@ public class PostRepo : Repository<Post>
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
 
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                             .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
@@ -436,7 +436,7 @@ public class PostRepo : Repository<Post>
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
 
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                             .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
@@ -569,7 +569,7 @@ public class PostRepo : Repository<Post>
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
 
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                             .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
@@ -580,7 +580,7 @@ public class PostRepo : Repository<Post>
                         if (listPosts == null) throw new ArgumentNullException(nameof(listPosts));
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                             .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
@@ -693,7 +693,7 @@ public class PostRepo : Repository<Post>
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
 
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                             .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
@@ -704,7 +704,7 @@ public class PostRepo : Repository<Post>
                         if (listPosts == null) throw new ArgumentNullException(nameof(listPosts));
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                             .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
@@ -817,7 +817,7 @@ public class PostRepo : Repository<Post>
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
 
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                             .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
@@ -828,7 +828,7 @@ public class PostRepo : Repository<Post>
                         if (listPosts == null) throw new ArgumentNullException(nameof(listPosts));
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                             .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
