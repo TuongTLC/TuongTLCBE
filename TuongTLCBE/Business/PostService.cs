@@ -125,7 +125,22 @@ public class PostService
     {
         try
         {
+            if (status == null)
+            {
+                status = "all";
+            }
             object posts = await _postRepo.GetPostsInfo(pageNumber, pageSize, status, categoryId, tagId);
+            return posts;
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }public async Task<object> SearchPosts(int pageNumber, int pageSize,string postName, string? status, Guid? categoryId, Guid? tagId)
+    {
+        try
+        {
+            object posts = await _postRepo.SearchPost(pageNumber, pageSize, postName,status, categoryId, tagId);
             return posts;
         }
         catch (Exception e)

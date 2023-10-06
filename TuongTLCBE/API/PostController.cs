@@ -39,6 +39,13 @@ public class PostController: Controller
         object result = await _postService.GetPosts(pageNumber, pageSize, status, categoryId, tagId);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
+    [HttpGet("search-post")]
+    [AllowAnonymous]
+    public async Task<IActionResult> SearchPost(int pageNumber, int pageSize,string postName,  string? status, Guid? categoryId, Guid? tagId)
+    {
+        object result = await _postService.SearchPosts(pageNumber, pageSize, postName, status, categoryId, tagId);
+        return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
+    }
     [HttpPost("update-post")]
     [Authorize(Roles = "User, Admin")]
     public async Task<IActionResult> UpdatePost(PostUpdateModel postUpdateModel)
