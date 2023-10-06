@@ -100,12 +100,11 @@ public class PostRepo : Repository<Post>
     public async Task<object> GetPostsInfo(int pageNumber, int pageSize, string? status, Guid? categoryId, Guid? tagId)
     {
         try
-        {            
+        {
             List<Post>? posts;
             PostPagingResponseModel responseModel = new();
             switch (status)
             {
-                
                 case "all":
                     posts = await context.Posts.OrderByDescending(x => x.CreateDate).ToListAsync();
                     if (posts.Any())
@@ -162,7 +161,7 @@ public class PostRepo : Repository<Post>
                                         postTagModels.Add(postTagModel);
                                     }
                                 }
-                            
+
                             var postInfo = new PostInfoModel
                             {
                                 PostInfo = postModel,
@@ -172,11 +171,11 @@ public class PostRepo : Repository<Post>
                             listPosts.Add(postInfo);
                         }
 
-                        if (categoryId != null && categoryId!=Guid.Empty)
+                        if (categoryId != null && categoryId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postCate in post.PostCategories)
                                 {
                                     if (postCate.Id.Equals(categoryId))
@@ -186,14 +185,15 @@ public class PostRepo : Repository<Post>
                                     }
                                 }
                             }
+
                             listPosts = newListPosts;
                         }
 
-                        if (tagId != null &&tagId!=Guid.Empty)
+                        if (tagId != null && tagId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postTag in post.PostTags)
                                 {
                                     if (postTag.Id.Equals(tagId))
@@ -202,21 +202,24 @@ public class PostRepo : Repository<Post>
                                         break;
                                     }
                                 }
-
                             }
+
                             listPosts = newListPosts;
                         }
 
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
-                        
+
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
                     }
+
                     break;
                 case "active":
-                    posts = await context.Posts.Where(x=> x.Status.Equals(true)).OrderByDescending(x => x.CreateDate).ToListAsync();
+                    posts = await context.Posts.Where(x => x.Status.Equals(true)).OrderByDescending(x => x.CreateDate)
+                        .ToListAsync();
                     if (posts.Any())
                     {
                         List<PostInfoModel> listPosts = new();
@@ -271,7 +274,7 @@ public class PostRepo : Repository<Post>
                                         postTagModels.Add(postTagModel);
                                     }
                                 }
-                            
+
                             var postInfo = new PostInfoModel
                             {
                                 PostInfo = postModel,
@@ -281,11 +284,11 @@ public class PostRepo : Repository<Post>
                             listPosts.Add(postInfo);
                         }
 
-                        if (categoryId != null && categoryId!=Guid.Empty)
+                        if (categoryId != null && categoryId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postCate in post.PostCategories)
                                 {
                                     if (postCate.Id.Equals(categoryId))
@@ -295,14 +298,15 @@ public class PostRepo : Repository<Post>
                                     }
                                 }
                             }
+
                             listPosts = newListPosts;
                         }
 
-                        if (tagId != null &&tagId!=Guid.Empty)
+                        if (tagId != null && tagId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postTag in post.PostTags)
                                 {
                                     if (postTag.Id.Equals(tagId))
@@ -311,21 +315,24 @@ public class PostRepo : Repository<Post>
                                         break;
                                     }
                                 }
-
                             }
+
                             listPosts = newListPosts;
                         }
 
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
-                        
+
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
                     }
+
                     break;
                 case "inactive":
-                    posts = await context.Posts.Where(x=> x.Status.Equals(false)).OrderByDescending(x => x.CreateDate).ToListAsync();
+                    posts = await context.Posts.Where(x => x.Status.Equals(false)).OrderByDescending(x => x.CreateDate)
+                        .ToListAsync();
                     if (posts.Any())
                     {
                         List<PostInfoModel> listPosts = new();
@@ -380,7 +387,7 @@ public class PostRepo : Repository<Post>
                                         postTagModels.Add(postTagModel);
                                     }
                                 }
-                            
+
                             var postInfo = new PostInfoModel
                             {
                                 PostInfo = postModel,
@@ -390,11 +397,11 @@ public class PostRepo : Repository<Post>
                             listPosts.Add(postInfo);
                         }
 
-                        if (categoryId != null && categoryId!=Guid.Empty)
+                        if (categoryId != null && categoryId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postCate in post.PostCategories)
                                 {
                                     if (postCate.Id.Equals(categoryId))
@@ -404,14 +411,15 @@ public class PostRepo : Repository<Post>
                                     }
                                 }
                             }
+
                             listPosts = newListPosts;
                         }
 
-                        if (tagId != null &&tagId!=Guid.Empty)
+                        if (tagId != null && tagId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postTag in post.PostTags)
                                 {
                                     if (postTag.Id.Equals(tagId))
@@ -420,20 +428,23 @@ public class PostRepo : Repository<Post>
                                         break;
                                     }
                                 }
-
                             }
+
                             listPosts = newListPosts;
                         }
 
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
-                        
+
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
                     }
+
                     break;
             }
+
             return responseModel;
         }
         catch (Exception e)
@@ -442,17 +453,19 @@ public class PostRepo : Repository<Post>
             return e;
         }
     }
-        public async Task<object> SearchPost(int pageNumber, int pageSize,string postName, string? status, Guid? categoryId, Guid? tagId)
+
+    public async Task<object> SearchPost(int pageNumber, int pageSize, string postName, string? status,
+        Guid? categoryId, Guid? tagId)
     {
         try
-        {            
-            List<Post>? posts;
+        {
+            List<Post> posts;
             PostPagingResponseModel responseModel = new();
             switch (status)
             {
-                
                 case "all":
-                    posts = await context.Posts.Where(x=>x.PostName.Contains(postName)).OrderByDescending(x => x.CreateDate).ToListAsync();
+                    posts = await context.Posts.Where(x => x.PostName.Contains(postName))
+                        .OrderByDescending(x => x.CreateDate).ToListAsync();
                     if (posts.Any())
                     {
                         List<PostInfoModel> listPosts = new();
@@ -507,7 +520,7 @@ public class PostRepo : Repository<Post>
                                         postTagModels.Add(postTagModel);
                                     }
                                 }
-                            
+
                             var postInfo = new PostInfoModel
                             {
                                 PostInfo = postModel,
@@ -517,11 +530,11 @@ public class PostRepo : Repository<Post>
                             listPosts.Add(postInfo);
                         }
 
-                        if (categoryId != null && categoryId!=Guid.Empty)
+                        if (categoryId != null && categoryId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postCate in post.PostCategories)
                                 {
                                     if (postCate.Id.Equals(categoryId))
@@ -531,14 +544,15 @@ public class PostRepo : Repository<Post>
                                     }
                                 }
                             }
+
                             listPosts = newListPosts;
                         }
 
-                        if (tagId != null &&tagId!=Guid.Empty)
+                        if (tagId != null && tagId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postTag in post.PostTags)
                                 {
                                     if (postTag.Id.Equals(tagId))
@@ -547,21 +561,35 @@ public class PostRepo : Repository<Post>
                                         break;
                                     }
                                 }
-
                             }
+
                             listPosts = newListPosts;
                         }
 
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
-                        
+
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
                     }
+                    else
+                    {
+                        List<PostInfoModel> listPosts = new();
+                        if (listPosts == null) throw new ArgumentNullException(nameof(listPosts));
+                        var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
+                        var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .RecordCount(postPaged.RecordCount);
+                        responseModel.Paging = paging;
+                        responseModel.ListPosts = postPaged.Results;
+                    }
+
                     break;
                 case "active":
-                    posts = await context.Posts.Where(z=>z.PostName.Contains(postName)).Where(x=> x.Status.Equals(true)).OrderByDescending(x => x.CreateDate).ToListAsync();
+                    posts = await context.Posts.Where(z => z.PostName.Contains(postName))
+                        .Where(x => x.Status.Equals(true)).OrderByDescending(x => x.CreateDate).ToListAsync();
                     if (posts.Any())
                     {
                         List<PostInfoModel> listPosts = new();
@@ -616,7 +644,7 @@ public class PostRepo : Repository<Post>
                                         postTagModels.Add(postTagModel);
                                     }
                                 }
-                            
+
                             var postInfo = new PostInfoModel
                             {
                                 PostInfo = postModel,
@@ -626,11 +654,11 @@ public class PostRepo : Repository<Post>
                             listPosts.Add(postInfo);
                         }
 
-                        if (categoryId != null && categoryId!=Guid.Empty)
+                        if (categoryId != null && categoryId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postCate in post.PostCategories)
                                 {
                                     if (postCate.Id.Equals(categoryId))
@@ -640,14 +668,15 @@ public class PostRepo : Repository<Post>
                                     }
                                 }
                             }
+
                             listPosts = newListPosts;
                         }
 
-                        if (tagId != null &&tagId!=Guid.Empty)
+                        if (tagId != null && tagId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postTag in post.PostTags)
                                 {
                                     if (postTag.Id.Equals(tagId))
@@ -656,21 +685,35 @@ public class PostRepo : Repository<Post>
                                         break;
                                     }
                                 }
-
                             }
+
                             listPosts = newListPosts;
                         }
 
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
-                        
+
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
                     }
+                    else
+                    {
+                        List<PostInfoModel> listPosts = new();
+                        if (listPosts == null) throw new ArgumentNullException(nameof(listPosts));
+                        var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
+                        var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .RecordCount(postPaged.RecordCount);
+                        responseModel.Paging = paging;
+                        responseModel.ListPosts = postPaged.Results;
+                    }
+
                     break;
                 case "inactive":
-                    posts = await context.Posts.Where(z=>z.PostName.Contains(postName)).Where(x=> x.Status.Equals(false)).OrderByDescending(x => x.CreateDate).ToListAsync();
+                    posts = await context.Posts.Where(z => z.PostName.Contains(postName))
+                        .Where(x => x.Status.Equals(false)).OrderByDescending(x => x.CreateDate).ToListAsync();
                     if (posts.Any())
                     {
                         List<PostInfoModel> listPosts = new();
@@ -725,7 +768,7 @@ public class PostRepo : Repository<Post>
                                         postTagModels.Add(postTagModel);
                                     }
                                 }
-                            
+
                             var postInfo = new PostInfoModel
                             {
                                 PostInfo = postModel,
@@ -735,11 +778,11 @@ public class PostRepo : Repository<Post>
                             listPosts.Add(postInfo);
                         }
 
-                        if (categoryId != null && categoryId!=Guid.Empty)
+                        if (categoryId != null && categoryId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postCate in post.PostCategories)
                                 {
                                     if (postCate.Id.Equals(categoryId))
@@ -749,14 +792,15 @@ public class PostRepo : Repository<Post>
                                     }
                                 }
                             }
+
                             listPosts = newListPosts;
                         }
 
-                        if (tagId != null &&tagId!=Guid.Empty)
+                        if (tagId != null && tagId != Guid.Empty)
                         {
                             List<PostInfoModel> newListPosts = new List<PostInfoModel>();
                             foreach (var post in listPosts)
-                            {   
+                            {
                                 foreach (var postTag in post.PostTags)
                                 {
                                     if (postTag.Id.Equals(tagId))
@@ -765,20 +809,34 @@ public class PostRepo : Repository<Post>
                                         break;
                                     }
                                 }
-
                             }
+
                             listPosts = newListPosts;
                         }
 
                         var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
-                        
+
                         var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .RecordCount(postPaged.RecordCount);
                         responseModel.Paging = paging;
                         responseModel.ListPosts = postPaged.Results;
                     }
+                    else
+                    {
+                        List<PostInfoModel> listPosts = new();
+                        if (listPosts == null) throw new ArgumentNullException(nameof(listPosts));
+                        var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
+                        var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
+                            .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount)
+                            .RecordCount(postPaged.RecordCount);
+                        responseModel.Paging = paging;
+                        responseModel.ListPosts = postPaged.Results;
+                    }
+
                     break;
             }
+
             return responseModel;
         }
         catch (Exception e)
@@ -788,7 +846,7 @@ public class PostRepo : Repository<Post>
         }
     }
 
-    
+
     public async Task<bool> ChangePostStatus(Guid postId, string status)
     {
         try

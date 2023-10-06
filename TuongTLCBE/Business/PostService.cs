@@ -140,6 +140,10 @@ public class PostService
     {
         try
         {
+            if (status == null)
+            {
+                status = "all";
+            }
             object posts = await _postRepo.SearchPost(pageNumber, pageSize, postName,status, categoryId, tagId);
             return posts;
         }
