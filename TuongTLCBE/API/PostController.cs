@@ -7,7 +7,7 @@ namespace TuongTLCBE.API;
 
 [Route("post")]
 [ApiController]
-public class PostController: Controller
+public class PostController : Controller
 {
     private readonly PostService _postService;
 
@@ -20,64 +20,80 @@ public class PostController: Controller
     [Authorize(Roles = "User, Admin")]
     public async Task<IActionResult> CreatePost(PostRequestModel postRequestModel)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        object result = await _postService.InsertPost(postRequestModel, token);
+        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        var result = await _postService.InsertPost(postRequestModel, token);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
-
     }
+
     [HttpGet("get-post")]
     [AllowAnonymous]
     public async Task<IActionResult> GetPost(Guid postId)
     {
-        object result = await _postService.GetPost(postId);
+        var result = await _postService.GetPost(postId);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
     }
+
     [HttpGet("get-posts")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetPosts(int pageNumber, int pageSize, string? status, Guid? categoryId, Guid? tagId)
+    public async Task<IActionResult> GetPosts(int pageNumber, int pageSize, string? status, Guid? categoryId,
+        Guid? tagId)
     {
-        object result = await _postService.GetPosts(pageNumber, pageSize, status, categoryId, tagId);
+        var result = await _postService.GetPosts(pageNumber, pageSize, status, categoryId, tagId);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
+
+    [HttpGet("get-posts-by-user")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetPostsByUser(int pageNumber, int pageSize)
+    {
+        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        var result = await _postService.GetPostsByUser(pageNumber, pageSize, token);
+        return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
+    }
+
+    [HttpGet("get-related-posts")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetRelatedPosts(int pageNumber, int pageSize, [FromQuery] List<Guid> categoriesId)
+    {
+        var result = await _postService.GetRelatedPosts(pageNumber, pageSize, categoriesId);
+        return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
+    }
+
     [HttpGet("search-post")]
     [AllowAnonymous]
-    public async Task<IActionResult> SearchPost(int pageNumber, int pageSize,string postName,  string? status, Guid? categoryId, Guid? tagId)
+    public async Task<IActionResult> SearchPost(int pageNumber, int pageSize, string postName, string? status,
+        Guid? categoryId, Guid? tagId)
     {
-        object result = await _postService.SearchPosts(pageNumber, pageSize, postName, status, categoryId, tagId);
+        var result = await _postService.SearchPosts(pageNumber, pageSize, postName, status, categoryId, tagId);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
+
     [HttpPost("update-post")]
     [Authorize(Roles = "User, Admin")]
     public async Task<IActionResult> UpdatePost(PostUpdateModel postUpdateModel)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        object result = await _postService.UpdatePost(postUpdateModel, token);
+        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        var result = await _postService.UpdatePost(postUpdateModel, token);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
-
     }
+
     [HttpPost("change-post-status")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> ChangePostStatus(Guid postId, string status)
     {
-        object result = await _postService.ChangePostStatus(postId, status);
+        var result = await _postService.ChangePostStatus(postId, status);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
-
     }
+
     [HttpDelete("delete-post")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeletePost(Guid postId)
     {
-        object result = await _postService.DeletePost(postId);
+        var result = await _postService.DeletePost(postId);
         if (result is bool)
-        {
             return (bool)result
                 ? Ok("Post deleted!")
                 : BadRequest("Failed to delete post.");
-        }
-        else
-        {
-            return BadRequest(result);
-        }
-
+        return BadRequest(result);
     }
 }
