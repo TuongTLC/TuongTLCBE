@@ -51,12 +51,12 @@ public class PostController : Controller
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
 
-    [HttpGet("get-related-posts")]
+    [HttpGet("get-top-liked-posts")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetRelatedPosts(int pageNumber, int pageSize, [FromQuery] List<Guid> categoriesId)
+    public async Task<IActionResult> GetTopLiked()
     {
-        var result = await _postService.GetRelatedPosts(pageNumber, pageSize, categoriesId);
-        return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
+        var result = await _postService.GetTopLiked();
+        return result.GetType() == typeof(List<PostInfoModel>) ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("search-post")]

@@ -886,12 +886,12 @@ public class PostRepo : Repository<Post>
         }
     }
 
-    public async Task<object> GetRelatedPosts(int pageNumber, int pageSize, List<Guid> categoriesId)
+    public async Task<object> GetTopLiked()
     {
         try
         {
             PostPagingResponseModel responseModel = new();
-            var posts = await context.Posts
+            var posts = await context.Posts.OrderByDescending(x => x.Like).Take(3)
                 .ToListAsync();
             if (posts.Any())
             {
@@ -957,36 +957,14 @@ public class PostRepo : Repository<Post>
                     listPosts.Add(postInfo);
                 }
 
-                if (categoriesId.Any())
-                {
-                    var newListPosts = new List<PostInfoModel>();
-                    foreach (var categoryId in categoriesId)
-                    foreach (var post in listPosts)
-                    foreach (var postCate in post.PostCategories)
-                        if (postCate.Id.Equals(categoryId) )
-                        {
-                            newListPosts.Add(post);
-                            break;
-                        }
-
-                    listPosts = newListPosts;
-                }
-
-                var listPostsTopLike = listPosts.OrderByDescending(x => x.PostInfo.Like).Take(6);
-
-                var postPaged = listPostsTopLike.AsQueryable().Paginate(pageNumber, pageSize);
-
-                var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
-                    .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
-                responseModel.Paging = paging;
-                responseModel.ListPosts = postPaged.Results;
+                return listPosts;
             }
 
             return responseModel;
         }
         catch (Exception e)
         {
-            return e + "ahihi";
+            return e;
         }
     }
 

@@ -138,11 +138,11 @@ public class PostService
         }
     }
 
-    public async Task<object> GetRelatedPosts(int pageNumber, int pageSize, List<Guid> categoriesId)
+    public async Task<object> GetTopLiked()
     {
         try
         {
-            var posts = await _postRepo.GetRelatedPosts(pageNumber, pageSize, categoriesId);
+            var posts = await _postRepo.GetTopLiked();
             return posts;
         }
         catch (Exception e)
