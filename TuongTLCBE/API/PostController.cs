@@ -30,7 +30,7 @@ public class PostController : Controller
     public async Task<IActionResult> GetPost(Guid postId)
     {
         var result = await _postService.GetPost(postId);
-        return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
+        return result?.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("get-posts")]
@@ -44,10 +44,9 @@ public class PostController : Controller
 
     [HttpGet("get-posts-by-user")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetPostsByUser(int pageNumber, int pageSize)
+    public async Task<IActionResult> GetPostsByUser(int pageNumber, int pageSize, string userId)
     {
-        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        var result = await _postService.GetPostsByUser(pageNumber, pageSize, token);
+        var result = await _postService.GetPostsByUser(pageNumber, pageSize, userId);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
 

@@ -5,16 +5,17 @@ using TuongTLCBE.Data.Models;
 
 namespace TuongTLCBE.Data.Repositories;
 
-public class TagRepo: Repository<Tag>
+public class TagRepo : Repository<Tag>
 {
     public TagRepo(TuongTlcdbContext context) : base(context)
     {
     }
+
     public async Task<bool> UpdateTag(TagUpdateModel tagUpdateModel)
     {
         try
         {
-            Tag? tag = await context.Tags.Where(x => x.Id.Equals(tagUpdateModel.Id))
+            var tag = await context.Tags.Where(x => x.Id.Equals(tagUpdateModel.Id))
                 .FirstOrDefaultAsync();
             if (tag != null)
             {
@@ -23,21 +24,20 @@ public class TagRepo: Repository<Tag>
                 _ = await context.SaveChangesAsync();
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
-        catch 
+        catch
         {
             return false;
         }
     }
+
     public async Task<bool> ChangeTagStatus(Guid tagId, bool status)
     {
         try
         {
-            Tag? tag = await context.Tags.Where(x => x.Id.Equals(tagId))
+            var tag = await context.Tags.Where(x => x.Id.Equals(tagId))
                 .FirstOrDefaultAsync();
             if (tag != null)
             {
@@ -45,16 +45,15 @@ public class TagRepo: Repository<Tag>
                 _ = await context.SaveChangesAsync();
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
-        catch 
+        catch
         {
             return false;
         }
     }
+
     public async Task<TagModel?> GetATag(Guid tagId)
     {
         try
@@ -62,7 +61,7 @@ public class TagRepo: Repository<Tag>
             var query = from c in context.Tags
                 where c.Id.Equals(tagId)
                 select new { c };
-            TagModel? tagModel = await query.Select(x => new TagModel()
+            var tagModel = await query.Select(x => new TagModel
             {
                 Id = x.c.Id,
                 TagName = x.c.TagName,
@@ -73,11 +72,12 @@ public class TagRepo: Repository<Tag>
             }).FirstOrDefaultAsync();
             return tagModel;
         }
-        catch 
+        catch
         {
             return null;
         }
     }
+
     public async Task<List<TagModel>?> GetTags(string? status)
     {
         try
@@ -88,7 +88,7 @@ public class TagRepo: Repository<Tag>
                 {
                     var query = from c in context.Tags
                         select new { c };
-                    List<TagModel> tagModel = await query.Select(x => new TagModel()
+                    var tagModel = await query.Select(x => new TagModel
                     {
                         Id = x.c.Id,
                         TagName = x.c.TagName,
@@ -101,19 +101,13 @@ public class TagRepo: Repository<Tag>
                 }
                 else
                 {
-                    bool statusIn = true;
-                    if (status != null && status.Trim().ToLower().Equals("active"))
-                    {
-                        statusIn = true;
-                    }
-                    if (status != null && status.Trim().ToLower().Equals("inactive"))
-                    {
-                        statusIn = false;
-                    }
+                    var statusIn = true;
+                    if (status != null && status.Trim().ToLower().Equals("active")) statusIn = true;
+                    if (status != null && status.Trim().ToLower().Equals("inactive")) statusIn = false;
                     var query = from c in context.Tags
                         where c.Status.Equals(statusIn)
                         select new { c };
-                    List<TagModel> tagModel = await query.Select(x => new TagModel()
+                    var tagModel = await query.Select(x => new TagModel
                     {
                         Id = x.c.Id,
                         TagName = x.c.TagName,
@@ -125,11 +119,11 @@ public class TagRepo: Repository<Tag>
                     return tagModel;
                 }
             }
-            else
+
             {
                 var query = from c in context.Tags
                     select new { c };
-                List<TagModel> tagModel = await query.Select(x => new TagModel()
+                var tagModel = await query.Select(x => new TagModel
                 {
                     Id = x.c.Id,
                     TagName = x.c.TagName,
@@ -141,7 +135,7 @@ public class TagRepo: Repository<Tag>
                 return tagModel;
             }
         }
-        catch 
+        catch
         {
             return null;
         }
