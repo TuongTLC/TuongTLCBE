@@ -58,6 +58,14 @@ public class PostController : Controller
         return result.GetType() == typeof(List<PostInfoModel>) ? Ok(result) : BadRequest(result);
     }
 
+    [HttpGet("get-top-related-posts")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetRelatedPosts([FromQuery] List<string> categoryIds)
+    {
+        var result = await _postService.GetRelatedPosts(categoryIds);
+        return Ok(result);
+    }
+
     [HttpGet("search-post")]
     [AllowAnonymous]
     public async Task<IActionResult> SearchPost(int pageNumber, int pageSize, string postName, string? status,

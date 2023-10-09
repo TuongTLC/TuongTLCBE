@@ -10,6 +10,25 @@ public class PostRepo : Repository<Post>
     {
     }
 
+    public async Task<List<string>?> GetPostsByCategory(Guid categoryIds)
+    {
+        try
+        {
+            var query = from p in context.Posts
+                join pc in context.PostCategories on p.Id equals pc.PostId
+                join c in context.Categories on pc.CategoryId equals c.Id
+                where c.Id.Equals(categoryIds)
+                orderby p.Like descending
+                select new { PostId = p.Id };
+            var posts = await query.Select(x => new string(x.PostId.ToString())).Take(6).ToListAsync();
+            return posts;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
 
     public async Task<List<Post>?> GetPostsInfo(string status)
     {

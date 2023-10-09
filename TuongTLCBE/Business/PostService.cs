@@ -653,4 +653,37 @@ public class PostService
             return e;
         }
     }
+
+    public async Task<object?> GetRelatedPosts(List<string> categoryIds)
+    {
+        try
+        {
+            List<string> postIds = new();
+            foreach (var categoryId in categoryIds)
+            {
+                var listPosts = await _postRepo.GetPostsByCategory(Guid.Parse(categoryId));
+                if (listPosts != null)
+                    foreach (var listPostCate in listPosts)
+                        postIds.Add(listPostCate);
+            }
+
+            postIds = postIds.Distinct().Take(3).ToList();
+            List<PostInfoModel> response = new();
+            foreach (var postId in postIds)
+            {
+                var postInfo = await GetPost(Guid.Parse(postId));
+                if (postInfo?.GetType() == typeof(PostInfoModel))
+                {
+                    response.Add((PostInfoModel)postInfo);
+                }
+            }
+                
+            return response;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
 }
