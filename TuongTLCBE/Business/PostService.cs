@@ -685,7 +685,7 @@ public class PostService
                         postIds.Add(listPostCate);
             }
 
-            postIds = postIds.Distinct().Take(3).ToList();
+            postIds = postIds.Distinct().Take(6).ToList();
             List<PostInfoModel> response = new();
             foreach (var postId in postIds)
             {
