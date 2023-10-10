@@ -58,7 +58,7 @@ public class PostController : Controller
         return result.GetType() == typeof(List<PostInfoModel>) ? Ok(result) : BadRequest(result);
     }
 
-    [HttpGet("get-top-related-posts")]
+    [HttpGet("get-related-posts")]
     [AllowAnonymous]
     public async Task<IActionResult> GetRelatedPosts(string postId)
     {
