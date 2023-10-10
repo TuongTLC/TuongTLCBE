@@ -6,8 +6,14 @@ namespace TuongTLCBE.Data.Repositories;
 
 public class PostRepo : Repository<Post>
 {
-    public PostRepo(TuongTlcdbContext context) : base(context)
+    private readonly PostCategoryRepo _postCategoryRepo;
+    private readonly PostTagRepo _postTagRepo;
+
+    public PostRepo(TuongTlcdbContext context, PostCategoryRepo postCategoryRepo, PostTagRepo postTagRepo) :
+        base(context)
     {
+        _postCategoryRepo = postCategoryRepo;
+        _postTagRepo = postTagRepo;
     }
 
     public async Task<List<string>?> GetPostsByCategory(Guid categoryIds)
@@ -135,11 +141,22 @@ public class PostRepo : Repository<Post>
             var post = await context.Posts.Where(x => x.Id.Equals(postUpdateModel.Id)).FirstOrDefaultAsync();
             if (post != null)
             {
+                var categoryUpdate = false;
+                var tagUpdate = false;
+                if (postUpdateModel.CategoriesIds.Any())
+                    categoryUpdate =
+                        await _postCategoryRepo.UpdatePostCategories(postUpdateModel.Id, postUpdateModel.CategoriesIds);
+
+                if (postUpdateModel.TagsIds.Any())
+                    tagUpdate = await _postTagRepo.UpdatePostTags(postUpdateModel.Id, postUpdateModel.TagsIds);
+
+                if (categoryUpdate == false || tagUpdate == false) return false;
                 post.PostName = postUpdateModel.PostName;
                 post.Summary = postUpdateModel.Summary;
                 post.Content = postUpdateModel.Content;
                 post.Thumbnail = postUpdateModel.Thumbnail;
-                _ = await context.SaveChangesAsync();
+                var postUpdate = await context.SaveChangesAsync();
+                if (postUpdate == 0) return false;
                 return true;
             }
 

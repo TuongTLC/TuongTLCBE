@@ -60,9 +60,9 @@ public class PostController : Controller
 
     [HttpGet("get-top-related-posts")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetRelatedPosts([FromQuery] List<string> categoryIds)
+    public async Task<IActionResult> GetRelatedPosts(string postId)
     {
-        var result = await _postService.GetRelatedPosts(categoryIds);
+        var result = await _postService.GetRelatedPosts(postId);
         return Ok(result);
     }
 

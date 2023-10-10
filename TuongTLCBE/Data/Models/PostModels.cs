@@ -9,6 +9,7 @@ public class PostRequestModel
     public List<Guid> CategoriesIds { get; set; }
     public List<Guid> TagsIds { get; set; }
 }
+
 public class PostModel
 {
     public Guid Id { get; set; }
@@ -26,15 +27,17 @@ public class PostModel
 public class PostAuthor
 {
     public Guid Id { get; set; }
-    public string  Fullname { get; set; }
+    public string Fullname { get; set; }
     public string RoleName { get; set; }
 }
+
 public class PostCategoryModel
 {
     public Guid Id { get; set; }
     public string CategoryName { get; set; } = null!;
     public string? Description { get; set; }
 }
+
 public class PostTagModel
 {
     public Guid Id { get; set; }
@@ -45,8 +48,8 @@ public class PostTagModel
 public class PostInfoModel
 {
     public PostModel PostInfo { get; set; }
-    public List<PostCategoryModel> PostCategories{ get; set; }
-    public List<PostTagModel> PostTags{ get; set; }
+    public List<PostCategoryModel> PostCategories { get; set; }
+    public List<PostTagModel> PostTags { get; set; }
 }
 
 public class PostPagingResponseModel
@@ -62,4 +65,6 @@ public class PostUpdateModel
     public string? Summary { get; set; }
     public string Content { get; set; }
     public string? Thumbnail { get; set; }
+    public List<Guid> CategoriesIds { get; set; }
+    public List<Guid> TagsIds { get; set; }
 }

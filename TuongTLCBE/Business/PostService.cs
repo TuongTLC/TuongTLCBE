@@ -654,14 +654,32 @@ public class PostService
         }
     }
 
-    public async Task<object?> GetRelatedPosts(List<string> categoryIds)
+    public async Task<object?> GetRelatedPosts(string relatePostId)
     {
         try
         {
+            var postCategories = await _postCategoryRepo.GetPostCategories(Guid.Parse(relatePostId));
+            List<PostCategoryModel> postCategoryModels = new();
+            if (postCategories.Any())
+                foreach (var cate in postCategories)
+                {
+                    var category = await _categoryRepo.Get(cate.CategoryId);
+                    if (category != null)
+                    {
+                        PostCategoryModel postCategoryModel = new()
+                        {
+                            Id = category.Id,
+                            CategoryName = category.CategoryName,
+                            Description = category.Description
+                        };
+                        postCategoryModels.Add(postCategoryModel);
+                    }
+                }
+
             List<string> postIds = new();
-            foreach (var categoryId in categoryIds)
+            foreach (var category in postCategoryModels)
             {
-                var listPosts = await _postRepo.GetPostsByCategory(Guid.Parse(categoryId));
+                var listPosts = await _postRepo.GetPostsByCategory(category.Id);
                 if (listPosts != null)
                     foreach (var listPostCate in listPosts)
                         postIds.Add(listPostCate);
@@ -672,12 +690,9 @@ public class PostService
             foreach (var postId in postIds)
             {
                 var postInfo = await GetPost(Guid.Parse(postId));
-                if (postInfo?.GetType() == typeof(PostInfoModel))
-                {
-                    response.Add((PostInfoModel)postInfo);
-                }
+                if (postInfo?.GetType() == typeof(PostInfoModel)) response.Add((PostInfoModel)postInfo);
             }
-                
+
             return response;
         }
         catch (Exception e)
