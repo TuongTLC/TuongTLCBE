@@ -19,6 +19,8 @@ public partial class TuongTlcdbContext : DbContext
 
     public virtual DbSet<PostCategory> PostCategories { get; set; }
 
+    public virtual DbSet<PostComment> PostComments { get; set; }
+
     public virtual DbSet<PostTag> PostTags { get; set; }
 
     public virtual DbSet<Tag> Tags { get; set; }
@@ -109,6 +111,34 @@ public partial class TuongTlcdbContext : DbContext
                 .HasForeignKey(d => d.PostId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("PostCategory_Post_ID_fk");
+        });
+
+        modelBuilder.Entity<PostComment>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PostComment_pk");
+
+            entity.ToTable("PostComment");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("(newid())")
+                .HasColumnName("ID");
+            entity.Property(e => e.CommenterId).HasColumnName("CommenterID");
+            entity.Property(e => e.Content).HasMaxLength(500);
+            entity.Property(e => e.Dislike).HasDefaultValueSql("((0))");
+            entity.Property(e => e.Like).HasDefaultValueSql("((0))");
+            entity.Property(e => e.ParentCommentId).HasColumnName("ParentCommentID");
+            entity.Property(e => e.PostId).HasColumnName("PostID");
+            entity.Property(e => e.Status).HasDefaultValueSql("((0))");
+
+            entity.HasOne(d => d.Commenter).WithMany(p => p.PostComments)
+                .HasForeignKey(d => d.CommenterId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("PostComment_User_ID_fk");
+
+            entity.HasOne(d => d.Post).WithMany(p => p.PostComments)
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("PostComment_Post_ID_fk");
         });
 
         modelBuilder.Entity<PostTag>(entity =>

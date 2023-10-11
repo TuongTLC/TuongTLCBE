@@ -29,6 +29,8 @@ public partial class User
 
     public virtual ICollection<FileUpload> FileUploads { get; set; } = new List<FileUpload>();
 
+    public virtual ICollection<PostComment> PostComments { get; set; } = new List<PostComment>();
+
     public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
 
     public virtual UserRole? Role { get; set; }
