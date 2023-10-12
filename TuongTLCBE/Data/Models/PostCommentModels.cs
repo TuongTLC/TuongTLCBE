@@ -26,4 +26,6 @@ public class PostCommentModel
     public int? Dislike { get; set; }
 
     public bool? Status { get; set; }
+
+    public List<PostCommentModel> Replies { get; set; } = new();
 }

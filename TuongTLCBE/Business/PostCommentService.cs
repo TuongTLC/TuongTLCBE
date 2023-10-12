@@ -45,12 +45,26 @@ public class PostCommentService
         }
     }
 
+    private static List<PostCommentModel> BuildCommentTree(List<PostCommentModel> comments, Guid? parentId)
+    {
+        var commentTree = new List<PostCommentModel>();
+
+        foreach (var comment in comments)
+            if (comment.ParentCommentId == parentId)
+            {
+                comment.Replies = BuildCommentTree(comments, comment.Id);
+                commentTree.Add(comment);
+            }
+
+        return commentTree;
+    }
+
     public async Task<object> GetPostComments(Guid postId)
     {
         try
         {
             var getPostComments = await _postCommentRepo.GetPostComments(postId);
-            if (getPostComments != null) return getPostComments;
+            if (getPostComments != null && getPostComments.Any()) return BuildCommentTree(getPostComments, null);
 
             return "Something went wrong while retrieving post's comments";
         }
@@ -58,6 +72,15 @@ public class PostCommentService
         {
             return e;
         }
+    }
+
+    private void FindAndAddReply(PostCommentModel current, PostCommentModel reply)
+    {
+        if (current.Id == reply.ParentCommentId)
+            current.Replies.Add(reply);
+        else
+            foreach (var child in current.Replies)
+                FindAndAddReply(child, reply);
     }
 
     public async Task<object> InsertPostComment(PostCommentInsertModel postCommentInsertModel, string token)
