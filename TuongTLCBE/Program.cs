@@ -7,10 +7,10 @@ using TuongTLCBE.Business;
 using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Repositories;
 
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args);
 
-string dbConn = await VaultHelper.GetSecrets("dbconn");
-string jwtToken = await VaultHelper.GetSecrets("jwt");
+var dbConn = await VaultHelper.GetSecrets("dbconn");
+var jwtToken = await VaultHelper.GetSecrets("jwt");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -21,6 +21,7 @@ builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<DecodeToken>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<FileService>();
+builder.Services.AddScoped<PostCommentService>();
 builder.Services.AddTransient<UserRepo>();
 builder.Services.AddTransient<CategoryRepo>();
 builder.Services.AddTransient<TagRepo>();
@@ -28,6 +29,7 @@ builder.Services.AddTransient<PostCategoryRepo>();
 builder.Services.AddTransient<PostTagRepo>();
 builder.Services.AddTransient<PostRepo>();
 builder.Services.AddTransient<FileRepo>();
+builder.Services.AddTransient<PostCommentRepo>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(option =>
@@ -53,7 +55,7 @@ builder.Services.AddSwaggerGen(option =>
             Type = SecuritySchemeType.ApiKey,
             Scheme = "Bearer",
             BearerFormat = "JWT",
-            Reference = new OpenApiReference()
+            Reference = new OpenApiReference
             {
                 Type = ReferenceType.SecurityScheme,
                 Id = "Bearer"
@@ -62,7 +64,7 @@ builder.Services.AddSwaggerGen(option =>
     option.AddSecurityDefinition("Bearer", securityScheme);
 
     option.AddSecurityRequirement(
-        new OpenApiSecurityRequirement() { { securityScheme, new string[] { } } }
+        new OpenApiSecurityRequirement { { securityScheme, new string[] { } } }
     );
 });
 
@@ -78,7 +80,7 @@ builder.Services
             ValidateIssuerSigningKey = true,
             ValidIssuer = "https://tuongtlc.ddns.net",
             ValidAudience = "https://tuongtlc.ddns.net",
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtToken)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtToken))
         };
     });
 
@@ -88,16 +90,15 @@ builder.Services.AddCors(
     p =>
         p.AddPolicy(
             "AllowOrigin",
-            policyBuilder =>
-            {
-                _ = policyBuilder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
-            }
+            policyBuilder => { _ = policyBuilder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader(); }
         )
 );
 
-WebApplication app = builder.Build();
+var app = builder.Build();
 
-if (app.Environment.IsDevelopment()) { }
+if (app.Environment.IsDevelopment())
+{
+}
 
 app.UseSwagger();
 

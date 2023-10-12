@@ -15,7 +15,7 @@ public partial class PostComment
 
     public string Content { get; set; } = null!;
 
-    public int? CommentDate { get; set; }
+    public DateTime? CommentDate { get; set; }
 
     public int? Like { get; set; }
 
@@ -24,6 +24,10 @@ public partial class PostComment
     public bool? Status { get; set; }
 
     public virtual User Commenter { get; set; } = null!;
+
+    public virtual ICollection<PostComment> InverseParentComment { get; set; } = new List<PostComment>();
+
+    public virtual PostComment? ParentComment { get; set; }
 
     public virtual Post Post { get; set; } = null!;
 }

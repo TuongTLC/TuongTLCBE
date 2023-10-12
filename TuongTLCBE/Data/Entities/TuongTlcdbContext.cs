@@ -122,6 +122,7 @@ public partial class TuongTlcdbContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("ID");
+            entity.Property(e => e.CommentDate).HasColumnType("datetime");
             entity.Property(e => e.CommenterId).HasColumnName("CommenterID");
             entity.Property(e => e.Content).HasMaxLength(500);
             entity.Property(e => e.Dislike).HasDefaultValueSql("((0))");
@@ -134,6 +135,10 @@ public partial class TuongTlcdbContext : DbContext
                 .HasForeignKey(d => d.CommenterId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("PostComment_User_ID_fk");
+
+            entity.HasOne(d => d.ParentComment).WithMany(p => p.InverseParentComment)
+                .HasForeignKey(d => d.ParentCommentId)
+                .HasConstraintName("PostComment_PostComment_ID_fk");
 
             entity.HasOne(d => d.Post).WithMany(p => p.PostComments)
                 .HasForeignKey(d => d.PostId)
