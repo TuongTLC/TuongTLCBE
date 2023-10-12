@@ -11,7 +11,7 @@ public class PostCommentModel
 {
     public Guid Id { get; set; }
 
-    public Guid CommenterId { get; set; }
+    public PostCommenter Commenter { get; set; }
 
     public Guid PostId { get; set; }
 
@@ -28,4 +28,11 @@ public class PostCommentModel
     public bool? Status { get; set; }
 
     public List<PostCommentModel> Replies { get; set; } = new();
+}
+
+public class PostCommenter
+{
+    public Guid Id { get; set; }
+    public string CommenterName { get; set; }
+    public string Username { get; set; }
 }

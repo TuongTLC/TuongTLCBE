@@ -8,11 +8,13 @@ public class PostCommentService
 {
     private readonly DecodeToken _decodeToken;
     private readonly PostCommentRepo _postCommentRepo;
+    private readonly UserRepo _userRepo;
 
-    public PostCommentService(PostCommentRepo postCommentRepo, DecodeToken decodeToken)
+    public PostCommentService(PostCommentRepo postCommentRepo, DecodeToken decodeToken, UserRepo userRepo)
     {
         _postCommentRepo = postCommentRepo;
         _decodeToken = decodeToken;
+        _userRepo = userRepo;
     }
 
     private async Task<PostCommentModel?> GetPostComment(Guid postCommentId)
@@ -22,19 +24,29 @@ public class PostCommentService
             var result = await _postCommentRepo.Get(postCommentId);
             if (result != null)
             {
-                PostCommentModel responseModel = new()
+                var user = await _userRepo.Get(result.CommenterId);
+                if (user != null)
                 {
-                    Id = result.Id,
-                    CommenterId = result.CommenterId,
-                    PostId = result.PostId,
-                    ParentCommentId = result.ParentCommentId,
-                    Content = result.Content,
-                    CommentDate = result.CommentDate,
-                    Like = result.Like,
-                    Dislike = result.Dislike,
-                    Status = result.Status
-                };
-                return responseModel;
+                    PostCommenter postCommenter = new()
+                    {
+                        Id = user.Id,
+                        CommenterName = user.FullName,
+                        Username = user.Username
+                    };
+                    PostCommentModel responseModel = new()
+                    {
+                        Id = result.Id,
+                        Commenter = postCommenter,
+                        PostId = result.PostId,
+                        ParentCommentId = result.ParentCommentId,
+                        Content = result.Content,
+                        CommentDate = result.CommentDate,
+                        Like = result.Like,
+                        Dislike = result.Dislike,
+                        Status = result.Status
+                    };
+                    return responseModel;
+                }
             }
 
             return null;
@@ -64,8 +76,7 @@ public class PostCommentService
         try
         {
             var getPostComments = await _postCommentRepo.GetPostComments(postId);
-            if (getPostComments != null && getPostComments.Any()) return BuildCommentTree(getPostComments, null);
-
+            if (getPostComments != null) return BuildCommentTree(getPostComments, null);
             return "Something went wrong while retrieving post's comments";
         }
         catch (Exception e)
@@ -74,14 +85,6 @@ public class PostCommentService
         }
     }
 
-    private void FindAndAddReply(PostCommentModel current, PostCommentModel reply)
-    {
-        if (current.Id == reply.ParentCommentId)
-            current.Replies.Add(reply);
-        else
-            foreach (var child in current.Replies)
-                FindAndAddReply(child, reply);
-    }
 
     public async Task<object> InsertPostComment(PostCommentInsertModel postCommentInsertModel, string token)
     {

@@ -6,8 +6,11 @@ namespace TuongTLCBE.Data.Repositories;
 
 public class PostCommentRepo : Repository<PostComment>
 {
-    public PostCommentRepo(TuongTlcdbContext context) : base(context)
+    private readonly UserRepo _userRepo;
+
+    public PostCommentRepo(TuongTlcdbContext context, UserRepo userRepo) : base(context)
     {
+        _userRepo = userRepo;
     }
 
     public async Task<List<PostCommentModel>?> GetPostComments(Guid postId)
@@ -19,25 +22,36 @@ public class PostCommentRepo : Repository<PostComment>
             if (postComments.Any())
                 foreach (var postComment in postComments)
                 {
-                    PostCommentModel convertModel = new()
+                    var user = await _userRepo.Get(postComment.CommenterId);
+                    if (user != null)
                     {
-                        Id = postComment.Id,
-                        CommenterId = postComment.CommenterId,
-                        PostId = postComment.PostId,
-                        ParentCommentId = postComment.ParentCommentId,
-                        Content = postComment.Content,
-                        CommentDate = postComment.CommentDate,
-                        Like = postComment.Like,
-                        Dislike = postComment.Dislike,
-                        Status = postComment.Status
-                    };
-                    postCommentModels.Add(convertModel);
+                        PostCommenter postCommenter = new()
+                        {
+                            Id = user.Id,
+                            CommenterName = user.FullName,
+                            Username = user.Username
+                        };
+                        PostCommentModel convertModel = new()
+                        {
+                            Id = postComment.Id,
+                            Commenter = postCommenter,
+                            PostId = postComment.PostId,
+                            ParentCommentId = postComment.ParentCommentId,
+                            Content = postComment.Content,
+                            CommentDate = postComment.CommentDate,
+                            Like = postComment.Like,
+                            Dislike = postComment.Dislike,
+                            Status = postComment.Status
+                        };
+                        postCommentModels.Add(convertModel);
+                    }
                 }
 
             return postCommentModels;
         }
-        catch
+        catch (Exception e)
         {
+            Console.WriteLine(e);
             return null;
         }
     }
