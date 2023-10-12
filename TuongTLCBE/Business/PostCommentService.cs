@@ -117,4 +117,21 @@ public class PostCommentService
             return e;
         }
     }
+
+    public async Task<object> UpdateComment(PostCommentUpdateModel commentUpdateModel, string token)
+    {
+        try
+        {
+            var userid = _decodeToken.Decode(token, "userid");
+            var comment = await _postCommentRepo.Get(commentUpdateModel.CommentId);
+            if (comment != null && !comment.CommenterId.Equals(Guid.Parse(userid)))
+                return "Not the owner of the comment!!!";
+            var updateResult = await _postCommentRepo.UpdateComment(commentUpdateModel);
+            return updateResult;
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
 }

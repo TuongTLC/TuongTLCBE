@@ -55,4 +55,30 @@ public class PostCommentRepo : Repository<PostComment>
             return null;
         }
     }
+
+    public async Task<bool> UpdateComment(PostCommentUpdateModel commentUpdateModel)
+    {
+        try
+        {
+            var comment = await context.PostComments.Where(x => x.Id.Equals(commentUpdateModel.CommentId))
+                .FirstOrDefaultAsync();
+            if (comment != null)
+            {
+                if (commentUpdateModel.Content != null) comment.Content = commentUpdateModel.Content;
+
+                if (commentUpdateModel.Like == true) comment.Like += 1;
+                if (commentUpdateModel.Dislike == true) comment.Like -= 1;
+                if (commentUpdateModel.Status != null) comment.Status = commentUpdateModel.Status;
+                var update = await context.SaveChangesAsync();
+                if (update == 0) return false;
+                return true;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }

@@ -36,3 +36,12 @@ public class PostCommenter
     public string CommenterName { get; set; }
     public string Username { get; set; }
 }
+
+public class PostCommentUpdateModel
+{
+    public Guid CommentId { get; set; }
+    public string? Content { get; set; }
+    public bool? Like { get; set; }
+    public bool? Dislike { get; set; }
+    public bool? Status { get; set; }
+}

@@ -32,4 +32,19 @@ public class PostCommentController : ControllerBase
         var result = await _postCommentService.GetPostComments(postId);
         return result.GetType() == typeof(List<PostCommentModel>) ? Ok(result) : BadRequest(result);
     }
+
+    [HttpPost("update-comment")]
+    [Authorize(Roles = "Admin, User")]
+    public async Task<ActionResult> UpdateComment(PostCommentUpdateModel commentUpdateModel)
+    {
+        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        var result = await _postCommentService.UpdateComment(commentUpdateModel, token);
+        if (result is bool)
+        {
+            if ((bool)result) return Ok("Comment updated!!!");
+
+            if ((bool)result == false) return BadRequest("Comment update failed!!!");
+        }
+        return BadRequest("Comment update failed!!!");
+    }
 }
