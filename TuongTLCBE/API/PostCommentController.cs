@@ -45,6 +45,7 @@ public class PostCommentController : ControllerBase
 
             if ((bool)result == false) return BadRequest("Comment update failed!!!");
         }
-        return BadRequest("Comment update failed!!!");
+
+        return BadRequest(result);
     }
 }
