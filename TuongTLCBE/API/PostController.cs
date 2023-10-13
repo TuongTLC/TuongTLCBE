@@ -103,4 +103,24 @@ public class PostController : Controller
                 : BadRequest("Failed to delete post.");
         return BadRequest(result);
     }
+
+    [HttpPost("like-post")]
+    [Authorize(Roles = "Admin, User")]
+    public async Task<ActionResult> LikePost(string postId)
+    {
+        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        var result = await _postService.LikePost(postId, token);
+        if (result is bool) return (bool)result ? Ok("Post liked!!!") : BadRequest("Post like failed!!!");
+        return BadRequest("Already interact!");
+    }
+
+    [HttpPost("dislike-post")]
+    [Authorize(Roles = "Admin, User")]
+    public async Task<ActionResult> DislikePost(string postId)
+    {
+        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        var result = await _postService.DislikePost(postId, token);
+        if (result is bool) return (bool)result ? Ok("Post disliked!!!") : BadRequest("Post dislike failed!!!");
+        return BadRequest("Already interact!");
+    }
 }

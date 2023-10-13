@@ -134,4 +134,30 @@ public class PostCommentService
             return e;
         }
     }
+
+    public async Task<object?> LikeComment(string commentId, string token)
+    {
+        try
+        {
+            var userId = _decodeToken.Decode(token, "userid");
+            return await _postCommentRepo.LikeComment(commentId, userId);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+
+    public async Task<object?> DislikeComment(string commentId, string token)
+    {
+        try
+        {
+            var userId = _decodeToken.Decode(token, "userid");
+            return await _postCommentRepo.DislikeComment(commentId, userId);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
 }

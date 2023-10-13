@@ -8,12 +8,15 @@ public class PostRepo : Repository<Post>
 {
     private readonly PostCategoryRepo _postCategoryRepo;
     private readonly PostTagRepo _postTagRepo;
+    private readonly UserInteractPostRepo _userInteractPostRepo;
 
-    public PostRepo(TuongTlcdbContext context, PostCategoryRepo postCategoryRepo, PostTagRepo postTagRepo) :
+    public PostRepo(TuongTlcdbContext context, PostCategoryRepo postCategoryRepo, PostTagRepo postTagRepo,
+        UserInteractPostRepo userInteractPostRepo) :
         base(context)
     {
         _postCategoryRepo = postCategoryRepo;
         _postTagRepo = postTagRepo;
+        _userInteractPostRepo = userInteractPostRepo;
     }
 
     public async Task<List<string>?> GetPostsByCategory(Guid categoryIds)
@@ -157,6 +160,69 @@ public class PostRepo : Repository<Post>
                 post.Thumbnail = postUpdateModel.Thumbnail;
                 var postUpdate = await context.SaveChangesAsync();
                 if (postUpdate == 0) return false;
+                return true;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+
+    public async Task<bool?> LikePost(string postId, string userId)
+    {
+        try
+        {
+            var checkInteraction = await context.UserInteractPosts
+                .Where(x => x.UserId.Equals(Guid.Parse(userId)) &&
+                            x.PostId.Equals(Guid.Parse(postId)))
+                .FirstOrDefaultAsync();
+            if (checkInteraction != null) return null;
+
+            var post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+                .FirstOrDefaultAsync();
+            if (post != null)
+            {
+                post.Like += 1;
+                var update = await context.SaveChangesAsync();
+                if (update > 0)
+                    _ = await _userInteractPostRepo.Insert(new UserInteractPost
+                        { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), PostId = Guid.Parse(postId) });
+                if (update == 0) return false;
+                return true;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool?> DislikePost(string postId, string userId)
+    {
+        try
+        {
+            var checkInteraction = await context.UserInteractPosts
+                .Where(x => x.UserId.Equals(Guid.Parse(userId)) &&
+                            x.PostId.Equals(Guid.Parse(postId)))
+                .FirstOrDefaultAsync();
+            if (checkInteraction != null) return null;
+
+            var comment = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+                .FirstOrDefaultAsync();
+            if (comment != null)
+            {
+                comment.Dislike += 1;
+                var update = await context.SaveChangesAsync();
+                if (update > 0)
+                    _ = await _userInteractPostRepo.Insert(new UserInteractPost
+                        { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), PostId = Guid.Parse(postId) });
+                if (update == 0) return false;
                 return true;
             }
 

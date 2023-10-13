@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace TuongTLCBE.Data.Entities;
 
@@ -26,6 +24,10 @@ public partial class TuongTlcdbContext : DbContext
     public virtual DbSet<Tag> Tags { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    public virtual DbSet<UserInteractComment?> UserInteractComments { get; set; }
+
+    public virtual DbSet<UserInteractPost> UserInteractPosts { get; set; }
 
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
@@ -210,6 +212,59 @@ public partial class TuongTlcdbContext : DbContext
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
                 .HasForeignKey(d => d.RoleId)
                 .HasConstraintName("FK_User_UserRole");
+        });
+
+        modelBuilder.Entity<UserInteractComment>(entity =>
+        {
+            entity.HasKey(e => e.Id)
+                .HasName("UserInteractComment_pk")
+                .IsClustered(false);
+
+            entity.ToTable("UserInteractComment");
+
+            entity.HasIndex(e => new { e.UserId, e.CommentId }, "UserInteractComment_UserID_CommentID_index")
+                .IsClustered();
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("(newid())")
+                .HasColumnName("ID");
+            entity.Property(e => e.CommentId).HasColumnName("CommentID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+
+            entity.HasOne(d => d.Comment).WithMany(p => p.UserInteractComments)
+                .HasForeignKey(d => d.CommentId)
+                .HasConstraintName("UserInteractComment_PostComment_ID_fk");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserInteractComments)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("UserInteractComment_User_ID_fk");
+        });
+
+        modelBuilder.Entity<UserInteractPost>(entity =>
+        {
+            entity.HasKey(e => e.Id)
+                .HasName("UserInteractPost_pk")
+                .IsClustered(false);
+
+            entity.ToTable("UserInteractPost");
+
+            entity.HasIndex(e => new { e.UserId, e.PostId }, "UserInteractPost_UserID_PostID_index").IsClustered();
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("(newid())")
+                .HasColumnName("ID");
+            entity.Property(e => e.PostId).HasColumnName("PostID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+
+            entity.HasOne(d => d.Post).WithMany(p => p.UserInteractPosts)
+                .HasForeignKey(d => d.PostId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("UserInteractPost_Post_ID_fk");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserInteractPosts)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("UserInteractPost_User_ID_fk");
         });
 
         modelBuilder.Entity<UserRole>(entity =>

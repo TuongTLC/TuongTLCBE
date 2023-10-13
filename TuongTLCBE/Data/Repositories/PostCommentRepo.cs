@@ -6,11 +6,14 @@ namespace TuongTLCBE.Data.Repositories;
 
 public class PostCommentRepo : Repository<PostComment>
 {
+    private readonly UserInteractCommentRepo _userInteractCommentRepo;
     private readonly UserRepo _userRepo;
 
-    public PostCommentRepo(TuongTlcdbContext context, UserRepo userRepo) : base(context)
+    public PostCommentRepo(TuongTlcdbContext context, UserRepo userRepo,
+        UserInteractCommentRepo userInteractCommentRepo) : base(context)
     {
         _userRepo = userRepo;
+        _userInteractCommentRepo = userInteractCommentRepo;
     }
 
     public async Task<List<PostCommentModel>?> GetPostComments(Guid postId)
@@ -79,16 +82,24 @@ public class PostCommentRepo : Repository<PostComment>
         }
     }
 
-    public async Task<bool> LikeComment(string commentId)
+    public async Task<bool?> LikeComment(string commentId, string userId)
     {
         try
         {
+            var checkInteraction = await context.UserInteractComments
+                .Where(x => x != null && x.UserId.Equals(Guid.Parse(userId)) &&
+                            x.CommentId.Equals(Guid.Parse(commentId)))
+                .FirstOrDefaultAsync();
+            if (checkInteraction != null) return null;
             var comment = await context.PostComments.Where(x => x.Id.Equals(Guid.Parse(commentId)))
                 .FirstOrDefaultAsync();
             if (comment != null)
             {
                 comment.Like += 1;
                 var update = await context.SaveChangesAsync();
+                if (update > 0)
+                    _ = await _userInteractCommentRepo.Insert(new UserInteractComment
+                        { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), CommentId = Guid.Parse(commentId) });
                 if (update == 0) return false;
                 return true;
             }
@@ -101,16 +112,24 @@ public class PostCommentRepo : Repository<PostComment>
         }
     }
 
-    public async Task<bool> DislikeComment(string commentId)
+    public async Task<bool?> DislikeComment(string commentId, string userId)
     {
         try
         {
+            var checkInteraction = await context.UserInteractComments
+                .Where(x => x != null && x.UserId.Equals(Guid.Parse(userId)) &&
+                            x.CommentId.Equals(Guid.Parse(commentId)))
+                .FirstOrDefaultAsync();
+            if (checkInteraction != null) return null;
             var comment = await context.PostComments.Where(x => x.Id.Equals(Guid.Parse(commentId)))
                 .FirstOrDefaultAsync();
             if (comment != null)
             {
                 comment.Dislike += 1;
                 var update = await context.SaveChangesAsync();
+                if (update > 0)
+                    _ = await _userInteractCommentRepo.Insert(new UserInteractComment
+                        { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), CommentId = Guid.Parse(commentId) });
                 if (update == 0) return false;
                 return true;
             }

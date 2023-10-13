@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuongTLCBE.Business;
 using TuongTLCBE.Data.Models;
-using TuongTLCBE.Data.Repositories;
 
 namespace TuongTLCBE.API;
 
@@ -10,13 +9,11 @@ namespace TuongTLCBE.API;
 [ApiController]
 public class PostCommentController : ControllerBase
 {
-    private readonly PostCommentRepo _postCommentRepo;
     private readonly PostCommentService _postCommentService;
 
-    public PostCommentController(PostCommentService postCommentService, PostCommentRepo postCommentRepo)
+    public PostCommentController(PostCommentService postCommentService)
     {
         _postCommentService = postCommentService;
-        _postCommentRepo = postCommentRepo;
     }
 
     [HttpPost("insert-comment")]
@@ -53,20 +50,22 @@ public class PostCommentController : ControllerBase
     }
 
     [HttpPost("like-comment")]
-    [AllowAnonymous]
+    [Authorize(Roles = "Admin, User")]
     public async Task<ActionResult> LikeComment(string commentId)
     {
-        var result = await _postCommentRepo.LikeComment(commentId);
-        if (result) return Ok("Comment liked!!!");
-        return BadRequest("Comment like failed!!!");
+        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        var result = await _postCommentService.LikeComment(commentId, token);
+        if (result is bool) return (bool)result ? Ok("Comment liked!!!") : BadRequest("Comment like failed!!!");
+        return BadRequest("Already interact!");
     }
 
     [HttpPost("dislike-comment")]
-    [AllowAnonymous]
+    [Authorize(Roles = "Admin, User")]
     public async Task<ActionResult> DislikeComment(string commentId)
     {
-        var result = await _postCommentRepo.DislikeComment(commentId);
-        if (result) return Ok("Comment disliked!!!");
-        return BadRequest("Comment dislike failed!!!");
+        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        var result = await _postCommentService.DislikeComment(commentId, token);
+        if (result is bool) return (bool)result ? Ok("Comment disliked!!!") : BadRequest("Comment dislike failed!!!");
+        return BadRequest("Already interact!");
     }
 }

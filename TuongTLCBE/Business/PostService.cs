@@ -701,4 +701,30 @@ public class PostService
             throw;
         }
     }
+
+    public async Task<object?> LikePost(string postId, string token)
+    {
+        try
+        {
+            var userId = _decodeToken.Decode(token, "userid");
+            return await _postRepo.LikePost(postId, userId);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+
+    public async Task<object?> DislikePost(string postId, string token)
+    {
+        try
+        {
+            var userId = _decodeToken.Decode(token, "userid");
+            return await _postRepo.DislikePost(postId, userId);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
 }

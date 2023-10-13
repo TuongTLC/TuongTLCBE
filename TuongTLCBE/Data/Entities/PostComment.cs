@@ -30,4 +30,6 @@ public partial class PostComment
     public virtual PostComment? ParentComment { get; set; }
 
     public virtual Post Post { get; set; } = null!;
+
+    public virtual ICollection<UserInteractComment> UserInteractComments { get; set; } = new List<UserInteractComment>();
 }

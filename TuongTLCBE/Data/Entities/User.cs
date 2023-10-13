@@ -34,4 +34,8 @@ public partial class User
     public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
 
     public virtual UserRole? Role { get; set; }
+
+    public virtual ICollection<UserInteractComment> UserInteractComments { get; set; } = new List<UserInteractComment>();
+
+    public virtual ICollection<UserInteractPost> UserInteractPosts { get; set; } = new List<UserInteractPost>();
 }
