@@ -83,7 +83,7 @@ public class PostCommentRepo : Repository<PostComment>
     {
         try
         {
-            var comment = await context.PostComments.Where(x => x.Id.Equals(commentId))
+            var comment = await context.PostComments.Where(x => x.Id.Equals(Guid.Parse(commentId)))
                 .FirstOrDefaultAsync();
             if (comment != null)
             {
