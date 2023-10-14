@@ -31,7 +31,7 @@ builder.Services.AddTransient<PostRepo>();
 builder.Services.AddTransient<FileRepo>();
 builder.Services.AddTransient<PostCommentRepo>();
 builder.Services.AddTransient<UserInteractCommentRepo>();
-builder.Services.AddTransient<UsỦeInteractPostRepo>();
+builder.Services.AddTransient<UserInteractPostRepo>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(option =>
