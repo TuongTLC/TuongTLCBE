@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -30,6 +30,8 @@ builder.Services.AddTransient<PostTagRepo>();
 builder.Services.AddTransient<PostRepo>();
 builder.Services.AddTransient<FileRepo>();
 builder.Services.AddTransient<PostCommentRepo>();
+builder.Services.AddTransient<UserInteractCommentRepo>();
+builder.Services.AddTransient<UsỦeInteractPostRepo>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(option =>
