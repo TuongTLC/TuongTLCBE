@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
 
 namespace TuongTLCBE.Data.Entities;
 
@@ -25,7 +27,7 @@ public partial class TuongTlcdbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<UserInteractComment?> UserInteractComments { get; set; }
+    public virtual DbSet<UserInteractComment> UserInteractComments { get; set; }
 
     public virtual DbSet<UserInteractPost> UserInteractPosts { get; set; }
 
@@ -126,7 +128,7 @@ public partial class TuongTlcdbContext : DbContext
                 .HasColumnName("ID");
             entity.Property(e => e.CommentDate).HasColumnType("datetime");
             entity.Property(e => e.CommenterId).HasColumnName("CommenterID");
-            entity.Property(e => e.Content).HasMaxLength(500);
+            entity.Property(e => e.Content).HasMaxLength(2000);
             entity.Property(e => e.Dislike).HasDefaultValueSql("((0))");
             entity.Property(e => e.Like).HasDefaultValueSql("((0))");
             entity.Property(e => e.ParentCommentId).HasColumnName("ParentCommentID");
@@ -222,8 +224,7 @@ public partial class TuongTlcdbContext : DbContext
 
             entity.ToTable("UserInteractComment");
 
-            entity.HasIndex(e => new { e.UserId, e.CommentId }, "UserInteractComment_UserID_CommentID_index")
-                .IsClustered();
+            entity.HasIndex(e => new { e.UserId, e.CommentId }, "UserInteractComment_UserID_CommentID_index").IsClustered();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
