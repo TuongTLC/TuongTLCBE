@@ -128,7 +128,7 @@ public partial class TuongTlcdbContext : DbContext
                 .HasColumnName("ID");
             entity.Property(e => e.CommentDate).HasColumnType("datetime");
             entity.Property(e => e.CommenterId).HasColumnName("CommenterID");
-            entity.Property(e => e.Content).HasMaxLength(2000);
+            entity.Property(e => e.Content).HasMaxLength(500);
             entity.Property(e => e.Dislike).HasDefaultValueSql("((0))");
             entity.Property(e => e.Like).HasDefaultValueSql("((0))");
             entity.Property(e => e.ParentCommentId).HasColumnName("ParentCommentID");
