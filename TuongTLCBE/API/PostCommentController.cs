@@ -55,8 +55,9 @@ public class PostCommentController : ControllerBase
     {
         var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
         var result = await _postCommentService.LikeComment(commentId, token);
-        if (result is bool) return (bool)result ? Ok("Comment liked!!!") : BadRequest("Comment like failed!!!");
-        return Conflict("Already interact!");
+        if (result == null) return Conflict("Already interact!");
+        if ((bool)result) return Ok("Comment liked!!!");
+        return BadRequest("Comment like failed!!!");
     }
 
     [HttpPost("dislike-comment")]
@@ -65,7 +66,8 @@ public class PostCommentController : ControllerBase
     {
         var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
         var result = await _postCommentService.DislikeComment(commentId, token);
-        if (result is bool) return (bool)result ? Ok("Comment disliked!!!") : BadRequest("Comment dislike failed!!!");
-        return Conflict("Already interact!");
+        if (result == null) return Conflict("Already interact!");
+        if ((bool)result) return Ok("Comment disliked!!!");
+        return BadRequest("Comment dislike failed!!!");
     }
 }
