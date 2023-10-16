@@ -97,9 +97,9 @@ public class PostController : Controller
     [HttpPost("change-post-status")]
     [SwaggerOperation(Summary = "Active/Inactive")]
     [Authorize(Roles = "User,Admin")]
-    public async Task<IActionResult> ChangePostStatus(Guid postId, string status)
+    public async Task<IActionResult> ChangePostStatus(ChangePostStatusModel changePostStatusModel)
     {
-        var result = await _postService.ChangePostStatus(postId, status);
+        var result = await _postService.ChangePostStatus(changePostStatusModel.PostId, changePostStatusModel.Status);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
     }
 

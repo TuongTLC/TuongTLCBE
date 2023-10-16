@@ -10,6 +10,12 @@ public class PostRequestModel
     public List<Guid> TagsIds { get; set; }
 }
 
+public class ChangePostStatusModel
+{
+    public Guid PostId { get; set; }
+    public string Status { get; set; }
+}
+
 public class PostModel
 {
     public Guid Id { get; set; }
