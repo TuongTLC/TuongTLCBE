@@ -42,11 +42,20 @@ public class PostController : Controller
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
 
-    [HttpGet("get-posts-by-user")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetPostsByUser(int pageNumber, int pageSize, string userId)
+    [HttpGet("get-user-posts-admin")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> GetUserPostsByAdmin(int pageNumber, int pageSize, string userId)
     {
-        var result = await _postService.GetPostsByUser(pageNumber, pageSize, userId);
+        var result = await _postService.GetUserPostsByAdmin(pageNumber, pageSize, userId);
+        return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
+    }
+
+    [HttpGet("get-user-posts")]
+    [Authorize(Roles = "User,Admin")]
+    public async Task<IActionResult> GetPostsByUser(int pageNumber, int pageSize)
+    {
+        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        var result = await _postService.GetPostsByUser(pageNumber, pageSize, token);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
 

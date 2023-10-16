@@ -95,7 +95,7 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            return await context.Posts.Where(x => x.Author.Equals(userId)).OrderByDescending(x => x.CreateDate)
+            return await context.Posts.Where(x => x.Author.Equals(userId)).OrderByDescending(x => x.CreateDate).ThenByDescending(y=>y.Status)
                 .ToListAsync();
         }
         catch

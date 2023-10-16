@@ -287,7 +287,7 @@ public class PostService
         }
     }
 
-    public async Task<object> GetPostsByUser(int pageNumber, int pageSize, string userId)
+    public async Task<object> GetUserPostsByAdmin(int pageNumber, int pageSize, string userId)
     {
         try
         {
@@ -373,7 +373,93 @@ public class PostService
             return e;
         }
     }
+ public async Task<object> GetPostsByUser(int pageNumber, int pageSize, string token)
+    {
+        try
+        {
+            string userid = _decodeToken.Decode(token, "userid");
+            PostPagingResponseModel responseModel = new();
+            var posts = await _postRepo.GetPostByUser(Guid.Parse(userid));
+            if (posts != null && posts.Any())
+            {
+                List<PostInfoModel> listPosts = new();
+                foreach (var post in posts)
+                {
+                    var author = await _userRepo.GetAuthor(post.Author);
+                    PostModel postModel = new()
+                    {
+                        Id = post.Id,
+                        PostName = post.PostName,
+                        Summary = post.Summary,
+                        Content = post.Content,
+                        CreateDate = post.CreateDate,
+                        Author = author,
+                        Like = post.Like,
+                        Dislike = post.Dislike,
+                        Thumbnail = post.Thumbnail,
+                        Status = post.Status
+                    };
+                    var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
+                    List<PostCategoryModel> postCategoryModels = new();
+                    if (postCategories.Any())
+                        foreach (var cate in postCategories)
+                        {
+                            var category = await _categoryRepo.Get(cate.CategoryId);
+                            if (category != null)
+                            {
+                                PostCategoryModel postCategoryModel = new()
+                                {
+                                    Id = category.Id,
+                                    CategoryName = category.CategoryName,
+                                    Description = category.Description
+                                };
+                                postCategoryModels.Add(postCategoryModel);
+                            }
+                        }
 
+                    var postTags = await _postTagRepo.GetPostTags(post.Id);
+                    List<PostTagModel> postTagModels = new();
+                    if (postTags.Any())
+                        foreach (var postTag in postTags)
+                        {
+                            var tag = await _tagRepo.Get(postTag.TagId);
+                            if (tag != null)
+                            {
+                                PostTagModel postTagModel = new()
+                                {
+                                    Id = tag.Id,
+                                    TagName = tag.TagName,
+                                    Description = tag.Description
+                                };
+                                postTagModels.Add(postTagModel);
+                            }
+                        }
+
+                    var postInfo = new PostInfoModel
+                    {
+                        PostInfo = postModel,
+                        PostCategories = postCategoryModels,
+                        PostTags = postTagModels
+                    };
+                    listPosts.Add(postInfo);
+                }
+
+
+                var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
+
+                var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
+                    .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
+                responseModel.Paging = paging;
+                responseModel.ListPosts = postPaged.Results;
+            }
+
+            return responseModel;
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
     public async Task<object> GetTopLiked()
     {
         try
