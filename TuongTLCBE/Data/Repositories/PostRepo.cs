@@ -39,19 +39,22 @@ public class PostRepo : Repository<Post>
     }
 
 
-    public async Task<List<Post>?> GetPostsInfo(string status)
+    public async Task<List<Post>?> GetPostsInfo(string status, bool ban)
     {
         try
         {
             switch (status)
             {
                 case "all":
-                    return await context.Posts.OrderByDescending(x => x.CreateDate).ToListAsync();
+                    return await context.Posts.Where(y => y.Ban == ban).OrderByDescending(x => x.CreateDate)
+                        .ToListAsync();
                 case "active":
-                    return await context.Posts.Where(x => x.Status.Equals(true)).OrderByDescending(x => x.CreateDate)
+                    return await context.Posts.Where(x => x.Status.Equals(true) && x.Ban == ban)
+                        .OrderByDescending(x => x.CreateDate)
                         .ToListAsync();
                 case "inactive":
-                    return await context.Posts.Where(x => x.Status.Equals(false)).OrderByDescending(x => x.CreateDate)
+                    return await context.Posts.Where(x => x.Status.Equals(false) && x.Ban == ban)
+                        .OrderByDescending(x => x.CreateDate)
                         .ToListAsync();
                 default:
                     return await context.Posts.OrderByDescending(x => x.CreateDate).ToListAsync();
@@ -95,7 +98,8 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            return await context.Posts.Where(x => x.Author.Equals(userId)).OrderByDescending(x => x.CreateDate).ThenByDescending(y=>y.Status)
+            return await context.Posts.Where(x => x.Author.Equals(userId)).OrderByDescending(x => x.CreateDate)
+                .ThenByDescending(y => y.Status)
                 .ToListAsync();
         }
         catch
@@ -222,6 +226,50 @@ public class PostRepo : Repository<Post>
                 if (update > 0)
                     _ = await _userInteractPostRepo.Insert(new UserInteractPost
                         { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), PostId = Guid.Parse(postId) });
+                if (update == 0) return false;
+                return true;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> BanPost(string postId)
+    {
+        try
+        {
+            var comment = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+                .FirstOrDefaultAsync();
+            if (comment != null)
+            {
+                comment.Ban = true;
+                var update = await context.SaveChangesAsync();
+                if (update == 0) return false;
+                return true;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> UnBanPost(string postId)
+    {
+        try
+        {
+            var comment = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+                .FirstOrDefaultAsync();
+            if (comment != null)
+            {
+                comment.Ban = false;
+                var update = await context.SaveChangesAsync();
                 if (update == 0) return false;
                 return true;
             }

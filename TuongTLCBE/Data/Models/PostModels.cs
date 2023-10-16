@@ -22,6 +22,7 @@ public class PostModel
     public int? Dislike { get; set; }
     public string? Thumbnail { get; set; }
     public bool Status { get; set; }
+    public bool Ban { get; set; }
 }
 
 public class PostAuthor

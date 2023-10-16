@@ -25,6 +25,8 @@ public partial class Post
 
     public string Content { get; set; } = null!;
 
+    public bool Ban { get; set; }
+
     public virtual User AuthorNavigation { get; set; } = null!;
 
     public virtual ICollection<PostCategory> PostCategories { get; set; } = new List<PostCategory>();

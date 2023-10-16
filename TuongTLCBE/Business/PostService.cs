@@ -60,7 +60,8 @@ public class PostService
                 Like = 0,
                 Dislike = 0,
                 Thumbnail = postRequestModel.Thumbnail,
-                Status = false
+                Status = false,
+                Ban = false
             };
             var insertPost = await _postRepo.Insert(post);
             if (insertPost != null)
@@ -118,7 +119,8 @@ public class PostService
                     Like = post.Like,
                     Dislike = post.Dislike,
                     Thumbnail = post.Thumbnail,
-                    Status = post.Status
+                    Status = post.Status,
+                    Ban = post.Ban
                 };
                 var postCategories = await _postCategoryRepo.GetPostCategories(postId);
                 List<PostCategoryModel> postCategoryModels = new();
@@ -173,13 +175,14 @@ public class PostService
         }
     }
 
-    public async Task<object> GetPosts(int pageNumber, int pageSize, string? status, Guid? categoryId, Guid? tagId)
+    public async Task<object> GetPosts(int pageNumber, int pageSize, string? status, bool ban, Guid? categoryId,
+        Guid? tagId)
     {
         try
         {
             status ??= "all";
             PostPagingResponseModel responseModel = new();
-            var posts = await _postRepo.GetPostsInfo(status);
+            var posts = await _postRepo.GetPostsInfo(status, ban);
             List<PostInfoModel> listPosts = new();
             if (posts != null && posts.Any())
             {
@@ -373,11 +376,12 @@ public class PostService
             return e;
         }
     }
- public async Task<object> GetPostsByUser(int pageNumber, int pageSize, string token)
+
+    public async Task<object> GetPostsByUser(int pageNumber, int pageSize, string token)
     {
         try
         {
-            string userid = _decodeToken.Decode(token, "userid");
+            var userid = _decodeToken.Decode(token, "userid");
             PostPagingResponseModel responseModel = new();
             var posts = await _postRepo.GetPostByUser(Guid.Parse(userid));
             if (posts != null && posts.Any())
@@ -460,6 +464,7 @@ public class PostService
             return e;
         }
     }
+
     public async Task<object> GetTopLiked()
     {
         try
@@ -807,6 +812,30 @@ public class PostService
         {
             var userId = _decodeToken.Decode(token, "userid");
             return await _postRepo.DislikePost(postId, userId);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+
+    public async Task<object> BanPost(string postId)
+    {
+        try
+        {
+            return await _postRepo.BanPost(postId);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+
+    public async Task<object> UnbanPost(string postId)
+    {
+        try
+        {
+            return await _postRepo.UnBanPost(postId);
         }
         catch (Exception e)
         {

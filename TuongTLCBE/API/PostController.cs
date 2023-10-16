@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using TuongTLCBE.Business;
 using TuongTLCBE.Data.Models;
 
@@ -35,10 +36,10 @@ public class PostController : Controller
 
     [HttpGet("get-posts")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetPosts(int pageNumber, int pageSize, string? status, Guid? categoryId,
+    public async Task<IActionResult> GetPosts(int pageNumber, int pageSize, string? status, bool ban, Guid? categoryId,
         Guid? tagId)
     {
-        var result = await _postService.GetPosts(pageNumber, pageSize, status, categoryId, tagId);
+        var result = await _postService.GetPosts(pageNumber, pageSize, status, ban, categoryId, tagId);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -94,11 +95,32 @@ public class PostController : Controller
     }
 
     [HttpPost("change-post-status")]
-    [Authorize(Roles = "Admin")]
+    [SwaggerOperation(Summary = "Active/Inactive")]
+    [Authorize(Roles = "User,Admin")]
     public async Task<IActionResult> ChangePostStatus(Guid postId, string status)
     {
         var result = await _postService.ChangePostStatus(postId, status);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
+    }
+
+    [HttpPost("ban-post")]
+    [SwaggerOperation(Summary = "Admin ban post")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> BanPost(string postId)
+    {
+        var result = await _postService.BanPost(postId);
+        if ((bool)result) return Ok("Post banned!!!");
+        return BadRequest("Post ban failed!!!");
+    }
+
+    [HttpPost("ban-post")]
+    [SwaggerOperation(Summary = "Admin unban post")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> UnbanPost(string postId)
+    {
+        var result = await _postService.UnbanPost(postId);
+        if ((bool)result) return Ok("Post unbanned!!!");
+        return BadRequest("Post unban failed!!!");
     }
 
     [HttpDelete("delete-post")]
