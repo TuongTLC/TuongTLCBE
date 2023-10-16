@@ -200,7 +200,7 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status
+                        Status = post.Status, Ban = post.Ban
                     };
                     var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -313,7 +313,7 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status
+                        Status = post.Status, Ban = post.Ban
                     };
                     var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -401,7 +401,7 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status
+                        Status = post.Status, Ban = post.Ban
                     };
                     var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -486,7 +486,7 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status
+                        Status = post.Status, Ban = post.Ban
                     };
                     var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -566,7 +566,7 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status
+                        Status = post.Status, Ban = post.Ban
                     };
                     var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
