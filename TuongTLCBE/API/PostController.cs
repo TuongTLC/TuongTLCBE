@@ -113,7 +113,7 @@ public class PostController : Controller
         return BadRequest("Post ban failed!!!");
     }
 
-    [HttpPost("ban-post")]
+    [HttpPost("unban-post")]
     [SwaggerOperation(Summary = "Admin unban post")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> UnbanPost(string postId)
