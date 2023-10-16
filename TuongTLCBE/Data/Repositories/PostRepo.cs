@@ -163,7 +163,12 @@ public class PostRepo : Repository<Post>
                 post.Content = postUpdateModel.Content;
                 post.Thumbnail = postUpdateModel.Thumbnail;
                 var postUpdate = await context.SaveChangesAsync();
-                if (postUpdate == 0) return false;
+                if (postUpdate == 0)
+                {
+                    if (categoryUpdate || tagUpdate) return true;
+                    return false;
+                }
+
                 return true;
             }
 

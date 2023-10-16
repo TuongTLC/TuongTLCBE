@@ -683,10 +683,10 @@ public class PostService
                 var post = await GetPost(postUpdateModel.Id);
                 if (post != null)
                     return post;
-                return "SomeThing went wrong!";
+                return "Something went wrong!";
             }
 
-            return "SomeThing went wrong!";
+            return "Something went wrong!";
         }
         catch (Exception? e)
         {
