@@ -61,6 +61,11 @@ namespace TuongTLCBE.Data.Models
         public UserInfoModel UserInfo { get; set; }
     }
 
+    public class BanUserModel
+    {
+        public Guid UserId { get; set; }
+        public bool Status { get; set; }
+    }
     public class UserUpdateRequestModel
     {
         public string Fullname { get; set; }

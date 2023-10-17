@@ -64,9 +64,9 @@ public class UserController : ControllerBase
     [HttpPost("change-account-status")]
     [SwaggerOperation(Summary = "Admin ban/unban account")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<object>> DisableAccount(Guid userId, bool status)
+    public async Task<ActionResult<object>> DisableAccount(BanUserModel userModel)
     {
-        var result = await _userService.ChangeAccountStatus(userId, status);
+        var result = await _userService.ChangeAccountStatus(userModel.UserId, userModel.Status);
         return result is bool ? Ok("User disabled!") : BadRequest(result);
     }
 
