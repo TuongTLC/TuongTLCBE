@@ -61,7 +61,7 @@ public class PostService
                 Dislike = 0,
                 Thumbnail = postRequestModel.Thumbnail,
                 Status = false,
-                Ban = false
+                AdminStatus = Enums.POST_REVIEW
             };
             var insertPost = await _postRepo.Insert(post);
             if (insertPost != null)
@@ -120,7 +120,7 @@ public class PostService
                     Dislike = post.Dislike,
                     Thumbnail = post.Thumbnail,
                     Status = post.Status,
-                    Ban = post.Ban
+                    AdminStatus = post.AdminStatus
                 };
                 var postCategories = await _postCategoryRepo.GetPostCategories(postId);
                 List<PostCategoryModel> postCategoryModels = new();
@@ -175,14 +175,16 @@ public class PostService
         }
     }
 
-    public async Task<object> GetPosts(int pageNumber, int pageSize, string? status, bool ban, Guid? categoryId,
+    public async Task<object> GetPosts(int pageNumber, int pageSize, string? status, string? adminStatus,
+        Guid? categoryId,
         Guid? tagId)
     {
         try
         {
             status ??= "all";
+            adminStatus ??= "approved";
             PostPagingResponseModel responseModel = new();
-            var posts = await _postRepo.GetPostsInfo(status, ban);
+            var posts = await _postRepo.GetPostsInfo(status, adminStatus);
             List<PostInfoModel> listPosts = new();
             if (posts != null && posts.Any())
             {
@@ -200,7 +202,7 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status, Ban = post.Ban
+                        Status = post.Status, AdminStatus = post.AdminStatus
                     };
                     var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -313,7 +315,7 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status, Ban = post.Ban
+                        Status = post.Status, AdminStatus = post.AdminStatus
                     };
                     var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -401,7 +403,7 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status, Ban = post.Ban
+                        Status = post.Status, AdminStatus = post.AdminStatus
                     };
                     var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -486,7 +488,7 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status, Ban = post.Ban
+                        Status = post.Status, AdminStatus = post.AdminStatus
                     };
                     var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -542,12 +544,14 @@ public class PostService
     }
 
     public async Task<object> SearchPosts(int pageNumber, int pageSize, string postName, string? status,
+        string? adminStatus,
         Guid? categoryId, Guid? tagId)
     {
         try
         {
             status ??= "all";
-            var posts = await _postRepo.SearchPost(postName, status);
+            adminStatus ??= "approved";
+            var posts = await _postRepo.SearchPost(postName, status, adminStatus);
             PostPagingResponseModel responseModel = new();
             if (posts != null && posts.Any())
             {
@@ -566,7 +570,7 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status, Ban = post.Ban
+                        Status = post.Status, AdminStatus = post.AdminStatus
                     };
                     var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();

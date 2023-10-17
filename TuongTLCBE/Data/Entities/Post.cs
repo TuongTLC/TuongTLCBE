@@ -25,7 +25,7 @@ public partial class Post
 
     public string Content { get; set; } = null!;
 
-    public bool Ban { get; set; }
+    public string AdminStatus { get; set; } = null!;
 
     public virtual User AuthorNavigation { get; set; } = null!;
 

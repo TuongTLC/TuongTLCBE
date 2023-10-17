@@ -81,6 +81,9 @@ public partial class TuongTlcdbContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("ID");
+            entity.Property(e => e.AdminStatus)
+                .HasMaxLength(10)
+                .HasDefaultValueSql("('review')");
             entity.Property(e => e.CreateDate).HasColumnType("datetime");
             entity.Property(e => e.Dislike).HasDefaultValueSql("((0))");
             entity.Property(e => e.Like).HasDefaultValueSql("((0))");

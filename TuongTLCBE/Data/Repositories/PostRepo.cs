@@ -39,21 +39,22 @@ public class PostRepo : Repository<Post>
     }
 
 
-    public async Task<List<Post>?> GetPostsInfo(string status, bool ban)
+    public async Task<List<Post>?> GetPostsInfo(string status, string adminStatus)
     {
         try
         {
             switch (status)
             {
                 case "all":
-                    return await context.Posts.Where(y => y.Ban == ban).OrderByDescending(x => x.CreateDate)
+                    return await context.Posts.Where(y => y.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                        .OrderByDescending(x => x.CreateDate)
                         .ToListAsync();
                 case "active":
-                    return await context.Posts.Where(x => x.Status.Equals(true) && x.Ban == ban)
+                    return await context.Posts.Where(x => x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
                         .OrderByDescending(x => x.CreateDate)
                         .ToListAsync();
                 case "inactive":
-                    return await context.Posts.Where(x => x.Status.Equals(false) && x.Ban == ban)
+                    return await context.Posts.Where(x => x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
                         .OrderByDescending(x => x.CreateDate)
                         .ToListAsync();
                 default:
@@ -66,25 +67,29 @@ public class PostRepo : Repository<Post>
         }
     }
 
-    public async Task<List<Post>?> SearchPost(string postName, string? status)
+    public async Task<List<Post>?> SearchPost(string postName, string status, string adminStatus)
     {
         try
         {
             switch (status)
             {
                 case "all":
-                    return await context.Posts.Where(x => x.PostName.Contains(postName))
+                    return await context.Posts.Where(x =>
+                            x.PostName.Contains(postName) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
                         .OrderByDescending(x => x.CreateDate).ToListAsync();
 
                 case "active":
                     return await context.Posts.Where(z => z.PostName.Contains(postName))
-                        .Where(x => x.Status.Equals(true)).OrderByDescending(x => x.CreateDate).ToListAsync();
+                        .Where(x => x.Status.Equals(true) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                        .OrderByDescending(x => x.CreateDate).ToListAsync();
 
                 case "inactive":
                     return await context.Posts.Where(z => z.PostName.Contains(postName))
-                        .Where(x => x.Status.Equals(false)).OrderByDescending(x => x.CreateDate).ToListAsync();
+                        .Where(x => x.Status.Equals(false) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                        .OrderByDescending(x => x.CreateDate).ToListAsync();
                 default:
-                    return await context.Posts.Where(x => x.PostName.Contains(postName))
+                    return await context.Posts.Where(x =>
+                            x.PostName.Contains(postName) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
                         .OrderByDescending(x => x.CreateDate).ToListAsync();
             }
         }
@@ -247,11 +252,11 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            var comment = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+            var post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
                 .FirstOrDefaultAsync();
-            if (comment != null)
+            if (post != null)
             {
-                comment.Ban = true;
+                post.AdminStatus = Enums.POST_BANNED;
                 var update = await context.SaveChangesAsync();
                 if (update == 0) return false;
                 return true;
@@ -269,11 +274,11 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            var comment = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+            var post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
                 .FirstOrDefaultAsync();
-            if (comment != null)
+            if (post != null)
             {
-                comment.Ban = false;
+                post.AdminStatus = Enums.POST_APPROVED;
                 var update = await context.SaveChangesAsync();
                 if (update == 0) return false;
                 return true;

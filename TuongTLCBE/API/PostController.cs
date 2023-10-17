@@ -36,10 +36,11 @@ public class PostController : Controller
 
     [HttpGet("get-posts")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetPosts(int pageNumber, int pageSize, string? status, bool ban, Guid? categoryId,
+    public async Task<IActionResult> GetPosts(int pageNumber, int pageSize, string? status, string? adminStatus,
+        Guid? categoryId,
         Guid? tagId)
     {
-        var result = await _postService.GetPosts(pageNumber, pageSize, status, ban, categoryId, tagId);
+        var result = await _postService.GetPosts(pageNumber, pageSize, status, adminStatus, categoryId, tagId);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -79,9 +80,11 @@ public class PostController : Controller
     [HttpGet("search-post")]
     [AllowAnonymous]
     public async Task<IActionResult> SearchPost(int pageNumber, int pageSize, string postName, string? status,
+        string? adminStatus,
         Guid? categoryId, Guid? tagId)
     {
-        var result = await _postService.SearchPosts(pageNumber, pageSize, postName, status, categoryId, tagId);
+        var result =
+            await _postService.SearchPosts(pageNumber, pageSize, postName, status, adminStatus, categoryId, tagId);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
 
