@@ -50,11 +50,13 @@ public class PostRepo : Repository<Post>
                         .OrderByDescending(x => x.CreateDate)
                         .ToListAsync();
                 case "active":
-                    return await context.Posts.Where(x => x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                    return await context.Posts.Where(x =>
+                            x.Status == true && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
                         .OrderByDescending(x => x.CreateDate)
                         .ToListAsync();
                 case "inactive":
-                    return await context.Posts.Where(x => x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                    return await context.Posts.Where(x =>
+                            x.Status == false && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
                         .OrderByDescending(x => x.CreateDate)
                         .ToListAsync();
                 default:

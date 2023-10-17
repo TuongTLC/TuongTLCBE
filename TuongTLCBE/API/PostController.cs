@@ -27,6 +27,7 @@ public class PostController : Controller
     }
 
     [HttpGet("get-post")]
+    [SwaggerOperation(Summary = "Get a post info")]
     [AllowAnonymous]
     public async Task<IActionResult> GetPost(Guid postId)
     {
@@ -35,6 +36,7 @@ public class PostController : Controller
     }
 
     [HttpGet("get-posts")]
+    [SwaggerOperation(Summary = "Get posts info, status:active/inactive, adminStatus:banned/review/approved")]
     [AllowAnonymous]
     public async Task<IActionResult> GetPosts(int pageNumber, int pageSize, string? status, string? adminStatus,
         Guid? categoryId,
@@ -45,6 +47,7 @@ public class PostController : Controller
     }
 
     [HttpGet("get-user-posts-admin")]
+    [SwaggerOperation(Summary = "Admin get user's posts")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUserPostsByAdmin(int pageNumber, int pageSize, string userId)
     {
@@ -53,6 +56,7 @@ public class PostController : Controller
     }
 
     [HttpGet("get-user-posts")]
+    [SwaggerOperation(Summary = "User get their own poosts")]
     [Authorize(Roles = "User,Admin")]
     public async Task<IActionResult> GetPostsByUser(int pageNumber, int pageSize)
     {
@@ -78,6 +82,7 @@ public class PostController : Controller
     }
 
     [HttpGet("search-post")]
+    [SwaggerOperation(Summary = "Search posts, status:active/inactive, adminStatus:banned/review/approved")]
     [AllowAnonymous]
     public async Task<IActionResult> SearchPost(int pageNumber, int pageSize, string postName, string? status,
         string? adminStatus,
