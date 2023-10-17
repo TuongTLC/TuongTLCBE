@@ -26,7 +26,7 @@ public class PostRepo : Repository<Post>
             var query = from p in context.Posts
                 join pc in context.PostCategories on p.Id equals pc.PostId
                 join c in context.Categories on pc.CategoryId equals c.Id
-                where c.Id.Equals(categoryIds)
+                where c.Id.Equals(categoryIds) && p.Status == true && p.AdminStatus.Equals(Enums.POST_APPROVED)
                 orderby p.Like descending
                 select new { PostId = p.Id };
             var posts = await query.Select(x => new string(x.PostId.ToString())).Take(6).ToListAsync();
