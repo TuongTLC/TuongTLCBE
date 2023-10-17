@@ -67,7 +67,7 @@ public class UserController : ControllerBase
     public async Task<ActionResult<object>> DisableAccount(BanUserModel userModel)
     {
         var result = await _userService.ChangeAccountStatus(userModel.UserId, userModel.Status);
-        return result is bool ? Ok("User disabled!") : BadRequest(result);
+        return result is bool ? Ok("User status changed!") : BadRequest(result);
     }
 
     [HttpGet("get-user")]
