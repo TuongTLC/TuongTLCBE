@@ -43,6 +43,27 @@ public class PostRepo : Repository<Post>
     {
         try
         {
+            if (adminStatus.Equals("all"))
+                switch (status)
+                {
+                    case "all":
+                        return await context.Posts
+                            .OrderByDescending(x => x.CreateDate)
+                            .ToListAsync();
+                    case "active":
+                        return await context.Posts.Where(x =>
+                                x.Status == true)
+                            .OrderByDescending(x => x.CreateDate)
+                            .ToListAsync();
+                    case "inactive":
+                        return await context.Posts.Where(x =>
+                                x.Status == false)
+                            .OrderByDescending(x => x.CreateDate)
+                            .ToListAsync();
+                    default:
+                        return await context.Posts.OrderByDescending(x => x.CreateDate).ToListAsync();
+                }
+
             switch (status)
             {
                 case "all":

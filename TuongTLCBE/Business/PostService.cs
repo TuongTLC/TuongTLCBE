@@ -182,7 +182,7 @@ public class PostService
         try
         {
             status ??= "all";
-            adminStatus ??= "approved";
+            adminStatus ??= "all";
             PostPagingResponseModel responseModel = new();
             var posts = await _postRepo.GetPostsInfo(status, adminStatus);
             List<PostInfoModel> listPosts = new();
