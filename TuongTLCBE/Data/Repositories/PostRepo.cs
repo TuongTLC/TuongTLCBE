@@ -280,6 +280,7 @@ public class PostRepo : Repository<Post>
             if (post != null)
             {
                 post.AdminStatus = Enums.POST_BANNED;
+                post.Status = false;
                 var update = await context.SaveChangesAsync();
                 if (update == 0) return false;
                 return true;
