@@ -33,7 +33,8 @@ public class UserRepo : Repository<User>
                             Email = x.u.Email,
                             Birthday = x.u.Birthday,
                             Phone = x.u.Phone,
-                            Status = x.u.Status
+                            Status = x.u.Status,
+                            Ban = x.u.Ban
                         }
                 )
                 .FirstOrDefaultAsync();
@@ -96,7 +97,8 @@ public class UserRepo : Repository<User>
                             Email = x.u.Email,
                             Birthday = x.u.Birthday,
                             Phone = x.u.Phone,
-                            Status = x.u.Status
+                            Status = x.u.Status,
+                            Ban = x.u.Ban
                         }
                 )
                 .FirstOrDefaultAsync();
@@ -131,7 +133,8 @@ public class UserRepo : Repository<User>
                                 Email = x.u.Email,
                                 Birthday = x.u.Birthday,
                                 Phone = x.u.Phone,
-                                Status = x.u.Status
+                                Status = x.u.Status,
+                                Ban = x.u.Ban
                             }
                     )
                     .ToListAsync();
@@ -159,7 +162,8 @@ public class UserRepo : Repository<User>
                                 Email = x.u.Email,
                                 Birthday = x.u.Birthday,
                                 Phone = x.u.Phone,
-                                Status = x.u.Status
+                                Status = x.u.Status,
+                                Ban = x.u.Ban
                             }
                     )
                     .ToListAsync();
@@ -266,7 +270,7 @@ public class UserRepo : Repository<User>
             var user = await context.Users.Where(x => x.Id.Equals(userId)).FirstOrDefaultAsync();
             if (user != null)
             {
-                user.Status = status;
+                user.Ban = status;
                 _ = await context.SaveChangesAsync();
                 return true;
             }

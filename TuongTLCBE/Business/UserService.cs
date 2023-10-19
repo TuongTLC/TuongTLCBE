@@ -100,7 +100,8 @@ public class UserService
                     Email = reqModel.Email,
                     Birthday = reqModel.Birthday,
                     Phone = reqModel.Phone,
-                    Status = false
+                    Status = false,
+                    Ban = false
                 };
             var userInsert = await _userRepo.Insert(userModel);
             if (userInsert != null)
@@ -118,7 +119,8 @@ public class UserService
                             Email = user.Email,
                             Birthday = user.Birthday,
                             Phone = user.Phone,
-                            Status = user.Status
+                            Status = user.Status,
+                            Ban = user.Ban
                         };
                     _ = _emailService.SendConfirmEmail(userLoginModel.Id);
                     return userLoginModel;
@@ -141,8 +143,8 @@ public class UserService
         {
             var user = await _userRepo.GetUserByUsername(request.Username);
             if (user == null) return "Username or password incorrect!";
-
-            if (user.Status == false) return "User banned!";
+            if (user.Ban == true) return "User Banned!";
+            if (user.Status == false) return "User inactive!";
             if (user.Status == null) return "User account is disabled!";
             if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
                 return "Username or password incorrect!";
@@ -157,7 +159,8 @@ public class UserService
                     Email = user.Email,
                     Birthday = user.Birthday,
                     Phone = user.Phone,
-                    Status = user.Status
+                    Status = user.Status,
+                    Ban = user.Ban
                 };
             UserLoginResponseModel userLoginResModel =
                 new() { Token = token, UserInfo = userLoginModel };
@@ -199,7 +202,8 @@ public class UserService
                             Email = user.Email,
                             Birthday = user.Birthday,
                             Phone = user.Phone,
-                            Status = user.Status
+                            Status = user.Status,
+                            Ban = user.Ban
                         };
                     return userInfoModel;
                 }
@@ -261,7 +265,7 @@ public class UserService
             var result = await _userRepo.ChangeAccountStatus(userId, status);
             if (result)
                 return true;
-            return "Change account status failed!";
+            return "Change account ban status failed!";
         }
         catch (Exception e)
         {

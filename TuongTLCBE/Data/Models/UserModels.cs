@@ -14,6 +14,7 @@ public class UserModel
     public DateTime? Birthday { get; set; }
     public string? Phone { get; set; }
     public bool? Status { get; set; }
+    public bool? Ban { get; set; }
 }
 
 public class UserRegisterRequestModel
@@ -48,6 +49,7 @@ public class UserInfoModel
     public string? Phone { get; set; }
 
     public bool? Status { get; set; }
+    public bool? Ban { get; set; }
 }
 
 public class UserLoginResponseModel

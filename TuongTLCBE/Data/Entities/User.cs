@@ -25,6 +25,8 @@ public partial class User
 
     public bool? Status { get; set; }
 
+    public bool? Ban { get; set; }
+
     public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
 
     public virtual ICollection<FileUpload> FileUploads { get; set; } = new List<FileUpload>();
