@@ -13,11 +13,13 @@ namespace TuongTLCBE.Business;
 public class UserService
 {
     private readonly DecodeToken _decodeToken;
+    private readonly EmailService _emailService;
     private readonly UserRepo _userRepo;
 
-    public UserService(UserRepo userRepo, DecodeToken decodeToken)
+    public UserService(UserRepo userRepo, DecodeToken decodeToken, EmailService emailService)
     {
         _decodeToken = decodeToken;
+        _emailService = emailService;
         _userRepo = userRepo;
     }
 
@@ -97,7 +99,8 @@ public class UserService
                     FullName = reqModel.Fullname,
                     Email = reqModel.Email,
                     Birthday = reqModel.Birthday,
-                    Phone = reqModel.Phone
+                    Phone = reqModel.Phone,
+                    Status = false
                 };
             var userInsert = await _userRepo.Insert(userModel);
             if (userInsert != null)
@@ -117,6 +120,7 @@ public class UserService
                             Phone = user.Phone,
                             Status = user.Status
                         };
+                    _ = _emailService.SendConfirmEmail(userLoginModel.Id);
                     return userLoginModel;
                 }
 

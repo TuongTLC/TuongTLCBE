@@ -21,6 +21,7 @@ builder.Services.AddScoped<TagService>();
 builder.Services.AddScoped<DecodeToken>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<FileService>();
+builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<PostCommentService>();
 builder.Services.AddTransient<UserRepo>();
 builder.Services.AddTransient<CategoryRepo>();
@@ -32,6 +33,7 @@ builder.Services.AddTransient<FileRepo>();
 builder.Services.AddTransient<PostCommentRepo>();
 builder.Services.AddTransient<UserInteractCommentRepo>();
 builder.Services.AddTransient<UserInteractPostRepo>();
+builder.Services.AddTransient<OTPCodeRepo>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSwaggerGen(option =>

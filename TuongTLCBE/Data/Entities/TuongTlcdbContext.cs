@@ -15,6 +15,8 @@ public partial class TuongTlcdbContext : DbContext
 
     public virtual DbSet<FileUpload> FileUploads { get; set; }
 
+    public virtual DbSet<Otpcode> Otpcodes { get; set; }
+
     public virtual DbSet<Post> Posts { get; set; }
 
     public virtual DbSet<PostCategory> PostCategories { get; set; }
@@ -70,6 +72,18 @@ public partial class TuongTlcdbContext : DbContext
             entity.HasOne(d => d.UploadedByNavigation).WithMany(p => p.FileUploads)
                 .HasForeignKey(d => d.UploadedBy)
                 .HasConstraintName("File_User_ID_fk");
+        });
+
+        modelBuilder.Entity<Otpcode>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("OTPCode_pk");
+
+            entity.ToTable("OTPCode");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("(newid())")
+                .HasColumnName("ID");
+            entity.Property(e => e.Email).HasMaxLength(200);
         });
 
         modelBuilder.Entity<Post>(entity =>

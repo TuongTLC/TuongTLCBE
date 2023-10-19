@@ -108,6 +108,7 @@ public class UserRepo : Repository<User>
         }
     }
 
+
     public async Task<List<UserInfoModel>?> GetUsers(string? status)
     {
         try
@@ -263,6 +264,26 @@ public class UserRepo : Repository<User>
         try
         {
             var user = await context.Users.Where(x => x.Id.Equals(userId)).FirstOrDefaultAsync();
+            if (user != null)
+            {
+                user.Status = status;
+                _ = await context.SaveChangesAsync();
+                return true;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> ChangeAccountStatusByEmail(string email, bool status)
+    {
+        try
+        {
+            var user = await context.Users.Where(x => x.Email.Equals(email)).FirstOrDefaultAsync();
             if (user != null)
             {
                 user.Status = status;

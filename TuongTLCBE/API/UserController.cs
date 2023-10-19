@@ -10,11 +10,13 @@ namespace TuongTLCBE.API;
 [ApiController]
 public class UserController : ControllerBase
 {
+    private readonly EmailService _emailService;
     private readonly UserService _userService;
 
-    public UserController(UserService userService)
+    public UserController(UserService userService, EmailService emailService)
     {
         _userService = userService;
+        _emailService = emailService;
     }
 
     [HttpPost("register")]
@@ -95,5 +97,14 @@ public class UserController : ControllerBase
     {
         var result = await _userService.DeleteAccount(userId);
         return result is bool ? Ok("User account deleted!") : BadRequest(result);
+    }
+
+    [HttpPost("verify-email")]
+    [AllowAnonymous]
+    public async Task<ActionResult<object>> VerifyEmail(EmailVerifyModel request)
+    {
+        var result = request.Email != null && request.Code != null &&
+                     await _emailService.VerifyCode(request.Code, request.Email);
+        return result ? Ok("User verified!") : BadRequest("User verified failed!");
     }
 }
