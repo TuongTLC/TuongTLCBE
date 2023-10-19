@@ -27,7 +27,7 @@ public class UserRegisterRequestModel
 
     [Required(ErrorMessage = "Required")] public string Email { get; set; }
 
-    public DateTime? Birthday { get; set; }
+    public DateTime Birthdate { get; set; }
     public string? Phone { get; set; }
 }
 

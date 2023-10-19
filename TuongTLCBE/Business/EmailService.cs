@@ -69,6 +69,7 @@ public class EmailService
         }
         catch (Exception e)
         {
+            Console.Write(e);
             return e;
         }
     }

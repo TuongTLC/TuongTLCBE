@@ -98,14 +98,16 @@ public class UserService
                     PasswordSalt = passwordSalt,
                     FullName = reqModel.Fullname,
                     Email = reqModel.Email,
-                    Birthday = reqModel.Birthday,
+                    Birthday = reqModel.Birthdate,
                     Phone = reqModel.Phone,
                     Status = false,
                     Ban = false
                 };
             var userInsert = await _userRepo.Insert(userModel);
+
             if (userInsert != null)
             {
+                _ = await _emailService.SendConfirmEmail(userInsert.Id);
                 var user = await _userRepo.GetUserByUsername(userInsert.Username);
                 if (user != null)
                 {
@@ -122,7 +124,6 @@ public class UserService
                             Status = user.Status,
                             Ban = user.Ban
                         };
-                    _ = _emailService.SendConfirmEmail(userLoginModel.Id);
                     return userLoginModel;
                 }
 

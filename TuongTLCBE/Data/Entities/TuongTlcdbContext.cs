@@ -76,14 +76,14 @@ public partial class TuongTlcdbContext : DbContext
 
         modelBuilder.Entity<Otpcode>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("OTPCode");
+            entity.HasKey(e => e.Id).HasName("OTPCode_pk");
 
-            entity.Property(e => e.Email).HasMaxLength(200);
+            entity.ToTable("OTPCode");
+
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("ID");
+            entity.Property(e => e.Email).HasMaxLength(200);
         });
 
         modelBuilder.Entity<Post>(entity =>
@@ -224,7 +224,6 @@ public partial class TuongTlcdbContext : DbContext
             entity.Property(e => e.RoleId)
                 .HasDefaultValueSql("('38b3d081-a7bc-4ed2-a394-f47d01263e0e')")
                 .HasColumnName("RoleID");
-            entity.Property(e => e.Status).HasDefaultValueSql("((1))");
             entity.Property(e => e.Username)
                 .HasMaxLength(50)
                 .UseCollation("Latin1_General_BIN");
