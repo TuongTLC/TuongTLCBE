@@ -835,6 +835,18 @@ public class PostService
         }
     }
 
+    public async Task<object> ApprovePost(string postId)
+    {
+        try
+        {
+            return await _postRepo.ApprovePost(postId);
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
+    }
+
     public async Task<object> UnbanPost(string postId)
     {
         try

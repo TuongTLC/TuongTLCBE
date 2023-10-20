@@ -121,6 +121,16 @@ public class PostController : Controller
         return BadRequest("Post ban failed!!!");
     }
 
+    [HttpPost("approve-post")]
+    [SwaggerOperation(Summary = "Admin approve post")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> ApprovePost(string postId)
+    {
+        var result = await _postService.ApprovePost(postId);
+        if ((bool)result) return Ok("Post approved!!!");
+        return BadRequest("Post approved failed!!!");
+    }
+
     [HttpPost("unban-post")]
     [SwaggerOperation(Summary = "Admin unban post")]
     [Authorize(Roles = "Admin")]

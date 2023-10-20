@@ -294,6 +294,29 @@ public class PostRepo : Repository<Post>
         }
     }
 
+    public async Task<bool> ApprovePost(string postId)
+    {
+        try
+        {
+            var post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+                .FirstOrDefaultAsync();
+            if (post != null)
+            {
+                post.AdminStatus = Enums.POST_APPROVED;
+                post.Status = true;
+                var update = await context.SaveChangesAsync();
+                if (update == 0) return false;
+                return true;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public async Task<bool> UnBanPost(string postId)
     {
         try
