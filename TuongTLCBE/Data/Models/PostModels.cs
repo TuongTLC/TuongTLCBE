@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace TuongTLCBE.Data.Models;
 
 public class PostRequestModel
@@ -18,45 +20,63 @@ public class ChangePostStatusModel
 
 public class PostModel
 {
-    public Guid Id { get; set; }
-    public string PostName { get; set; } = null!;
-    public string? Summary { get; set; }
-    public string Content { get; set; }
-    public DateTime CreateDate { get; set; }
-    public PostAuthor? Author { get; set; }
-    public int? Like { get; set; }
-    public int? Dislike { get; set; }
-    public string? Thumbnail { get; set; }
-    public bool Status { get; set; }
-    public string AdminStatus { get; set; }
+    [JsonPropertyName("id")] public Guid Id { get; set; }
+
+    [JsonPropertyName("postName")] public string PostName { get; set; } = null!;
+
+    [JsonPropertyName("summary")] public string? Summary { get; set; }
+
+    [JsonPropertyName("content")] public string Content { get; set; }
+
+    [JsonPropertyName("createDate")] public DateTime CreateDate { get; set; }
+
+    [JsonPropertyName("author")] public PostAuthor? Author { get; set; }
+
+    [JsonPropertyName("like")] public int? Like { get; set; }
+
+    [JsonPropertyName("dislike")] public int? Dislike { get; set; }
+
+    [JsonPropertyName("thumbnail")] public string? Thumbnail { get; set; }
+
+    [JsonPropertyName("status")] public bool Status { get; set; }
+
+    [JsonPropertyName("adminStatus")] public string AdminStatus { get; set; }
 }
 
 public class PostAuthor
 {
-    public Guid Id { get; set; }
-    public string Fullname { get; set; }
-    public string RoleName { get; set; }
+    [JsonPropertyName("id")] public Guid Id { get; set; }
+
+    [JsonPropertyName("fullname")] public string Fullname { get; set; }
+
+    [JsonPropertyName("roleName")] public string RoleName { get; set; }
 }
 
 public class PostCategoryModel
 {
-    public Guid Id { get; set; }
-    public string CategoryName { get; set; } = null!;
-    public string? Description { get; set; }
+    [JsonPropertyName("id")] public Guid Id { get; set; }
+
+    [JsonPropertyName("categoryName")] public string CategoryName { get; set; } = null!;
+
+    [JsonPropertyName("description")] public string? Description { get; set; }
 }
 
 public class PostTagModel
 {
-    public Guid Id { get; set; }
-    public string TagName { get; set; } = null!;
-    public string? Description { get; set; }
+    [JsonPropertyName("id")] public Guid Id { get; set; }
+
+    [JsonPropertyName("tagName")] public string TagName { get; set; } = null!;
+
+    [JsonPropertyName("description")] public string? Description { get; set; }
 }
 
 public class PostInfoModel
 {
-    public PostModel PostInfo { get; set; }
-    public List<PostCategoryModel> PostCategories { get; set; }
-    public List<PostTagModel> PostTags { get; set; }
+    [JsonPropertyName("postInfo")] public PostModel PostInfo { get; set; }
+
+    [JsonPropertyName("postCategories")] public List<PostCategoryModel> PostCategories { get; set; }
+
+    [JsonPropertyName("postTags")] public List<PostTagModel> PostTags { get; set; }
 }
 
 public class PostPagingResponseModel

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TuongTLCBE.Business;
 using TuongTLCBE.Business.CacheService;
-using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Models;
 
 namespace TuongTLCBE.API;
@@ -47,9 +46,10 @@ public class PostController : Controller
         Guid? tagId)
     {
         var cacheData =
-            _cacheService.GetData<PostPagingResponseModel>("post" + pageNumber + pageSize + status + adminStatus + categoryId +
+            _cacheService.GetData<PostPagingResponseModel>("post" + pageNumber + pageSize + status + adminStatus +
+                                                           categoryId +
                                                            tagId);
-        if (cacheData != null ) return Ok(cacheData);
+        if (cacheData != null) return Ok(cacheData);
         var result = await _postService.GetPosts(pageNumber, pageSize, status, adminStatus, categoryId, tagId);
         var expireTime = DateTimeOffset.Now.AddHours(12);
         _cacheService.SetData("post" + pageNumber + pageSize + status + adminStatus + categoryId +
