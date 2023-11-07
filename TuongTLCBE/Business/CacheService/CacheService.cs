@@ -1,5 +1,4 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System.Text.Json;
 using StackExchange.Redis;
 
 namespace TuongTLCBE.Business.CacheService;
@@ -14,29 +13,17 @@ public class CacheService : ICacheService
         _database = redis.GetDatabase();
     }
 
-    public string? GetData(string key)
+    public T? GetData<T>(string key)
     {
         var value = _database.StringGet(key);
-        if (!string.IsNullOrWhiteSpace(value)) return value;
-        return null;
+        if (!string.IsNullOrWhiteSpace(value)) return JsonSerializer.Deserialize<T>(value);
+        return default;
     }
 
     public bool SetData<T>(string key, T value, DateTimeOffset expirationTime)
     {
         var expireTime = expirationTime.DateTime.Subtract(DateTime.Now);
-
-        var contractResolver = new DefaultContractResolver
-        {
-            NamingStrategy = new CamelCaseNamingStrategy()
-        };
-
-        var json = JsonConvert.SerializeObject(value, new JsonSerializerSettings
-        {
-            ContractResolver = contractResolver,
-            Formatting = Formatting.Indented
-        });
-
-        var isSet = _database.StringSet(key, json, expireTime);
+        var isSet = _database.StringSet(key, JsonSerializer.Serialize(value), expireTime);
         return isSet;
     }
 
