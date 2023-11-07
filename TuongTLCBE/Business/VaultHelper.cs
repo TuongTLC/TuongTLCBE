@@ -47,6 +47,7 @@ public static class VaultHelper
         }
     }
 
+
     public static async Task<EmailSecretModel> GetEmailSecrets()
     {
         try

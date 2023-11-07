@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using TuongTLCBE.Business;
+using TuongTLCBE.Business.CacheService;
+using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Models;
 
 namespace TuongTLCBE.API;
@@ -10,11 +12,13 @@ namespace TuongTLCBE.API;
 [ApiController]
 public class PostController : Controller
 {
+    private readonly ICacheService _cacheService;
     private readonly PostService _postService;
 
-    public PostController(PostService postService)
+    public PostController(PostService postService, ICacheService cacheService)
     {
         _postService = postService;
+        _cacheService = cacheService;
     }
 
     [HttpPost("create-post")]
@@ -42,7 +46,14 @@ public class PostController : Controller
         Guid? categoryId,
         Guid? tagId)
     {
+        var cacheData =
+            _cacheService.GetData<PostPagingResponseModel>("post" + pageNumber + pageSize + status + adminStatus + categoryId +
+                                                           tagId);
+        if (cacheData != null ) return Ok(cacheData);
         var result = await _postService.GetPosts(pageNumber, pageSize, status, adminStatus, categoryId, tagId);
+        var expireTime = DateTimeOffset.Now.AddHours(12);
+        _cacheService.SetData("post" + pageNumber + pageSize + status + adminStatus + categoryId +
+                              tagId, result, expireTime);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
 

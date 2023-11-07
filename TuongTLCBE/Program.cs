@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using TuongTLCBE.Business;
+using TuongTLCBE.Business.CacheService;
 using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Repositories;
 
@@ -11,9 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 var dbConn = await VaultHelper.GetSecrets("dbconn");
 var jwtToken = await VaultHelper.GetSecrets("jwt");
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<PostCategoryService>();
