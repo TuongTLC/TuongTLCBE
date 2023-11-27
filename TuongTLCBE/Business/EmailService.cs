@@ -74,6 +74,45 @@ public class EmailService
         }
     }
 
+    public async Task<object> NewPostNotification(Guid postId)
+    {
+        try
+        {
+            var emailSecretModel = await VaultHelper.GetEmailSecrets();
+            if (emailSecretModel.Email == null || emailSecretModel.Password == null) return "Get email failed!";
+            var from = emailSecretModel.Email;
+            var password = emailSecretModel.Password;
+            MimeMessage message = new();
+            message.From.Add(MailboxAddress.Parse(from));
+            message.Subject = "TuongTLC new post notification.";
+            message.To.Add(MailboxAddress.Parse("trinhtuong98@gmail.com"));
+            message.Body = new TextPart(TextFormat.Html)
+            {
+                Text =
+                    "<html>" +
+                    "<body>" +
+                    "<h1>TuongTLC<h1>" +
+                    "<h3>A new post have been created and await your approval.</h3>" +
+                    "<p>Please follow the link to view post detail.</p>" +
+                    "<p>Post detail: https://tuongtlc.ddns.net/preview-post?postId=" + postId + "</p>" +
+                    "</body>" +
+                    "</html>"
+            };
+
+            using SmtpClient smtp = new();
+            await smtp.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync(from, password);
+            _ = await smtp.SendAsync(message);
+            await smtp.DisconnectAsync(true);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Console.Write(e);
+            return e;
+        }
+    }
+
     public async Task<bool> VerifyCode(string code, string email)
     {
         try

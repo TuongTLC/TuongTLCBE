@@ -1,4 +1,5 @@
 using EntityFrameworkPaginateCore;
+using TuongTLCBE.Business.CacheService;
 using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Models;
 using TuongTLCBE.Data.Repositories;
@@ -7,8 +8,10 @@ namespace TuongTLCBE.Business;
 
 public class PostService
 {
+    private readonly ICacheService _cacheService;
     private readonly CategoryRepo _categoryRepo;
     private readonly DecodeToken _decodeToken;
+    private readonly EmailService _emailService;
     private readonly PostCategoryRepo _postCategoryRepo;
     private readonly PostRepo _postRepo;
     private readonly PostTagRepo _postTagRepo;
@@ -16,7 +19,8 @@ public class PostService
     private readonly UserRepo _userRepo;
 
     public PostService(DecodeToken decodeToken, PostCategoryRepo postCategoryRepo, PostTagRepo postTagRepo,
-        CategoryRepo categoryRepo, TagRepo tagRepo, PostRepo postRepo, UserRepo userRepo)
+        CategoryRepo categoryRepo, TagRepo tagRepo, PostRepo postRepo, UserRepo userRepo, EmailService emailService,
+        ICacheService cacheService)
     {
         _postCategoryRepo = postCategoryRepo;
         _postTagRepo = postTagRepo;
@@ -25,6 +29,8 @@ public class PostService
         _postRepo = postRepo;
         _decodeToken = decodeToken;
         _userRepo = userRepo;
+        _emailService = emailService;
+        _cacheService = cacheService;
     }
 
     public async Task<object> InsertPost(PostRequestModel postRequestModel, string token)
@@ -89,6 +95,12 @@ public class PostService
                 }
 
                 var postInfoModel = await GetPost(post.Id);
+                if (postInfoModel != null)
+                {
+                    _ = await _emailService.NewPostNotification(post.Id);
+                    _cacheService.FlushData();
+                }
+
                 return postInfoModel ?? "Something went wrong!!";
             }
 
@@ -684,6 +696,7 @@ public class PostService
             var result = await _postRepo.UpdatePost(postUpdateModel);
             if (result)
             {
+                _cacheService.FlushData();
                 var post = await GetPost(postUpdateModel.Id);
                 if (post != null)
                     return post;
@@ -740,7 +753,11 @@ public class PostService
 
             var result = await _postRepo.Delete(post);
             if (result > 0)
+            {
+                _cacheService.FlushData();
                 return true;
+            }
+
             return false;
         }
         catch (Exception e)

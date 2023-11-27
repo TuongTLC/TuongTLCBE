@@ -13,7 +13,6 @@ public class PostController : Controller
 {
     private readonly ICacheService _cacheService;
     private readonly PostService _postService;
-
     public PostController(PostService postService, ICacheService cacheService)
     {
         _postService = postService;

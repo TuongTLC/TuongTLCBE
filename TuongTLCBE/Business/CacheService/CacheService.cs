@@ -6,11 +6,13 @@ namespace TuongTLCBE.Business.CacheService;
 public class CacheService : ICacheService
 {
     private readonly IDatabase _database;
+    private readonly IServer _server;
 
     public CacheService()
     {
-        var redis = ConnectionMultiplexer.Connect("192.168.1.32:6379, password=itslocalhost");
+        var redis = ConnectionMultiplexer.Connect("192.168.1.32:6379, password=itslocalhost, allowAdmin=true");
         _database = redis.GetDatabase();
+        _server = redis.GetServer("192.168.1.32:6379");
     }
 
     public T? GetData<T>(string key)
@@ -33,5 +35,9 @@ public class CacheService : ICacheService
         if (exist) return _database.KeyDelete(key);
 
         return false;
+    }
+    public void FlushData()
+    {
+        _server.FlushDatabase();
     }
 }
