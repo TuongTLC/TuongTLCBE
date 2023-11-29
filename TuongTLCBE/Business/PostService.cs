@@ -722,7 +722,11 @@ public class PostService
             {
                 var post = await GetPost(postId);
                 if (post != null)
+                {
+                    _cacheService.FlushData();
                     return post;
+                }
+
                 return "SomeThing went wrong!";
             }
 
@@ -844,6 +848,7 @@ public class PostService
     {
         try
         {
+            _cacheService.FlushData();
             return await _postRepo.BanPost(postId);
         }
         catch (Exception e)
@@ -856,6 +861,7 @@ public class PostService
     {
         try
         {
+            _cacheService.FlushData();
             return await _postRepo.ApprovePost(postId);
         }
         catch (Exception e)
@@ -868,6 +874,7 @@ public class PostService
     {
         try
         {
+            _cacheService.FlushData();
             return await _postRepo.UnBanPost(postId);
         }
         catch (Exception e)
