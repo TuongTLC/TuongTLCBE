@@ -29,15 +29,37 @@ public class CacheService : ICacheService
         return isSet;
     }
 
-    public object RemoveData(string key)
+    public async Task<object> RemoveData(string key)
     {
-        var exist = _database.KeyExists(key);
-        if (exist) return _database.KeyDelete(key);
-
-        return false;
+        try
+        {
+            var exist = await _database.KeyExistsAsync(key);
+            if (exist) return await _database.KeyDeleteAsync(key);
+            return false;
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
     }
+
     public void FlushData()
     {
         _server.FlushDatabase();
+    }
+
+    public async Task<object> RemoveOldCache(string prefix)
+    {
+        try
+        {
+            var keys = _server.Keys(pattern: prefix + "*").ToList();
+            if (!keys.Any()) return "No matching keys!";
+            foreach (var key in keys) await RemoveData(key);
+            return true;
+        }
+        catch (Exception e)
+        {
+            return e;
+        }
     }
 }

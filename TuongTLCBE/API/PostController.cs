@@ -13,6 +13,7 @@ public class PostController : Controller
 {
     private readonly ICacheService _cacheService;
     private readonly PostService _postService;
+
     public PostController(PostService postService, ICacheService cacheService)
     {
         _postService = postService;
@@ -66,7 +67,7 @@ public class PostController : Controller
     }
 
     [HttpGet("get-user-posts")]
-    [SwaggerOperation(Summary = "User get their own poosts")]
+    [SwaggerOperation(Summary = "User get their own posts")]
     [Authorize(Roles = "User,Admin")]
     public async Task<IActionResult> GetPostsByUser(int pageNumber, int pageSize)
     {
@@ -183,5 +184,14 @@ public class PostController : Controller
         if (result == null) return Conflict("Already interact!");
         if ((bool)result) return Ok("Post disliked!!!");
         return BadRequest("Post dislike failed!!!");
+    }
+
+    [HttpPost("delete-cache")]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult> DeleteCache(string prefix)
+    {
+        var result = await _cacheService.RemoveOldCache(prefix);
+        if (result is bool) return Ok(result);
+        return BadRequest(result);
     }
 }

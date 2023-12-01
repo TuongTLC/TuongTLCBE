@@ -98,7 +98,7 @@ public class PostService
                 if (postInfoModel != null)
                 {
                     _ = await _emailService.NewPostNotification(post.Id);
-                    _cacheService.FlushData();
+                    await _cacheService.RemoveOldCache("post");
                 }
 
                 return postInfoModel ?? "Something went wrong!!";
@@ -696,7 +696,7 @@ public class PostService
             var result = await _postRepo.UpdatePost(postUpdateModel);
             if (result)
             {
-                _cacheService.FlushData();
+                await _cacheService.RemoveOldCache("post");
                 var post = await GetPost(postUpdateModel.Id);
                 if (post != null)
                     return post;
@@ -723,7 +723,7 @@ public class PostService
                 var post = await GetPost(postId);
                 if (post != null)
                 {
-                    _cacheService.FlushData();
+                    await _cacheService.RemoveOldCache("post");
                     return post;
                 }
 
@@ -758,7 +758,7 @@ public class PostService
             var result = await _postRepo.Delete(post);
             if (result > 0)
             {
-                _cacheService.FlushData();
+                await _cacheService.RemoveOldCache("post");
                 return true;
             }
 
@@ -848,7 +848,7 @@ public class PostService
     {
         try
         {
-            _cacheService.FlushData();
+            await _cacheService.RemoveOldCache("post");
             return await _postRepo.BanPost(postId);
         }
         catch (Exception e)
@@ -861,7 +861,7 @@ public class PostService
     {
         try
         {
-            _cacheService.FlushData();
+            await _cacheService.RemoveOldCache("post");
             return await _postRepo.ApprovePost(postId);
         }
         catch (Exception e)
@@ -874,7 +874,7 @@ public class PostService
     {
         try
         {
-            _cacheService.FlushData();
+            await _cacheService.RemoveOldCache("post");
             return await _postRepo.UnBanPost(postId);
         }
         catch (Exception e)
