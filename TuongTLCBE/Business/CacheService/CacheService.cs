@@ -10,9 +10,9 @@ public class CacheService : ICacheService
 
     public CacheService()
     {
-        var redis = ConnectionMultiplexer.Connect("192.168.1.32:6379, password=itslocalhost, allowAdmin=true");
+        var redis = ConnectionMultiplexer.Connect("192.168.1.232:6379, password=itslocalhost, allowAdmin=true");
         _database = redis.GetDatabase();
-        _server = redis.GetServer("192.168.1.32:6379");
+        _server = redis.GetServer("192.168.1.232:6379");
     }
 
     public T? GetData<T>(string key)
