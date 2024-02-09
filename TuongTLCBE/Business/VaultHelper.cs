@@ -46,7 +46,7 @@ public static class VaultHelper
             throw new ArgumentException("Environment variable not found.");
         }
     }
-    
+
     public static async Task<EmailSecretModel> GetEmailSecrets()
     {
         try

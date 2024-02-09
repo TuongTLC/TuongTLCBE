@@ -20,11 +20,8 @@ public class CategoryService
     {
         try
         {
-            string userId = _decodeToken.Decode(token, "userid");
-            if (categoryInsertModel.CategoryName.IsNullOrEmpty())
-            {
-                return "Category name invalid!";
-            }
+            var userId = _decodeToken.Decode(token, "userid");
+            if (categoryInsertModel.CategoryName.IsNullOrEmpty()) return "Category name invalid!";
 
             Category insertCategory = new()
             {
@@ -34,7 +31,7 @@ public class CategoryService
                 CreatedBy = Guid.Parse(userId),
                 CreatedDate = DateTime.Now
             };
-            Category? insert = await _categoryRepo.Insert(insertCategory);
+            var insert = await _categoryRepo.Insert(insertCategory);
             if (insert != null)
             {
                 CategoryModel res = new()
@@ -58,14 +55,15 @@ public class CategoryService
             return e;
         }
     }
+
     public async Task<object> UpdateCategory(CategoryUpdateModel categoryUpdateModel)
     {
         try
         {
-            bool update = await _categoryRepo.UpdateCategory(categoryUpdateModel);
+            var update = await _categoryRepo.UpdateCategory(categoryUpdateModel);
             if (update)
             {
-                Category? res = await _categoryRepo.Get(categoryUpdateModel.Id);
+                var res = await _categoryRepo.Get(categoryUpdateModel.Id);
                 if (res != null)
                 {
                     CategoryModel resCate = new()
@@ -99,37 +97,30 @@ public class CategoryService
     {
         try
         {
-            bool result = await _categoryRepo.ChangeCategoryStatus(categoryId, status);
+            var result = await _categoryRepo.ChangeCategoryStatus(categoryId, status);
             if (result)
-            {
                 return true;
-            }
             else
-            {
                 return "Change category status failed!";
-            }
         }
         catch (Exception e)
         {
             return e;
         }
     }
+
     public async Task<object> DeleteCategory(Guid categoryId)
     {
         try
         {
-            Category? getCate = await _categoryRepo.Get(categoryId);
+            var getCate = await _categoryRepo.Get(categoryId);
             if (getCate != null)
             {
-                int result = await _categoryRepo.Delete(getCate);
-                if (result>0)
-                {
+                var result = await _categoryRepo.Delete(getCate);
+                if (result > 0)
                     return true;
-                }
                 else
-                {
                     return "Delete category failed!";
-                }
             }
             else
             {
@@ -146,34 +137,27 @@ public class CategoryService
     {
         try
         {
-            CategoryModel? categoryModel = await _categoryRepo.GetACategory(categoryId);
+            var categoryModel = await _categoryRepo.GetACategory(categoryId);
             if (categoryModel != null)
-            {
                 return categoryModel;
-            }
             else
-            {
                 return "Category not found!";
-            }
         }
         catch (Exception e)
         {
             return e;
         }
     }
+
     public async Task<object> GetCategories(string? status)
     {
         try
         {
             List<CategoryModel>? categoryModel = await _categoryRepo.GetCategories(status);
             if (categoryModel != null)
-            {
                 return categoryModel;
-            }
             else
-            {
                 return "Error while getting categories!";
-            }
         }
         catch (Exception e)
         {

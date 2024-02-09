@@ -1,10 +1,9 @@
-﻿namespace TuongTLCBE.Data.Repositories
+﻿namespace TuongTLCBE.Data.Repositories;
+
+public interface IRepository<T>
+    where T : class
 {
-    public interface IRepository<T>
-        where T : class
-    {
-        Task<T?> Get(Guid id);
-        Task<T?> Insert(T entity);
-        Task<int> Delete(T entity);
-    }
+    Task<T?> Get(Guid id);
+    Task<T?> Insert(T entity);
+    Task<int> Delete(T entity);
 }
