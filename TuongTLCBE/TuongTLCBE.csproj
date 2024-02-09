@@ -19,15 +19,15 @@
     <ItemGroup>
         <PackageReference Include="EntityFrameworkPaginateCore" Version="2.1.0"/>
         <PackageReference Include="MailKit" Version="4.2.0"/>
-        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="6.0.26" />
         <PackageReference Include="MimeKit" Version="4.2.0"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.26" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.26">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.26" />
         <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.1.0"/>
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
         <PackageReference Include="VaultSharp" Version="1.13.0.1"/>
