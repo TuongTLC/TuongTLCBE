@@ -52,7 +52,7 @@ public class CategoryController : Controller
     [SwaggerOperation(Summary = "Get categories by status: active/inactive/all")]
 
     [AllowAnonymous]
-    public async Task<ActionResult> GateCategories(string? status)
+    public async Task<ActionResult> GetCategories(string? status)
     {
         object result = await _categoryService.GetCategories(status);
         return (result.GetType()==typeof(List<CategoryModel>)) ? Ok(result) : BadRequest(result);
