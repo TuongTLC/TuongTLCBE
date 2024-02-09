@@ -13,7 +13,7 @@ public class DecodeToken
 
     public string Decode(string token, string nameClaim)
     {
-        var claim = _tokenHandler
+        System.Security.Claims.Claim? claim = _tokenHandler
             .ReadJwtToken(token)
             .Claims.FirstOrDefault(selector => selector.Type.ToString().Equals(nameClaim));
         return claim != null ? claim.Value : "Error!!!";

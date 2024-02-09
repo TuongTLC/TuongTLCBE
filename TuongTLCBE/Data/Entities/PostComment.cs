@@ -31,6 +31,5 @@ public partial class PostComment
 
     public virtual Post Post { get; set; } = null!;
 
-    public virtual ICollection<UserInteractComment> UserInteractComments { get; set; } =
-        new List<UserInteractComment>();
+    public virtual ICollection<UserInteractComment> UserInteractComments { get; set; } = new List<UserInteractComment>();
 }

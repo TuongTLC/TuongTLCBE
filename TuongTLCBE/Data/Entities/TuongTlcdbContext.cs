@@ -241,8 +241,7 @@ public partial class TuongTlcdbContext : DbContext
 
             entity.ToTable("UserInteractComment");
 
-            entity.HasIndex(e => new { e.UserId, e.CommentId }, "UserInteractComment_UserID_CommentID_index")
-                .IsClustered();
+            entity.HasIndex(e => new { e.UserId, e.CommentId }, "UserInteractComment_UserID_CommentID_index").IsClustered();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("(newid())")

@@ -23,7 +23,6 @@ public class PostTagService
             return e;
         }
     }
-
     public async Task<object> InsertPostTag(Guid postId, List<Guid> tagsIds)
     {
         try
@@ -40,13 +39,13 @@ public class PostTagService
                     };
                     await _postTagRepo.Insert(postTag);
                 }
-
                 return _postTagRepo.GetPostTags(postId);
             }
             else
             {
                 return "Tags ID is empty!";
             }
+            
         }
         catch (Exception e)
         {
@@ -60,11 +59,15 @@ public class PostTagService
         {
             if (tagsIds.Any())
             {
-                var result = await _postTagRepo.UpdatePostTags(postId, tagsIds);
+                bool result = await _postTagRepo.UpdatePostTags(postId, tagsIds);
                 if (result)
+                {
                     return _postTagRepo.GetPostTags(postId);
+                }
                 else
+                {
                     return "Update post's tags failed!";
+                }
             }
             else
             {
@@ -81,11 +84,15 @@ public class PostTagService
     {
         try
         {
-            var result = await _postTagRepo.DeletePostTag(postId, tagId);
+            bool result = await _postTagRepo.DeletePostTag(postId, tagId);
             if (result)
+            {
                 return _postTagRepo.GetPostTags(postId);
+            }
             else
+            {
                 return "Delete post tag failed!";
+            }
         }
         catch (Exception e)
         {

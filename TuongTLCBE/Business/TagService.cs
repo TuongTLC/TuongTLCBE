@@ -20,8 +20,11 @@ public class TagService
     {
         try
         {
-            var userId = _decodeToken.Decode(token, "userid");
-            if (tagInsertModel.TagName.IsNullOrEmpty()) return "Tag name invalid!";
+            string userId = _decodeToken.Decode(token, "userid");
+            if (tagInsertModel.TagName.IsNullOrEmpty())
+            {
+                return "Tag name invalid!";
+            }
 
             Tag insertTag = new()
             {
@@ -31,7 +34,7 @@ public class TagService
                 CreatedBy = Guid.Parse(userId),
                 CreatedDate = DateTime.Now
             };
-            var insert = await _tagRepo.Insert(insertTag);
+            Tag? insert = await _tagRepo.Insert(insertTag);
             if (insert != null)
             {
                 TagModel res = new()
@@ -55,15 +58,14 @@ public class TagService
             return e;
         }
     }
-
     public async Task<object> UpdateTag(TagUpdateModel tagUpdateModel)
     {
         try
         {
-            var update = await _tagRepo.UpdateTag(tagUpdateModel);
+            bool update = await _tagRepo.UpdateTag(tagUpdateModel);
             if (update)
             {
-                var res = await _tagRepo.Get(tagUpdateModel.Id);
+                Tag? res = await _tagRepo.Get(tagUpdateModel.Id);
                 if (res != null)
                 {
                     TagModel resCate = new()
@@ -97,30 +99,37 @@ public class TagService
     {
         try
         {
-            var result = await _tagRepo.ChangeTagStatus(tagId, status);
+            bool result = await _tagRepo.ChangeTagStatus(tagId, status);
             if (result)
+            {
                 return true;
+            }
             else
+            {
                 return "Change tag status failed!";
+            }
         }
         catch (Exception e)
         {
             return e;
         }
     }
-
     public async Task<object> DeleteTag(Guid tagId)
     {
         try
         {
-            var getCate = await _tagRepo.Get(tagId);
+            Tag? getCate = await _tagRepo.Get(tagId);
             if (getCate != null)
             {
-                var result = await _tagRepo.Delete(getCate);
-                if (result > 0)
+                int result = await _tagRepo.Delete(getCate);
+                if (result>0)
+                {
                     return true;
+                }
                 else
+                {
                     return "Delete tag failed!";
+                }
             }
             else
             {
@@ -137,27 +146,34 @@ public class TagService
     {
         try
         {
-            var tagModel = await _tagRepo.GetATag(tagId);
+            TagModel? tagModel = await _tagRepo.GetATag(tagId);
             if (tagModel != null)
+            {
                 return tagModel;
+            }
             else
+            {
                 return "Tag not found!";
+            }
         }
         catch (Exception e)
         {
             return e;
         }
     }
-
     public async Task<object> GetTags(string? status)
     {
         try
         {
             List<TagModel>? tagModel = await _tagRepo.GetTags(status);
             if (tagModel != null)
+            {
                 return tagModel;
+            }
             else
+            {
                 return "Error while getting categories!";
+            }
         }
         catch (Exception e)
         {

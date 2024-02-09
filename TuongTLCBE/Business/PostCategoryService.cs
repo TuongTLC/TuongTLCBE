@@ -23,7 +23,6 @@ public class PostCategoryService
             return e;
         }
     }
-
     public async Task<object> InsertPostCategory(Guid postId, List<Guid> categoriesIds)
     {
         try
@@ -40,13 +39,13 @@ public class PostCategoryService
                     };
                     await _postCategoryRepo.Insert(postCategory);
                 }
-
                 return _postCategoryRepo.GetPostCategories(postId);
             }
             else
             {
                 return "Categories ID is empty!";
             }
+            
         }
         catch (Exception e)
         {
@@ -60,11 +59,15 @@ public class PostCategoryService
         {
             if (categoriesIds.Any())
             {
-                var result = await _postCategoryRepo.UpdatePostCategories(postId, categoriesIds);
+                bool result = await _postCategoryRepo.UpdatePostCategories(postId, categoriesIds);
                 if (result)
+                {
                     return _postCategoryRepo.GetPostCategories(postId);
+                }
                 else
+                {
                     return "Update post's categories failed!";
+                }
             }
             else
             {
@@ -81,11 +84,15 @@ public class PostCategoryService
     {
         try
         {
-            var result = await _postCategoryRepo.DeletePostCategory(postId, categoryId);
+            bool result = await _postCategoryRepo.DeletePostCategory(postId, categoryId);
             if (result)
+            {
                 return _postCategoryRepo.GetPostCategories(postId);
+            }
             else
+            {
                 return "Delete post category failed!";
+            }
         }
         catch (Exception e)
         {

@@ -3,7 +3,7 @@ using TuongTLCBE.Data.Entities;
 
 namespace TuongTLCBE.Data.Repositories;
 
-public class PostTagRepo : Repository<PostTag>
+public class PostTagRepo: Repository<PostTag>
 {
     public PostTagRepo(TuongTlcdbContext context) : base(context)
     {
@@ -21,16 +21,22 @@ public class PostTagRepo : Repository<PostTag>
             List<PostTag> postTags =
                 await context.PostTags.Where(x => x.PostId.Equals(postId)).ToListAsync();
             if (postTags.Any())
+            {
                 foreach (var pc in postTags)
+                {
                     context.Remove(pc);
+                }
+            }
 
             foreach (var cateId in tagsIds)
+            {
                 context.Add(new PostTag() { Id = Guid.NewGuid(), PostId = postId, TagId = cateId });
+            }
 
             _ = await context.SaveChangesAsync();
             return true;
         }
-        catch
+        catch 
         {
             return false;
         }
@@ -40,7 +46,7 @@ public class PostTagRepo : Repository<PostTag>
     {
         try
         {
-            var postTag = await context.PostTags
+            PostTag? postTag = await context.PostTags
                 .Where(x => x.PostId.Equals(postId) && x.TagId.Equals(tagId)).FirstOrDefaultAsync();
             if (postTag != null)
             {

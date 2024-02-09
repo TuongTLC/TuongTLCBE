@@ -2,6 +2,7 @@ namespace TuongTLCBE.Data.Models;
 
 public class PaginationResponseModel
 {
+
     public PaginationResponseModel PageSize(int size)
     {
         pageSize = size;
