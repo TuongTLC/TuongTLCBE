@@ -89,7 +89,7 @@ builder.Services
         };
     });
 
-builder.Services.AddDbContext<TuongTlcdbContext>(options => options.UseSqlServer(dbConn));
+builder.Services.AddDbContext<TuongTLCDBContext>(options => options.UseSqlServer(dbConn));
 
 builder.Services.AddCors(
     p =>

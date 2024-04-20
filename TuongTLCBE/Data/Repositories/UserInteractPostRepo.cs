@@ -4,7 +4,7 @@ namespace TuongTLCBE.Data.Repositories;
 
 public class UserInteractPostRepo : Repository<UserInteractPost>
 {
-    public UserInteractPostRepo(TuongTlcdbContext context) : base(context)
+    public UserInteractPostRepo(TuongTLCDBContext context) : base(context)
     {
     }
 }

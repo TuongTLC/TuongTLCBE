@@ -9,7 +9,7 @@ public class PostCommentRepo : Repository<PostComment>
     private readonly UserInteractCommentRepo _userInteractCommentRepo;
     private readonly UserRepo _userRepo;
 
-    public PostCommentRepo(TuongTlcdbContext context, UserRepo userRepo,
+    public PostCommentRepo(TuongTLCDBContext context, UserRepo userRepo,
         UserInteractCommentRepo userInteractCommentRepo) : base(context)
     {
         _userRepo = userRepo;

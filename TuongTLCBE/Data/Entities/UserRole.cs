@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TuongTLCBE.Data.Entities;
-
-public partial class UserRole
+namespace TuongTLCBE.Data.Entities
 {
-    public Guid Id { get; set; }
+    public partial class UserRole
+    {
+        public UserRole()
+        {
+            Users = new HashSet<User>();
+        }
 
-    public string RoleName { get; set; } = null!;
+        public Guid Id { get; set; }
+        public string RoleName { get; set; } = null!;
+        public string? Desctiption { get; set; }
 
-    public string? Desctiption { get; set; }
-
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+        public virtual ICollection<User> Users { get; set; }
+    }
 }

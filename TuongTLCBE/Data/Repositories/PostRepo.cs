@@ -10,7 +10,7 @@ public class PostRepo : Repository<Post>
     private readonly PostTagRepo _postTagRepo;
     private readonly UserInteractPostRepo _userInteractPostRepo;
 
-    public PostRepo(TuongTlcdbContext context, PostCategoryRepo postCategoryRepo, PostTagRepo postTagRepo,
+    public PostRepo(TuongTLCDBContext context, PostCategoryRepo postCategoryRepo, PostTagRepo postTagRepo,
         UserInteractPostRepo userInteractPostRepo) :
         base(context)
     {

@@ -7,7 +7,7 @@ namespace TuongTLCBE.Data.Repositories;
 
 public class UserRepo : Repository<User>
 {
-    public UserRepo(TuongTlcdbContext context)
+    public UserRepo(TuongTLCDBContext context)
         : base(context)
     {
     }

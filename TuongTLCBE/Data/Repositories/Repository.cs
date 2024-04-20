@@ -7,10 +7,10 @@ namespace TuongTLCBE.Data.Repositories
     public class Repository<T> : IRepository<T>
         where T : class
     {
-        protected readonly TuongTlcdbContext context;
+        protected readonly TuongTLCDBContext context;
         private readonly DbSet<T> _entities;
 
-        public Repository(TuongTlcdbContext context)
+        public Repository(TuongTLCDBContext context)
         {
             this.context = context;
             _entities = context.Set<T>();

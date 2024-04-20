@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TuongTLCBE.Data.Entities;
-
-public partial class Otpcode
+namespace TuongTLCBE.Data.Entities
 {
-    public int Code { get; set; }
-
-    public string Email { get; set; } = null!;
-
-    public Guid Id { get; set; }
+    public partial class Otpcode
+    {
+        public int Code { get; set; }
+        public string Email { get; set; } = null!;
+        public Guid Id { get; set; }
+        public DateTime CreatedTime { get; set; }
+    }
 }

@@ -5,7 +5,7 @@ namespace TuongTLCBE.Data.Repositories;
 
 public class PostTagRepo: Repository<PostTag>
 {
-    public PostTagRepo(TuongTlcdbContext context) : base(context)
+    public PostTagRepo(TuongTLCDBContext context) : base(context)
     {
     }
 

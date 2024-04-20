@@ -5,7 +5,7 @@ namespace TuongTLCBE.Data.Repositories;
 
 public class OTPCodeRepo : Repository<Otpcode>
 {
-    public OTPCodeRepo(TuongTlcdbContext context) : base(context)
+    public OTPCodeRepo(TuongTLCDBContext context) : base(context)
     {
     }
 

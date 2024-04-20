@@ -7,7 +7,7 @@ namespace TuongTLCBE.Data.Repositories;
 
 public class CategoryRepo : Repository<Category>
 {
-    public CategoryRepo(TuongTlcdbContext context) : base(context)
+    public CategoryRepo(TuongTLCDBContext context) : base(context)
     {
     }
 

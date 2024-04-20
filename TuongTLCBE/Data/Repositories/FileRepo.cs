@@ -5,7 +5,7 @@ namespace TuongTLCBE.Data.Repositories;
 
 public class FileRepo: Repository<FileUpload>
 {
-    public FileRepo(TuongTlcdbContext context) : base(context)
+    public FileRepo(TuongTLCDBContext context) : base(context)
     {
     }
 

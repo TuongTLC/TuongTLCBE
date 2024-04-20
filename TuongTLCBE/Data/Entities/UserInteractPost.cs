@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TuongTLCBE.Data.Entities;
-
-public partial class UserInteractPost
+namespace TuongTLCBE.Data.Entities
 {
-    public Guid Id { get; set; }
+    public partial class UserInteractPost
+    {
+        public Guid Id { get; set; }
+        public Guid UserId { get; set; }
+        public Guid PostId { get; set; }
 
-    public Guid UserId { get; set; }
-
-    public Guid PostId { get; set; }
-
-    public virtual Post Post { get; set; } = null!;
-
-    public virtual User User { get; set; } = null!;
+        public virtual Post Post { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
+    }
 }

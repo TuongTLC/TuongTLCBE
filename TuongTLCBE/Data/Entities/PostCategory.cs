@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace TuongTLCBE.Data.Entities;
-
-public partial class PostCategory
+namespace TuongTLCBE.Data.Entities
 {
-    public Guid Id { get; set; }
+    public partial class PostCategory
+    {
+        public Guid Id { get; set; }
+        public Guid PostId { get; set; }
+        public Guid CategoryId { get; set; }
 
-    public Guid PostId { get; set; }
-
-    public Guid CategoryId { get; set; }
-
-    public virtual Category Category { get; set; } = null!;
-
-    public virtual Post Post { get; set; } = null!;
+        public virtual Category Category { get; set; } = null!;
+        public virtual Post Post { get; set; } = null!;
+    }
 }
