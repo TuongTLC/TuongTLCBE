@@ -133,18 +133,23 @@ public class EmailService
         }
     }
 
-    public async Task<object> SendNewOtpCode(string email)
+    public async Task<object> SendNewOtpCode(string username)
     {
         try
         {
-            var otpExist = await _otpCodeRepo.CheckOtpExist(email);
-            if (otpExist)
-            {
-                return "OTP code can only be sent once every 3 minutes!";
-            }
-            var user = await _userRepo.GetUserByEmail(email);
+            var user = await _userRepo.GetUserByUsername(username);
+            
             if (user != null)
             {
+                if (user.Status == true)
+                {
+                    return "User already activated!";
+                }
+                var otpExist = await _otpCodeRepo.CheckOtpExist(user.Email);
+                if (otpExist)
+                {
+                    return "OTP code can only be sent once every 3 minutes!";
+                }
                 var sent = await SendConfirmEmail(user.Id);
                 if ((bool)sent)
                 {
