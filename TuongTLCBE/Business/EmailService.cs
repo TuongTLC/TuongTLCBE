@@ -132,4 +132,30 @@ public class EmailService
             return false;
         }
     }
+
+    public async Task<object> SendNewOtpCode(string email)
+    {
+        try
+        {
+            var otpExist = await _otpCodeRepo.CheckOtpExist(email);
+            if (otpExist)
+            {
+                return "OTP code can only be sent once every 3 minutes!";
+            }
+            var user = await _userRepo.GetUserByEmail(email);
+            if (user != null)
+            {
+                var sent = await SendConfirmEmail(user.Id);
+                if ((bool)sent)
+                {
+                    return true;
+                }
+            }
+            return "Send OTP Code failed!";
+        }
+        catch (Exception e)
+        {
+            return "Send OTP Code failed!";
+        }
+    }
 }

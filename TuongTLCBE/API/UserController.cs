@@ -107,4 +107,12 @@ public class UserController : ControllerBase
                      await _emailService.VerifyCode(request.Code, request.Email);
         return result ? Ok("User verified!") : BadRequest("User verified failed!");
     }
+
+    [HttpPost("sent-new-otp-code")]
+    [AllowAnonymous]
+    public async Task<ActionResult<object>> SendNewOtp(string email)
+    {
+        var result = await _emailService.SendNewOtpCode(email);
+        return result is bool ? Ok("New OTP code sent!") : BadRequest(result);
+    } 
 }

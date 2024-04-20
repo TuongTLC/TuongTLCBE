@@ -109,7 +109,41 @@ public class UserRepo : Repository<User>
             return null;
         }
     }
-
+    public async Task<UserModel?> GetUserByEmail(string email)
+    {
+        try
+        {
+            var query =
+                from u in context.Users
+                join ur in context.UserRoles on u.RoleId equals ur.Id
+                where u.Email.Equals(email)
+                select new { u, ur };
+            var userModel = await query
+                .Select(
+                    x =>
+                        new UserModel
+                        {
+                            Id = x.u.Id,
+                            Username = x.u.Username,
+                            PasswordHash = x.u.PasswordHash,
+                            PasswordSalt = x.u.PasswordSalt,
+                            RoleName = x.ur.RoleName,
+                            Fullname = x.u.FullName,
+                            Email = x.u.Email,
+                            Birthday = x.u.Birthday,
+                            Phone = x.u.Phone,
+                            Status = x.u.Status,
+                            Ban = x.u.Ban
+                        }
+                )
+                .FirstOrDefaultAsync();
+            return userModel;
+        }
+        catch
+        {
+            return null;
+        }
+    }
 
     public async Task<List<UserInfoModel>?> GetUsers(string? status)
     {
