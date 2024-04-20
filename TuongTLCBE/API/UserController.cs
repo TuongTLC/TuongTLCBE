@@ -110,7 +110,7 @@ public class UserController : ControllerBase
 
     [HttpPost("sent-new-otp-code")]
     [AllowAnonymous]
-    public async Task<ActionResult<object>> SendNewOtp(string email)
+    public async Task<ActionResult<object>> SendNewOtp([FromBody] string email)
     {
         var result = await _emailService.SendNewOtpCode(email);
         return result is bool ? Ok("New OTP code sent!") : BadRequest(result);
