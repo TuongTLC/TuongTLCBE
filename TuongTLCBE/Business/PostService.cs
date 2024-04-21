@@ -823,6 +823,7 @@ public class PostService
         try
         {
             var userId = _decodeToken.Decode(token, "userid");
+            await _cacheService.RemoveOldCache("post");
             return await _postRepo.LikePost(postId, userId);
         }
         catch (Exception e)
@@ -836,6 +837,7 @@ public class PostService
         try
         {
             var userId = _decodeToken.Decode(token, "userid");
+            await _cacheService.RemoveOldCache("post");
             return await _postRepo.DislikePost(postId, userId);
         }
         catch (Exception e)
