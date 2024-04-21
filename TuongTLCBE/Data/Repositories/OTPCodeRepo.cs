@@ -11,7 +11,7 @@ public class OTPCodeRepo : Repository<Otpcode>
 
     public async Task<Otpcode?> GetOtp(string code, string email)
     {
-        return await context.Otpcodes.Where(x => x.Code.Equals(int.Parse(code)) && x.Email.Equals(email))
+        return await context.Otpcodes.Where(x => x.Code.Equals(code) && x.Email.Equals(email))
             .FirstOrDefaultAsync();
     }
 

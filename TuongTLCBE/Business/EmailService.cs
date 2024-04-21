@@ -26,7 +26,7 @@ public class EmailService
             var user = await _userRepo.Get(userId);
             if (user == null) return "User does not exist!";
             Random rnd = new();
-            var otp = rnd.Next(000000, 999999);
+            var otp = rnd.Next(000000, 999999).ToString("D6");
             var otpcode = new Otpcode
             {
                 Code = otp,
@@ -41,17 +41,24 @@ public class EmailService
                 var password = emailSecretModel.Password;
                 MimeMessage message = new();
                 message.From.Add(MailboxAddress.Parse(from));
-                message.Subject = "TuongTLC account confirmation.";
+                message.Subject = "TuongTLC account verification.";
                 message.To.Add(MailboxAddress.Parse(user.Email));
                 message.Body = new TextPart(TextFormat.Html)
                 {
                     Text =
                         "<html>" +
                         "<body>" +
-                        "<h1>TuongTLC<h1>" +
-                        "<h3>You have just create the account:  " + user.Username + ".</h3>" +
-                        "<p>Please use the OTP code to activate your account.</p>" +
-                        "<p>Code: " + otp + "</p>" +
+                        "<h3>Dear " + user.Username + ",</h3>" +
+                        "<p>We noticed you want to verify your account using this email." +
+                        " To complete verify process, please enter the following one-time code in the verification form:</p>" +
+                        "<h1>" + otp + "</h1>" +
+                        "<p>This code is valid for 3 minutes.<p>" +
+                        "<h3>Wasn’t you?</h3>" +
+                        "<p>If this wasn’t you, don’t worry, your email address may have been entered by mistake." +
+                        "You can simply ignore or delete this email.</p>" +
+                        "<p>Thank you for being part of the TuongTLC community!<p><br/>" +
+                        "<p>Warm regards, <p>" +
+                        "<p>TuongTLC" +
                         "</body>" +
                         "</html>"
                 };

@@ -80,6 +80,8 @@ namespace TuongTLCBE.Data.Entities
                     .HasColumnName("ID")
                     .HasDefaultValueSql("(newid())");
 
+                entity.Property(e => e.Code).HasMaxLength(6);
+
                 entity.Property(e => e.CreatedTime)
                     .HasColumnType("datetime")
                     .HasDefaultValueSql("(getdate())");
