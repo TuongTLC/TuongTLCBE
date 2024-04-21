@@ -113,16 +113,20 @@ public class EmailService
         }
     }
 
-    public async Task<bool> VerifyCode(string code, string email)
+    public async Task<bool> VerifyCode(string code, string username)
     {
         try
         {
-            var otp = await _otpCodeRepo.GetOtp(code, email);
-            if (otp != null)
+            var user = await _userRepo.GetUserByUsername(username);
+            if (user != null)
             {
-                var deleteCode = await _otpCodeRepo.Delete(otp);
-                var updateUser = await _userRepo.ChangeAccountStatusByEmail(email, true);
-                if (deleteCode > 0 && updateUser) return true;
+                var otp = await _otpCodeRepo.GetOtp(code, user.Email);
+                if (otp != null)
+                {
+                    var deleteCode = await _otpCodeRepo.Delete(otp);
+                    var updateUser = await _userRepo.ChangeAccountStatusByEmail(user.Email, true);
+                    if (deleteCode > 0 && updateUser) return true;
+                }
             }
 
             return false;

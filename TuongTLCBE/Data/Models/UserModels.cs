@@ -90,5 +90,5 @@ public class EmailSecretModel
 public class EmailVerifyModel
 {
     public string? Code { get; set; }
-    public string? Email { get; set; }
+    public string? Username { get; set; }
 }

@@ -99,12 +99,12 @@ public class UserController : ControllerBase
         return result is bool ? Ok("User account deleted!") : BadRequest(result);
     }
 
-    [HttpPost("verify-email")]
+    [HttpPost("verify-user")]
     [AllowAnonymous]
     public async Task<ActionResult<object>> VerifyEmail(EmailVerifyModel request)
     {
-        var result = request.Email != null && request.Code != null &&
-                     await _emailService.VerifyCode(request.Code, request.Email);
+        var result = request.Username != null && request.Code != null &&
+                     await _emailService.VerifyCode(request.Code, request.Username);
         return result ? Ok("User verified!") : BadRequest("User verified failed!");
     }
 
