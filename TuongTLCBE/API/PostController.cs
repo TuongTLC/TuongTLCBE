@@ -51,7 +51,7 @@ public class PostController : Controller
                                                            tagId);
         if (cacheData != null) return Ok(cacheData);
         var result = await _postService.GetPosts(pageNumber, pageSize, status, adminStatus, categoryId, tagId);
-        var expireTime = DateTimeOffset.Now.AddDays(7);
+        var expireTime = DateTimeOffset.Now.AddHours(1);
         _cacheService.SetData("post" + pageNumber + pageSize + status + adminStatus + categoryId +
                               tagId, result, expireTime);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
