@@ -339,7 +339,6 @@ public class UserService
             );
 
         var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
         return jwt;
     }
 }
