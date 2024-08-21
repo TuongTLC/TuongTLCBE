@@ -312,7 +312,6 @@ public class UserService
         var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         return computedHash.SequenceEqual(passwordHash);
     }
-
     private async Task<string> CreateToken(UserModel user)
     {
         List<Claim> claims =
@@ -328,7 +327,6 @@ public class UserService
             new(Encoding.UTF8.GetBytes(await VaultHelper.GetSecrets("jwt")));
 
         SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha512Signature);
-
         JwtSecurityToken token =
             new(
                 claims: claims,
