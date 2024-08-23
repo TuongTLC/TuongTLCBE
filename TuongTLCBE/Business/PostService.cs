@@ -37,7 +37,7 @@ public class PostService
     {
         try
         {
-            if (postRequestModel.PostName.Length <= 6) return "Post name too short!";
+            if (postRequestModel.PostName.Length < 6) return "Post name too short!";
             if (postRequestModel.Content.Length <= 50) return "Content too short!";
             if (!postRequestModel.CategoriesIds.Any() && !postRequestModel.TagsIds.Any())
                 return "Categories id or tag id is empty!";
