@@ -83,7 +83,7 @@ public class FileService
 
             foreach (var file in files)
             {
-                var urlPath = "http://yourdomain.com/FileStorage/Pictures/"; // Update with your actual domain
+                var urlPath = "https://statics.tuongtlc.site/FileStorage/Pictures/"; // Update with your actual domain
                 var id = Guid.NewGuid();
                 var filename = id + Path.GetExtension(file.FileName);
                 urls.Add(urlPath + userId + "/" + filename);
@@ -147,12 +147,12 @@ public class FileService
         }
     }
 
-    private bool DeleteImgInStorage(string imgUrl, string token)
+    /*private bool DeleteImgInStorage(string imgUrl, string token)
     {
         try
         {
             var userid = _decodeToken.Decode(token, "userid");
-            var deletePath = "https://tuongtlc.site/FileStorage/Pictures/" + userid.ToLower() + "/";
+            var deletePath = "https://statics.tuongtlc.site/FileStorage/Pictures/" + userid.ToLower() + "/";
             var startIndex = imgUrl.IndexOf(deletePath, StringComparison.Ordinal);
 
             if (startIndex >= 0)
@@ -176,5 +176,37 @@ public class FileService
         {
             return false;
         }
+    }*/
+    private bool DeleteImgInStorage(string imgUrl, string token)
+    {
+        try
+        {
+            var userid = _decodeToken.Decode(token, "userid");
+            var deletePath = "https://statics.tuongtlc.site/FileStorage/Pictures/" + userid.ToLower() + "/";
+            var startIndex = imgUrl.IndexOf(deletePath, StringComparison.Ordinal);
+
+            if (startIndex >= 0)
+            {
+                var length = deletePath.Length;
+                var output = imgUrl.Remove(startIndex, length);
+                // Change the file path to a Linux-compatible path
+                var filePath = $"/var/www/statics/WebStatics/FileStorage/Pictures/{userid.ToLower()}/{output.ToLower()}";
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+                    return true;
+                }
+
+                return false;
+            }
+
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
     }
+
 }

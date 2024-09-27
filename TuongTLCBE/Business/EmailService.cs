@@ -169,7 +169,7 @@ public class EmailService
             }
             return "Send OTP Code failed!";
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return "Send OTP Code failed!";
         }
