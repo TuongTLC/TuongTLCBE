@@ -32,7 +32,7 @@ public class FileService
         }
     }
 
-    public async Task<object> UploadFile(List<IFormFile> files, string token)
+    /*public async Task<object> UploadFile(List<IFormFile> files, string token)
     {
         try
         {
@@ -40,7 +40,7 @@ public class FileService
             var userId = _decodeToken.Decode(token, "userid");
             foreach (var file in files)
             {
-                var urlPath = Endpoint + ":8080/FileStorage/Pictures/";
+                var urlPath = Endpoint + "/FileStorage/Pictures/";
                 var id = Guid.NewGuid();
                 var filename = id + Path.GetExtension(file.FileName);
                 urls.Add(urlPath + userId + "/" + filename);
@@ -50,13 +50,59 @@ public class FileService
                 var desPath = Path.Combine(@"N:\TuongTLCWebsite_Data\Webdata\FileStorage\Pictures", userId, filename);
                 /*
                 await file.CopyToAsync(new FileStream(desPath, FileMode.Create));
-                */
+                #1#
                 using (var sourceStream = file.OpenReadStream())
                 using (var destinationStream = new FileStream(desPath, FileMode.Create))
                 {
                     await sourceStream.CopyToAsync(destinationStream);
                 }
 
+                FileUpload fileIn = new()
+                {
+                    Id = id,
+                    Path = urlPath + userId + "/" + filename,
+                    UploadedBy = Guid.Parse(userId),
+                    UploadDate = DateTime.Now
+                };
+                _ = await _fileRepo.Insert(fileIn);
+            }
+
+            return urls;
+        }
+        catch (Exception e)
+        {
+            return e.ToString();
+        }
+    }*/
+    public async Task<object> UploadFile(List<IFormFile> files, string token)
+    {
+        try
+        {
+            List<string> urls = new();
+            var userId = _decodeToken.Decode(token, "userid");
+
+            foreach (var file in files)
+            {
+                var urlPath = "http://yourdomain.com/FileStorage/Pictures/"; // Update with your actual domain
+                var id = Guid.NewGuid();
+                var filename = id + Path.GetExtension(file.FileName);
+                urls.Add(urlPath + userId + "/" + filename);
+
+                var userFolder = Path.Combine("/var/www/statics/WebStatics/FileStorage/Pictures/", userId);
+                var desPath = Path.Combine(userFolder, filename);
+
+                // Check if the user's folder exists, and create it if it does not
+                if (!Directory.Exists(userFolder))
+                    Directory.CreateDirectory(userFolder);
+
+                // Save the file to the specified destination
+                using (var sourceStream = file.OpenReadStream())
+                using (var destinationStream = new FileStream(desPath, FileMode.Create))
+                {
+                    await sourceStream.CopyToAsync(destinationStream);
+                }
+
+                // Create a new FileUpload object to store metadata
                 FileUpload fileIn = new()
                 {
                     Id = id,
