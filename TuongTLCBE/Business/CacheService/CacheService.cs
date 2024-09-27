@@ -8,6 +8,7 @@ public class CacheService : ICacheService
     private readonly IDatabase _database;
     private readonly IServer _server;
 
+    
     public CacheService()
     {
         var redis = ConnectionMultiplexer.Connect("localhost:6379, password=itslocalhost, allowAdmin=true");
