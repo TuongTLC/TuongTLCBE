@@ -15,7 +15,7 @@ public static class VaultHelper
 
     private static readonly string Endpoint =
         Environment.GetEnvironmentVariable("VaultEndPoint", EnvironmentVariableTarget.Process)
-        ?? throw new ArgumentException("Environment variable not found.");
+        ?? throw new ArgumentException("Environment variable VaultEndPoint not found.");
      
     public static async Task<string> GetSecrets(string secretType)
     {
@@ -41,7 +41,7 @@ public static class VaultHelper
             var unseal = await UnsealVaultAsync();
             if (unseal)
                 return await GetSecrets(secretType);
-            throw new ArgumentException("Environment variable not found.");
+            throw new ArgumentException("Environment variable "+secretType+" not found.");
         }
     }
     
@@ -70,7 +70,7 @@ public static class VaultHelper
             var unseal = await UnsealVaultAsync();
             if (unseal)
                 return await GetEmailSecrets();
-            throw new ArgumentException("Environment variable not found.");
+            throw new ArgumentException("Email environment variable not found.");
         }
     }
 
@@ -80,11 +80,11 @@ public static class VaultHelper
         var unsealKeys = new[]
         {
             Environment.GetEnvironmentVariable("VaultKey1", EnvironmentVariableTarget.Process)
-            ?? throw new ArgumentException("Environment variable not found."),
+            ?? throw new ArgumentException("Environment variable VaultKey1 not found."),
             Environment.GetEnvironmentVariable("VaultKey2", EnvironmentVariableTarget.Process)
-            ?? throw new ArgumentException("Environment variable not found."),
+            ?? throw new ArgumentException("Environment variable VaultKey2 not found."),
             Environment.GetEnvironmentVariable("VaultKey3", EnvironmentVariableTarget.Process)
-            ?? throw new ArgumentException("Environment variable not found.")
+            ?? throw new ArgumentException("Environment variable VaultKey3 not found.")
         };
         var success = false;
         foreach (var key in unsealKeys)
