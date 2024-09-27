@@ -83,8 +83,8 @@ builder.Services
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "https://tuongtlc.ddns.net",
-            ValidAudience = "https://tuongtlc.ddns.net",
+            ValidIssuer = "https://tuongtlc.site",
+            ValidAudience = "https://tuongtlc.site",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtToken))
         };
     });

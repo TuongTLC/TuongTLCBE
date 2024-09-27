@@ -331,8 +331,8 @@ public class UserService
         JwtSecurityToken token =
             new(
                 claims: claims,
-                audience: "https://tuongtlc.ddns.net",
-                issuer: "https://tuongtlc.ddns.net",
+                audience: "https://tuongtlc.site",
+                issuer: "https://tuongtlc.site",
                 expires: DateTime.Now.AddHours(24),
                 signingCredentials: creds
             );

@@ -106,7 +106,7 @@ public class FileService
         try
         {
             var userid = _decodeToken.Decode(token, "userid");
-            var deletePath = "https://tuongtlc.ddns.net:8080/FileStorage/Pictures/" + userid.ToLower() + "/";
+            var deletePath = "https://tuongtlc.site/FileStorage/Pictures/" + userid.ToLower() + "/";
             var startIndex = imgUrl.IndexOf(deletePath, StringComparison.Ordinal);
 
             if (startIndex >= 0)

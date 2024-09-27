@@ -101,7 +101,7 @@ public class EmailService
                     "<h1>TuongTLC<h1>" +
                     "<h3>A new post have been created and await your approval.</h3>" +
                     "<p>Please follow the link to view post detail.</p>" +
-                    "<p>Post detail: https://tuongtlc.ddns.net/preview-post?postId=" + postId + "</p>" +
+                    "<p>Post detail: https://tuongtlc.site/preview-post?postId=" + postId + "</p>" +
                     "</body>" +
                     "</html>"
             };
