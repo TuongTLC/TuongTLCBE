@@ -130,13 +130,12 @@ public class FileService
             if (fileUploadGet != null)
             {
                 if (!fileUploadGet.UploadedBy.Equals(Guid.Parse(userid))) return "This file isn't your to delete!";
-                // bool deleteInDb = DeleteImgInStorage(url, token);
-                // if (deleteInDb)
-                // {
-                //    return (await _fileRepo.Delete(fileUploadGet)) > 0;
-                // }
-                return await _fileRepo.Delete(fileUploadGet) > 0;
-                // return "Failed to delete file in storage!";
+                bool deleteInDb = DeleteImgInStorage(url, token);
+                if (deleteInDb)
+                {
+                    return (await _fileRepo.Delete(fileUploadGet)) > 0;
+                 }
+                //return await _fileRepo.Delete(fileUploadGet) > 0;
             }
 
             return "File not found!";
