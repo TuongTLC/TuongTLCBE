@@ -22,8 +22,8 @@ public class FileService
     {
         try
         {
-            var userId = _decodeToken.Decode(token, "userid");
-            var fileList = await _fileRepo.GetFilesByUser(Guid.Parse(userId));
+            string userId = _decodeToken.Decode(token, "userid");
+            List<FileUpload> fileList = await _fileRepo.GetFilesByUser(Guid.Parse(userId));
             return fileList;
         }
         catch (Exception e)
@@ -79,25 +79,27 @@ public class FileService
         try
         {
             List<string> urls = new();
-            var userId = _decodeToken.Decode(token, "userid");
+            string userId = _decodeToken.Decode(token, "userid");
 
-            foreach (var file in files)
+            foreach (IFormFile file in files)
             {
-                var urlPath = "https://statics.tuongtlc.site/FileStorage/Pictures/"; // Update with your actual domain
-                var id = Guid.NewGuid();
-                var filename = id + Path.GetExtension(file.FileName);
+                string urlPath = "https://statics.tuongtlc.site/FileStorage/Pictures/"; // Update with your actual domain
+                Guid id = Guid.NewGuid();
+                string filename = id + Path.GetExtension(file.FileName);
                 urls.Add(urlPath + userId + "/" + filename);
 
-                var userFolder = Path.Combine("/var/www/statics/WebStatics/FileStorage/Pictures/", userId);
-                var desPath = Path.Combine(userFolder, filename);
+                string userFolder = Path.Combine("/var/www/statics/WebStatics/FileStorage/Pictures/", userId);
+                string desPath = Path.Combine(userFolder, filename);
 
                 // Check if the user's folder exists, and create it if it does not
                 if (!Directory.Exists(userFolder))
-                    Directory.CreateDirectory(userFolder);
+                {
+                    _ = Directory.CreateDirectory(userFolder);
+                }
 
                 // Save the file to the specified destination
-                using (var sourceStream = file.OpenReadStream())
-                using (var destinationStream = new FileStream(desPath, FileMode.Create))
+                using (Stream sourceStream = file.OpenReadStream())
+                using (FileStream destinationStream = new(desPath, FileMode.Create))
                 {
                     await sourceStream.CopyToAsync(destinationStream);
                 }
@@ -125,16 +127,20 @@ public class FileService
     {
         try
         {
-            var userid = _decodeToken.Decode(token, "userid");
-            var fileUploadGet = await _fileRepo.GetFileByPath(url);
+            string userid = _decodeToken.Decode(token, "userid");
+            FileUpload? fileUploadGet = await _fileRepo.GetFileByPath(url);
             if (fileUploadGet != null)
             {
-                if (!fileUploadGet.UploadedBy.Equals(Guid.Parse(userid))) return "This file isn't your to delete!";
+                if (!fileUploadGet.UploadedBy.Equals(Guid.Parse(userid)))
+                {
+                    return "This file isn't your to delete!";
+                }
+
                 bool deleteInDb = DeleteImgInStorage(url, token);
                 if (deleteInDb)
                 {
                     return (await _fileRepo.Delete(fileUploadGet)) > 0;
-                 }
+                }
                 //return await _fileRepo.Delete(fileUploadGet) > 0;
             }
 
@@ -180,16 +186,16 @@ public class FileService
     {
         try
         {
-            var userid = _decodeToken.Decode(token, "userid");
-            var deletePath = "https://statics.tuongtlc.site/FileStorage/Pictures/" + userid.ToLower() + "/";
-            var startIndex = imgUrl.IndexOf(deletePath, StringComparison.Ordinal);
+            string userid = _decodeToken.Decode(token, "userid");
+            string deletePath = "https://statics.tuongtlc.site/FileStorage/Pictures/" + userid.ToLower() + "/";
+            int startIndex = imgUrl.IndexOf(deletePath, StringComparison.Ordinal);
 
             if (startIndex >= 0)
             {
-                var length = deletePath.Length;
-                var output = imgUrl.Remove(startIndex, length);
+                int length = deletePath.Length;
+                string output = imgUrl.Remove(startIndex, length);
                 // Change the file path to a Linux-compatible path
-                var filePath = $"/var/www/statics/WebStatics/FileStorage/Pictures/{userid.ToLower()}/{output.ToLower()}";
+                string filePath = $"/var/www/statics/WebStatics/FileStorage/Pictures/{userid.ToLower()}/{output.ToLower()}";
 
                 if (File.Exists(filePath))
                 {

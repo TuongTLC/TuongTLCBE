@@ -37,25 +37,41 @@ public class PostService
     {
         try
         {
-            if (postRequestModel.PostName.Length < 6) return "Post name too short!";
-            if (postRequestModel.Content.Length <= 50) return "Content too short!";
+            if (postRequestModel.PostName.Length < 6)
+            {
+                return "Post name too short!";
+            }
+
+            if (postRequestModel.Content.Length <= 50)
+            {
+                return "Content too short!";
+            }
+
             if (!postRequestModel.CategoriesIds.Any() && !postRequestModel.TagsIds.Any())
+            {
                 return "Categories id or tag id is empty!";
-
-            foreach (var cateId in postRequestModel.CategoriesIds)
-            {
-                var categoryCheck = await _categoryRepo.Get(cateId);
-                if (categoryCheck == null) return "Category " + cateId + " not found!";
             }
 
-            foreach (var tagId in postRequestModel.TagsIds)
+            foreach (Guid cateId in postRequestModel.CategoriesIds)
             {
-                var tagCheck = await _tagRepo.Get(tagId);
-                if (tagCheck == null) return "Tag " + tagId + " not found!";
+                Category? categoryCheck = await _categoryRepo.Get(cateId);
+                if (categoryCheck == null)
+                {
+                    return "Category " + cateId + " not found!";
+                }
             }
 
-            var userId = _decodeToken.Decode(token, "userid");
-            var post = new Post
+            foreach (Guid tagId in postRequestModel.TagsIds)
+            {
+                Tag? tagCheck = await _tagRepo.Get(tagId);
+                if (tagCheck == null)
+                {
+                    return "Tag " + tagId + " not found!";
+                }
+            }
+
+            string userId = _decodeToken.Decode(token, "userid");
+            Post post = new()
             {
                 Id = Guid.NewGuid(),
                 PostName = postRequestModel.PostName,
@@ -69,10 +85,10 @@ public class PostService
                 Status = false,
                 AdminStatus = Enums.POST_REVIEW
             };
-            var insertPost = await _postRepo.Insert(post);
+            Post? insertPost = await _postRepo.Insert(post);
             if (insertPost != null)
             {
-                foreach (var cateInsert in postRequestModel.CategoriesIds)
+                foreach (Guid cateInsert in postRequestModel.CategoriesIds)
                 {
                     PostCategory postCategoryInsert = new()
                     {
@@ -83,7 +99,7 @@ public class PostService
                     _ = await _postCategoryRepo.Insert(postCategoryInsert);
                 }
 
-                foreach (var tagInsert in postRequestModel.TagsIds)
+                foreach (Guid tagInsert in postRequestModel.TagsIds)
                 {
                     PostTag postTagInsert = new()
                     {
@@ -94,11 +110,11 @@ public class PostService
                     _ = await _postTagRepo.Insert(postTagInsert);
                 }
 
-                var postInfoModel = await GetPost(post.Id);
+                object? postInfoModel = await GetPost(post.Id);
                 if (postInfoModel != null)
                 {
                     _ = await _emailService.NewPostNotification(post.Id);
-                    await _cacheService.RemoveOldCache("post");
+                    _ = await _cacheService.RemoveOldCache("post");
                 }
 
                 return postInfoModel ?? "Something went wrong!!";
@@ -116,10 +132,10 @@ public class PostService
     {
         try
         {
-            var post = await _postRepo.Get(postId);
+            Post? post = await _postRepo.Get(postId);
             if (post != null)
             {
-                var author = await _userRepo.GetAuthor(post.Author);
+                PostAuthor? author = await _userRepo.GetAuthor(post.Author);
                 PostModel postModel = new()
                 {
                     Id = post.Id,
@@ -134,12 +150,13 @@ public class PostService
                     Status = post.Status,
                     AdminStatus = post.AdminStatus
                 };
-                var postCategories = await _postCategoryRepo.GetPostCategories(postId);
+                List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(postId);
                 List<PostCategoryModel> postCategoryModels = new();
                 if (postCategories.Any())
-                    foreach (var cate in postCategories)
+                {
+                    foreach (PostCategory cate in postCategories)
                     {
-                        var category = await _categoryRepo.Get(cate.CategoryId);
+                        Category? category = await _categoryRepo.Get(cate.CategoryId);
                         if (category != null)
                         {
                             PostCategoryModel model = new()
@@ -151,13 +168,15 @@ public class PostService
                             postCategoryModels.Add(model);
                         }
                     }
+                }
 
-                var postTags = await _postTagRepo.GetPostTags(postId);
+                List<PostTag> postTags = await _postTagRepo.GetPostTags(postId);
                 List<PostTagModel> postTagModels = new();
                 if (postTags.Any())
-                    foreach (var postTag in postTags)
+                {
+                    foreach (PostTag postTag in postTags)
                     {
-                        var tag = await _tagRepo.Get(postTag.TagId);
+                        Tag? tag = await _tagRepo.Get(postTag.TagId);
                         if (tag != null)
                         {
                             PostTagModel model = new()
@@ -169,8 +188,9 @@ public class PostService
                             postTagModels.Add(model);
                         }
                     }
+                }
 
-                var postInfo = new PostInfoModel
+                PostInfoModel postInfo = new()
                 {
                     PostInfo = postModel,
                     PostCategories = postCategoryModels,
@@ -196,13 +216,13 @@ public class PostService
             status ??= "all";
             adminStatus ??= "all";
             PostPagingResponseModel responseModel = new();
-            var posts = await _postRepo.GetPostsInfo(status, adminStatus);
+            List<Post>? posts = await _postRepo.GetPostsInfo(status, adminStatus);
             List<PostInfoModel> listPosts = new();
             if (posts != null && posts.Any())
             {
-                foreach (var post in posts)
+                foreach (Post post in posts)
                 {
-                    var author = await _userRepo.GetAuthor(post.Author);
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
@@ -214,14 +234,16 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status, AdminStatus = post.AdminStatus
+                        Status = post.Status,
+                        AdminStatus = post.AdminStatus
                     };
-                    var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
+                    List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
                     if (postCategories.Any())
-                        foreach (var cate in postCategories)
+                    {
+                        foreach (PostCategory cate in postCategories)
                         {
-                            var category = await _categoryRepo.Get(cate.CategoryId);
+                            Category? category = await _categoryRepo.Get(cate.CategoryId);
                             if (category != null)
                             {
                                 PostCategoryModel postCategoryModel = new()
@@ -233,13 +255,15 @@ public class PostService
                                 postCategoryModels.Add(postCategoryModel);
                             }
                         }
+                    }
 
-                    var postTags = await _postTagRepo.GetPostTags(post.Id);
+                    List<PostTag> postTags = await _postTagRepo.GetPostTags(post.Id);
                     List<PostTagModel> postTagModels = new();
                     if (postTags.Any())
-                        foreach (var postTag in postTags)
+                    {
+                        foreach (PostTag postTag in postTags)
                         {
-                            var tag = await _tagRepo.Get(postTag.TagId);
+                            Tag? tag = await _tagRepo.Get(postTag.TagId);
                             if (tag != null)
                             {
                                 PostTagModel postTagModel = new()
@@ -251,8 +275,9 @@ public class PostService
                                 postTagModels.Add(postTagModel);
                             }
                         }
+                    }
 
-                    var postInfo = new PostInfoModel
+                    PostInfoModel postInfo = new()
                     {
                         PostInfo = postModel,
                         PostCategories = postCategoryModels,
@@ -263,35 +288,43 @@ public class PostService
 
                 if (categoryId != null && categoryId != Guid.Empty)
                 {
-                    var newListPosts = new List<PostInfoModel>();
-                    foreach (var post in listPosts)
-                    foreach (var postCate in post.PostCategories)
-                        if (postCate.Id.Equals(categoryId))
+                    List<PostInfoModel> newListPosts = new();
+                    foreach (PostInfoModel post in listPosts)
+                    {
+                        foreach (PostCategoryModel postCate in post.PostCategories)
                         {
-                            newListPosts.Add(post);
-                            break;
+                            if (postCate.Id.Equals(categoryId))
+                            {
+                                newListPosts.Add(post);
+                                break;
+                            }
                         }
+                    }
 
                     listPosts = newListPosts;
                 }
 
                 if (tagId != null && tagId != Guid.Empty)
                 {
-                    var newListPosts = new List<PostInfoModel>();
-                    foreach (var post in listPosts)
-                    foreach (var postTag in post.PostTags)
-                        if (postTag.Id.Equals(tagId))
+                    List<PostInfoModel> newListPosts = new();
+                    foreach (PostInfoModel post in listPosts)
+                    {
+                        foreach (PostTagModel postTag in post.PostTags)
                         {
-                            newListPosts.Add(post);
-                            break;
+                            if (postTag.Id.Equals(tagId))
+                            {
+                                newListPosts.Add(post);
+                                break;
+                            }
                         }
+                    }
 
                     listPosts = newListPosts;
                 }
             }
 
-            var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
-            var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
+            Page<PostInfoModel> postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
+            PaginationResponseModel paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                 .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                 .RecordCount(postPaged.RecordCount);
             responseModel.Paging = paging;
@@ -309,13 +342,13 @@ public class PostService
         try
         {
             PostPagingResponseModel responseModel = new();
-            var posts = await _postRepo.GetPostByUser(Guid.Parse(userId));
+            List<Post>? posts = await _postRepo.GetPostByUser(Guid.Parse(userId));
             if (posts != null && posts.Any())
             {
                 List<PostInfoModel> listPosts = new();
-                foreach (var post in posts)
+                foreach (Post post in posts)
                 {
-                    var author = await _userRepo.GetAuthor(post.Author);
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
@@ -327,14 +360,16 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status, AdminStatus = post.AdminStatus
+                        Status = post.Status,
+                        AdminStatus = post.AdminStatus
                     };
-                    var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
+                    List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
                     if (postCategories.Any())
-                        foreach (var cate in postCategories)
+                    {
+                        foreach (PostCategory cate in postCategories)
                         {
-                            var category = await _categoryRepo.Get(cate.CategoryId);
+                            Category? category = await _categoryRepo.Get(cate.CategoryId);
                             if (category != null)
                             {
                                 PostCategoryModel postCategoryModel = new()
@@ -346,13 +381,15 @@ public class PostService
                                 postCategoryModels.Add(postCategoryModel);
                             }
                         }
+                    }
 
-                    var postTags = await _postTagRepo.GetPostTags(post.Id);
+                    List<PostTag> postTags = await _postTagRepo.GetPostTags(post.Id);
                     List<PostTagModel> postTagModels = new();
                     if (postTags.Any())
-                        foreach (var postTag in postTags)
+                    {
+                        foreach (PostTag postTag in postTags)
                         {
-                            var tag = await _tagRepo.Get(postTag.TagId);
+                            Tag? tag = await _tagRepo.Get(postTag.TagId);
                             if (tag != null)
                             {
                                 PostTagModel postTagModel = new()
@@ -364,8 +401,9 @@ public class PostService
                                 postTagModels.Add(postTagModel);
                             }
                         }
+                    }
 
-                    var postInfo = new PostInfoModel
+                    PostInfoModel postInfo = new()
                     {
                         PostInfo = postModel,
                         PostCategories = postCategoryModels,
@@ -375,9 +413,9 @@ public class PostService
                 }
 
 
-                var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
+                Page<PostInfoModel> postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
 
-                var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
+                PaginationResponseModel paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                     .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
                 responseModel.Paging = paging;
                 responseModel.ListPosts = postPaged.Results;
@@ -395,15 +433,15 @@ public class PostService
     {
         try
         {
-            var userid = _decodeToken.Decode(token, "userid");
+            string userid = _decodeToken.Decode(token, "userid");
             PostPagingResponseModel responseModel = new();
-            var posts = await _postRepo.GetPostByUser(Guid.Parse(userid));
+            List<Post>? posts = await _postRepo.GetPostByUser(Guid.Parse(userid));
             if (posts != null && posts.Any())
             {
                 List<PostInfoModel> listPosts = new();
-                foreach (var post in posts)
+                foreach (Post post in posts)
                 {
-                    var author = await _userRepo.GetAuthor(post.Author);
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
@@ -415,14 +453,16 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status, AdminStatus = post.AdminStatus
+                        Status = post.Status,
+                        AdminStatus = post.AdminStatus
                     };
-                    var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
+                    List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
                     if (postCategories.Any())
-                        foreach (var cate in postCategories)
+                    {
+                        foreach (PostCategory cate in postCategories)
                         {
-                            var category = await _categoryRepo.Get(cate.CategoryId);
+                            Category? category = await _categoryRepo.Get(cate.CategoryId);
                             if (category != null)
                             {
                                 PostCategoryModel postCategoryModel = new()
@@ -434,13 +474,15 @@ public class PostService
                                 postCategoryModels.Add(postCategoryModel);
                             }
                         }
+                    }
 
-                    var postTags = await _postTagRepo.GetPostTags(post.Id);
+                    List<PostTag> postTags = await _postTagRepo.GetPostTags(post.Id);
                     List<PostTagModel> postTagModels = new();
                     if (postTags.Any())
-                        foreach (var postTag in postTags)
+                    {
+                        foreach (PostTag postTag in postTags)
                         {
-                            var tag = await _tagRepo.Get(postTag.TagId);
+                            Tag? tag = await _tagRepo.Get(postTag.TagId);
                             if (tag != null)
                             {
                                 PostTagModel postTagModel = new()
@@ -452,8 +494,9 @@ public class PostService
                                 postTagModels.Add(postTagModel);
                             }
                         }
+                    }
 
-                    var postInfo = new PostInfoModel
+                    PostInfoModel postInfo = new()
                     {
                         PostInfo = postModel,
                         PostCategories = postCategoryModels,
@@ -463,9 +506,9 @@ public class PostService
                 }
 
 
-                var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
+                Page<PostInfoModel> postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
 
-                var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
+                PaginationResponseModel paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                     .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount).RecordCount(postPaged.RecordCount);
                 responseModel.Paging = paging;
                 responseModel.ListPosts = postPaged.Results;
@@ -483,12 +526,13 @@ public class PostService
     {
         try
         {
-            var posts = await _postRepo.GetTopLiked();
+            List<Post>? posts = await _postRepo.GetTopLiked();
             List<PostInfoModel> listPosts = new();
             if (posts != null && posts.Any())
-                foreach (var post in posts)
+            {
+                foreach (Post post in posts)
                 {
-                    var author = await _userRepo.GetAuthor(post.Author);
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
@@ -500,14 +544,16 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status, AdminStatus = post.AdminStatus
+                        Status = post.Status,
+                        AdminStatus = post.AdminStatus
                     };
-                    var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
+                    List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
                     if (postCategories.Any())
-                        foreach (var cate in postCategories)
+                    {
+                        foreach (PostCategory cate in postCategories)
                         {
-                            var category = await _categoryRepo.Get(cate.CategoryId);
+                            Category? category = await _categoryRepo.Get(cate.CategoryId);
                             if (category != null)
                             {
                                 PostCategoryModel postCategoryModel = new()
@@ -519,13 +565,15 @@ public class PostService
                                 postCategoryModels.Add(postCategoryModel);
                             }
                         }
+                    }
 
-                    var postTags = await _postTagRepo.GetPostTags(post.Id);
+                    List<PostTag> postTags = await _postTagRepo.GetPostTags(post.Id);
                     List<PostTagModel> postTagModels = new();
                     if (postTags.Any())
-                        foreach (var postTag in postTags)
+                    {
+                        foreach (PostTag postTag in postTags)
                         {
-                            var tag = await _tagRepo.Get(postTag.TagId);
+                            Tag? tag = await _tagRepo.Get(postTag.TagId);
                             if (tag != null)
                             {
                                 PostTagModel postTagModel = new()
@@ -537,8 +585,9 @@ public class PostService
                                 postTagModels.Add(postTagModel);
                             }
                         }
+                    }
 
-                    var postInfo = new PostInfoModel
+                    PostInfoModel postInfo = new()
                     {
                         PostInfo = postModel,
                         PostCategories = postCategoryModels,
@@ -546,6 +595,7 @@ public class PostService
                     };
                     listPosts.Add(postInfo);
                 }
+            }
 
             return listPosts;
         }
@@ -563,14 +613,14 @@ public class PostService
         {
             status ??= "all";
             adminStatus ??= "approved";
-            var posts = await _postRepo.SearchPost(postName, status, adminStatus);
+            List<Post>? posts = await _postRepo.SearchPost(postName, status, adminStatus);
             PostPagingResponseModel responseModel = new();
             if (posts != null && posts.Any())
             {
                 List<PostInfoModel> listPosts = new();
-                foreach (var post in posts)
+                foreach (Post post in posts)
                 {
-                    var author = await _userRepo.GetAuthor(post.Author);
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
@@ -582,14 +632,16 @@ public class PostService
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status, AdminStatus = post.AdminStatus
+                        Status = post.Status,
+                        AdminStatus = post.AdminStatus
                     };
-                    var postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
+                    List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
                     if (postCategories.Any())
-                        foreach (var cate in postCategories)
+                    {
+                        foreach (PostCategory cate in postCategories)
                         {
-                            var category = await _categoryRepo.Get(cate.CategoryId);
+                            Category? category = await _categoryRepo.Get(cate.CategoryId);
                             if (category != null)
                             {
                                 PostCategoryModel postCategoryModel = new()
@@ -601,13 +653,15 @@ public class PostService
                                 postCategoryModels.Add(postCategoryModel);
                             }
                         }
+                    }
 
-                    var postTags = await _postTagRepo.GetPostTags(post.Id);
+                    List<PostTag> postTags = await _postTagRepo.GetPostTags(post.Id);
                     List<PostTagModel> postTagModels = new();
                     if (postTags.Any())
-                        foreach (var postTag in postTags)
+                    {
+                        foreach (PostTag postTag in postTags)
                         {
-                            var tag = await _tagRepo.Get(postTag.TagId);
+                            Tag? tag = await _tagRepo.Get(postTag.TagId);
                             if (tag != null)
                             {
                                 PostTagModel postTagModel = new()
@@ -619,8 +673,9 @@ public class PostService
                                 postTagModels.Add(postTagModel);
                             }
                         }
+                    }
 
-                    var postInfo = new PostInfoModel
+                    PostInfoModel postInfo = new()
                     {
                         PostInfo = postModel,
                         PostCategories = postCategoryModels,
@@ -631,35 +686,43 @@ public class PostService
 
                 if (categoryId != null && categoryId != Guid.Empty)
                 {
-                    var newListPosts = new List<PostInfoModel>();
-                    foreach (var post in listPosts)
-                    foreach (var postCate in post.PostCategories)
-                        if (postCate.Id.Equals(categoryId))
+                    List<PostInfoModel> newListPosts = new();
+                    foreach (PostInfoModel post in listPosts)
+                    {
+                        foreach (PostCategoryModel postCate in post.PostCategories)
                         {
-                            newListPosts.Add(post);
-                            break;
+                            if (postCate.Id.Equals(categoryId))
+                            {
+                                newListPosts.Add(post);
+                                break;
+                            }
                         }
+                    }
 
                     listPosts = newListPosts;
                 }
 
                 if (tagId != null && tagId != Guid.Empty)
                 {
-                    var newListPosts = new List<PostInfoModel>();
-                    foreach (var post in listPosts)
-                    foreach (var postTag in post.PostTags)
-                        if (postTag.Id.Equals(tagId))
+                    List<PostInfoModel> newListPosts = new();
+                    foreach (PostInfoModel post in listPosts)
+                    {
+                        foreach (PostTagModel postTag in post.PostTags)
                         {
-                            newListPosts.Add(post);
-                            break;
+                            if (postTag.Id.Equals(tagId))
+                            {
+                                newListPosts.Add(post);
+                                break;
+                            }
                         }
+                    }
 
                     listPosts = newListPosts;
                 }
 
-                var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
+                Page<PostInfoModel> postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
 
-                var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
+                PaginationResponseModel paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                     .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                     .RecordCount(postPaged.RecordCount);
                 responseModel.Paging = paging;
@@ -668,9 +731,13 @@ public class PostService
             else
             {
                 List<PostInfoModel> listPosts = new();
-                if (listPosts == null) throw new ArgumentNullException(nameof(listPosts));
-                var postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
-                var paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
+                if (listPosts == null)
+                {
+                    throw new ArgumentNullException(nameof(listPosts));
+                }
+
+                Page<PostInfoModel> postPaged = listPosts.AsQueryable().Paginate(pageNumber, pageSize);
+                PaginationResponseModel paging = new PaginationResponseModel().CurPage(postPaged.CurrentPage)
                     .PageSize(postPaged.PageSize).PageCount(postPaged.PageCount == 0 ? 1 : postPaged.PageCount)
                     .RecordCount(postPaged.RecordCount);
                 responseModel.Paging = paging;
@@ -689,18 +756,24 @@ public class PostService
     {
         try
         {
-            var userId = _decodeToken.Decode(token, "userid");
-            var postCheck = await _postRepo.Get(postUpdateModel.Id);
-            if (postCheck == null) return "Post not found!";
-            if (!postCheck.Author.Equals(Guid.Parse(userId))) return "Not the author!";
-            var result = await _postRepo.UpdatePost(postUpdateModel);
+            string userId = _decodeToken.Decode(token, "userid");
+            Post? postCheck = await _postRepo.Get(postUpdateModel.Id);
+            if (postCheck == null)
+            {
+                return "Post not found!";
+            }
+
+            if (!postCheck.Author.Equals(Guid.Parse(userId)))
+            {
+                return "Not the author!";
+            }
+
+            bool result = await _postRepo.UpdatePost(postUpdateModel);
             if (result)
             {
-                await _cacheService.RemoveOldCache("post");
-                var post = await GetPost(postUpdateModel.Id);
-                if (post != null)
-                    return post;
-                return "Something went wrong!";
+                _ = await _cacheService.RemoveOldCache("post");
+                object? post = await GetPost(postUpdateModel.Id);
+                return post ?? "Something went wrong!";
             }
 
             return "Something went wrong!";
@@ -715,15 +788,23 @@ public class PostService
     {
         try
         {
-            var result = false;
-            if (status.Trim().ToLower().Equals("active")) result = await _postRepo.ChangePostStatus(postId, true);
-            if (status.Trim().ToLower().Equals("inactive")) result = await _postRepo.ChangePostStatus(postId, false);
+            bool result = false;
+            if (status.Trim().ToLower().Equals("active"))
+            {
+                result = await _postRepo.ChangePostStatus(postId, true);
+            }
+
+            if (status.Trim().ToLower().Equals("inactive"))
+            {
+                result = await _postRepo.ChangePostStatus(postId, false);
+            }
+
             if (result)
             {
-                var post = await GetPost(postId);
+                object? post = await GetPost(postId);
                 if (post != null)
                 {
-                    await _cacheService.RemoveOldCache("post");
+                    _ = await _cacheService.RemoveOldCache("post");
                     return post;
                 }
 
@@ -742,23 +823,34 @@ public class PostService
     {
         try
         {
-            var post = await _postRepo.Get(postId);
-            if (post == null) return "Post not found!";
+            Post? post = await _postRepo.Get(postId);
+            if (post == null)
+            {
+                return "Post not found!";
+            }
 
-            var postCategories = await _postCategoryRepo.GetPostCategories(postId);
+            List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(postId);
             if (postCategories.Any())
-                foreach (var postCate in postCategories)
-                    await _postCategoryRepo.Delete(postCate);
+            {
+                foreach (PostCategory postCate in postCategories)
+                {
+                    _ = await _postCategoryRepo.Delete(postCate);
+                }
+            }
 
-            var postTags = await _postTagRepo.GetPostTags(postId);
+            List<PostTag> postTags = await _postTagRepo.GetPostTags(postId);
             if (postTags.Any())
-                foreach (var postTag in postTags)
-                    await _postTagRepo.Delete(postTag);
+            {
+                foreach (PostTag postTag in postTags)
+                {
+                    _ = await _postTagRepo.Delete(postTag);
+                }
+            }
 
-            var result = await _postRepo.Delete(post);
+            int result = await _postRepo.Delete(post);
             if (result > 0)
             {
-                await _cacheService.RemoveOldCache("post");
+                _ = await _cacheService.RemoveOldCache("post");
                 return true;
             }
 
@@ -774,12 +866,13 @@ public class PostService
     {
         try
         {
-            var postCategories = await _postCategoryRepo.GetPostCategories(Guid.Parse(relatePostId));
+            List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(Guid.Parse(relatePostId));
             List<PostCategoryModel> postCategoryModels = new();
             if (postCategories.Any())
-                foreach (var cate in postCategories)
+            {
+                foreach (PostCategory cate in postCategories)
                 {
-                    var category = await _categoryRepo.Get(cate.CategoryId);
+                    Category? category = await _categoryRepo.Get(cate.CategoryId);
                     if (category != null)
                     {
                         PostCategoryModel postCategoryModel = new()
@@ -791,22 +884,30 @@ public class PostService
                         postCategoryModels.Add(postCategoryModel);
                     }
                 }
+            }
 
             List<string> postIds = new();
-            foreach (var category in postCategoryModels)
+            foreach (PostCategoryModel category in postCategoryModels)
             {
-                var listPosts = await _postRepo.GetPostsByCategory(category.Id);
+                List<string>? listPosts = await _postRepo.GetPostsByCategory(category.Id);
                 if (listPosts != null)
-                    foreach (var listPostCate in listPosts)
+                {
+                    foreach (string listPostCate in listPosts)
+                    {
                         postIds.Add(listPostCate);
+                    }
+                }
             }
 
             postIds = postIds.Distinct().Take(6).ToList();
             List<PostInfoModel> response = new();
-            foreach (var postId in postIds)
+            foreach (string postId in postIds)
             {
-                var postInfo = await GetPost(Guid.Parse(postId));
-                if (postInfo?.GetType() == typeof(PostInfoModel)) response.Add((PostInfoModel)postInfo);
+                object? postInfo = await GetPost(Guid.Parse(postId));
+                if (postInfo?.GetType() == typeof(PostInfoModel))
+                {
+                    response.Add((PostInfoModel)postInfo);
+                }
             }
 
             return response;
@@ -822,8 +923,8 @@ public class PostService
     {
         try
         {
-            var userId = _decodeToken.Decode(token, "userid");
-            await _cacheService.RemoveOldCache("post");
+            string userId = _decodeToken.Decode(token, "userid");
+            _ = await _cacheService.RemoveOldCache("post");
             return await _postRepo.LikePost(postId, userId);
         }
         catch (Exception e)
@@ -836,8 +937,8 @@ public class PostService
     {
         try
         {
-            var userId = _decodeToken.Decode(token, "userid");
-            await _cacheService.RemoveOldCache("post");
+            string userId = _decodeToken.Decode(token, "userid");
+            _ = await _cacheService.RemoveOldCache("post");
             return await _postRepo.DislikePost(postId, userId);
         }
         catch (Exception e)
@@ -850,7 +951,7 @@ public class PostService
     {
         try
         {
-            await _cacheService.RemoveOldCache("post");
+            _ = await _cacheService.RemoveOldCache("post");
             return await _postRepo.BanPost(postId);
         }
         catch (Exception e)
@@ -863,7 +964,7 @@ public class PostService
     {
         try
         {
-            await _cacheService.RemoveOldCache("post");
+            _ = await _cacheService.RemoveOldCache("post");
             return await _postRepo.ApprovePost(postId);
         }
         catch (Exception e)
@@ -876,7 +977,7 @@ public class PostService
     {
         try
         {
-            await _cacheService.RemoveOldCache("post");
+            _ = await _cacheService.RemoveOldCache("post");
             return await _postRepo.UnBanPost(postId);
         }
         catch (Exception e)

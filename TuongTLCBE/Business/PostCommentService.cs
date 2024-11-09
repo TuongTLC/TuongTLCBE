@@ -21,10 +21,10 @@ public class PostCommentService
     {
         try
         {
-            var result = await _postCommentRepo.Get(postCommentId);
+            PostComment? result = await _postCommentRepo.Get(postCommentId);
             if (result != null)
             {
-                var user = await _userRepo.Get(result.CommenterId);
+                User? user = await _userRepo.Get(result.CommenterId);
                 if (user != null)
                 {
                     PostCommenter postCommenter = new()
@@ -59,14 +59,16 @@ public class PostCommentService
 
     private static List<PostCommentModel> BuildCommentTree(List<PostCommentModel> comments, Guid? parentId)
     {
-        var commentTree = new List<PostCommentModel>();
+        List<PostCommentModel> commentTree = new();
 
-        foreach (var comment in comments)
+        foreach (PostCommentModel comment in comments)
+        {
             if (comment.ParentCommentId == parentId)
             {
                 comment.Replies = BuildCommentTree(comments, comment.Id);
                 commentTree.Add(comment);
             }
+        }
 
         return commentTree;
     }
@@ -75,9 +77,8 @@ public class PostCommentService
     {
         try
         {
-            var getPostComments = await _postCommentRepo.GetPostComments(postId);
-            if (getPostComments != null) return BuildCommentTree(getPostComments, null);
-            return "Something went wrong while retrieving post's comments";
+            List<PostCommentModel>? getPostComments = await _postCommentRepo.GetPostComments(postId);
+            return getPostComments != null ? BuildCommentTree(getPostComments, null) : "Something went wrong while retrieving post's comments";
         }
         catch (Exception e)
         {
@@ -90,7 +91,7 @@ public class PostCommentService
     {
         try
         {
-            var userId = _decodeToken.Decode(token, "userid");
+            string userId = _decodeToken.Decode(token, "userid");
             PostComment postComment = new()
             {
                 Id = Guid.NewGuid(),
@@ -103,11 +104,14 @@ public class PostCommentService
                 Dislike = 0,
                 Status = false
             };
-            var insert = await _postCommentRepo.Insert(postComment);
+            PostComment? insert = await _postCommentRepo.Insert(postComment);
             if (insert != null)
             {
-                var result = await GetPostComment(insert.Id);
-                if (result != null) return result;
+                PostCommentModel? result = await GetPostComment(insert.Id);
+                if (result != null)
+                {
+                    return result;
+                }
             }
 
             return "Something went wrong while insert comment!";
@@ -122,11 +126,14 @@ public class PostCommentService
     {
         try
         {
-            var userid = _decodeToken.Decode(token, "userid");
-            var comment = await _postCommentRepo.Get(commentUpdateModel.CommentId);
+            string userid = _decodeToken.Decode(token, "userid");
+            PostComment? comment = await _postCommentRepo.Get(commentUpdateModel.CommentId);
             if (comment != null && !comment.CommenterId.Equals(Guid.Parse(userid)))
+            {
                 return "Not the owner of the comment!!!";
-            var updateResult = await _postCommentRepo.UpdateComment(commentUpdateModel);
+            }
+
+            bool updateResult = await _postCommentRepo.UpdateComment(commentUpdateModel);
             return updateResult;
         }
         catch (Exception e)
@@ -139,7 +146,7 @@ public class PostCommentService
     {
         try
         {
-            var userId = _decodeToken.Decode(token, "userid");
+            string userId = _decodeToken.Decode(token, "userid");
             return await _postCommentRepo.LikeComment(commentId, userId);
         }
         catch (Exception e)
@@ -152,7 +159,7 @@ public class PostCommentService
     {
         try
         {
-            var userId = _decodeToken.Decode(token, "userid");
+            string userId = _decodeToken.Decode(token, "userid");
             return await _postCommentRepo.DislikeComment(commentId, userId);
         }
         catch (Exception e)

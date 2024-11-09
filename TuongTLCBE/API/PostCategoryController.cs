@@ -8,7 +8,7 @@ namespace TuongTLCBE.API;
 
 [Route("post-category/")]
 [ApiController]
-public class PostCategoryController: ControllerBase
+public class PostCategoryController : ControllerBase
 {
     private readonly PostCategoryService _postCategoryService;
 

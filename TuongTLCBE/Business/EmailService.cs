@@ -23,22 +23,30 @@ public class EmailService
     {
         try
         {
-            var user = await _userRepo.Get(userId);
-            if (user == null) return "User does not exist!";
+            User? user = await _userRepo.Get(userId);
+            if (user == null)
+            {
+                return "User does not exist!";
+            }
+
             Random rnd = new();
-            var otp = rnd.Next(000000, 999999).ToString("D6");
-            var otpcode = new Otpcode
+            string otp = rnd.Next(000000, 999999).ToString("D6");
+            Otpcode otpcode = new()
             {
                 Code = otp,
                 Email = user.Email
             };
-            var insertOtp = await _otpCodeRepo.Insert(otpcode);
+            Otpcode? insertOtp = await _otpCodeRepo.Insert(otpcode);
             if (insertOtp != null)
             {
-                var emailSecretModel = await VaultHelper.GetEmailSecrets();
-                if (emailSecretModel.Email == null || emailSecretModel.Password == null) return "Get email failed!";
-                var from = emailSecretModel.Email;
-                var password = emailSecretModel.Password;
+                Data.Models.EmailSecretModel emailSecretModel = await VaultHelper.GetEmailSecrets();
+                if (emailSecretModel.Email == null || emailSecretModel.Password == null)
+                {
+                    return "Get email failed!";
+                }
+
+                string from = emailSecretModel.Email;
+                string password = emailSecretModel.Password;
                 MimeMessage message = new();
                 message.From.Add(MailboxAddress.Parse(from));
                 message.Subject = "TuongTLC account verification.";
@@ -85,10 +93,14 @@ public class EmailService
     {
         try
         {
-            var emailSecretModel = await VaultHelper.GetEmailSecrets();
-            if (emailSecretModel.Email == null || emailSecretModel.Password == null) return "Get email failed!";
-            var from = emailSecretModel.Email;
-            var password = emailSecretModel.Password;
+            Data.Models.EmailSecretModel emailSecretModel = await VaultHelper.GetEmailSecrets();
+            if (emailSecretModel.Email == null || emailSecretModel.Password == null)
+            {
+                return "Get email failed!";
+            }
+
+            string from = emailSecretModel.Email;
+            string password = emailSecretModel.Password;
             MimeMessage message = new();
             message.From.Add(MailboxAddress.Parse(from));
             message.Subject = "TuongTLC new post notification.";
@@ -124,15 +136,18 @@ public class EmailService
     {
         try
         {
-            var user = await _userRepo.GetUserByUsername(username);
+            Data.Models.UserModel? user = await _userRepo.GetUserByUsername(username);
             if (user != null)
             {
-                var otp = await _otpCodeRepo.GetOtp(code, user.Email);
+                Otpcode? otp = await _otpCodeRepo.GetOtp(code, user.Email);
                 if (otp != null)
                 {
-                    var deleteCode = await _otpCodeRepo.Delete(otp);
-                    var updateUser = await _userRepo.ChangeAccountStatusByEmail(user.Email, true);
-                    if (deleteCode > 0 && updateUser) return true;
+                    int deleteCode = await _otpCodeRepo.Delete(otp);
+                    bool updateUser = await _userRepo.ChangeAccountStatusByEmail(user.Email, true);
+                    if (deleteCode > 0 && updateUser)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -148,20 +163,20 @@ public class EmailService
     {
         try
         {
-            var user = await _userRepo.GetUserByUsername(username);
-            
+            Data.Models.UserModel? user = await _userRepo.GetUserByUsername(username);
+
             if (user != null)
             {
                 if (user.Status == true)
                 {
                     return "User already activated!";
                 }
-                var otpExist = await _otpCodeRepo.CheckOtpExist(user.Email);
+                bool otpExist = await _otpCodeRepo.CheckOtpExist(user.Email);
                 if (otpExist)
                 {
                     return "OTP code can only be sent once every 3 minutes!";
                 }
-                var sent = await SendConfirmEmail(user.Id);
+                object sent = await SendConfirmEmail(user.Id);
                 if ((bool)sent)
                 {
                     return true;

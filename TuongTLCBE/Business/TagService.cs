@@ -100,14 +100,7 @@ public class TagService
         try
         {
             bool result = await _tagRepo.ChangeTagStatus(tagId, status);
-            if (result)
-            {
-                return true;
-            }
-            else
-            {
-                return "Change tag status failed!";
-            }
+            return result ? true : "Change tag status failed!";
         }
         catch (Exception e)
         {
@@ -122,14 +115,7 @@ public class TagService
             if (getCate != null)
             {
                 int result = await _tagRepo.Delete(getCate);
-                if (result>0)
-                {
-                    return true;
-                }
-                else
-                {
-                    return "Delete tag failed!";
-                }
+                return result > 0 ? true : "Delete tag failed!";
             }
             else
             {
@@ -147,14 +133,7 @@ public class TagService
         try
         {
             TagModel? tagModel = await _tagRepo.GetATag(tagId);
-            if (tagModel != null)
-            {
-                return tagModel;
-            }
-            else
-            {
-                return "Tag not found!";
-            }
+            return tagModel != null ? tagModel : "Tag not found!";
         }
         catch (Exception e)
         {
@@ -166,14 +145,7 @@ public class TagService
         try
         {
             List<TagModel>? tagModel = await _tagRepo.GetTags(status);
-            if (tagModel != null)
-            {
-                return tagModel;
-            }
-            else
-            {
-                return "Error while getting categories!";
-            }
+            return tagModel != null ? tagModel : "Error while getting categories!";
         }
         catch (Exception e)
         {

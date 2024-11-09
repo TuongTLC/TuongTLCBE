@@ -29,7 +29,7 @@ public class PostTagService
         {
             if (tagsIds.Any())
             {
-                foreach (var cateId in tagsIds)
+                foreach (Guid cateId in tagsIds)
                 {
                     PostTag postTag = new()
                     {
@@ -37,7 +37,7 @@ public class PostTagService
                         PostId = postId,
                         TagId = cateId
                     };
-                    await _postTagRepo.Insert(postTag);
+                    _ = await _postTagRepo.Insert(postTag);
                 }
                 return _postTagRepo.GetPostTags(postId);
             }
@@ -45,7 +45,7 @@ public class PostTagService
             {
                 return "Tags ID is empty!";
             }
-            
+
         }
         catch (Exception e)
         {
@@ -60,14 +60,7 @@ public class PostTagService
             if (tagsIds.Any())
             {
                 bool result = await _postTagRepo.UpdatePostTags(postId, tagsIds);
-                if (result)
-                {
-                    return _postTagRepo.GetPostTags(postId);
-                }
-                else
-                {
-                    return "Update post's tags failed!";
-                }
+                return result ? _postTagRepo.GetPostTags(postId) : "Update post's tags failed!";
             }
             else
             {
@@ -85,14 +78,7 @@ public class PostTagService
         try
         {
             bool result = await _postTagRepo.DeletePostTag(postId, tagId);
-            if (result)
-            {
-                return _postTagRepo.GetPostTags(postId);
-            }
-            else
-            {
-                return "Delete post tag failed!";
-            }
+            return result ? _postTagRepo.GetPostTags(postId) : "Delete post tag failed!";
         }
         catch (Exception e)
         {

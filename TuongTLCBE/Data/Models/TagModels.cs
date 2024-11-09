@@ -11,7 +11,7 @@ public class TagModel
     public Guid CreatedBy { get; set; }
 
     public DateTime CreatedDate { get; set; }
-    
+
     public bool? Status { get; set; }
 }
 public class TagInsertModel

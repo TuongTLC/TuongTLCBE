@@ -19,7 +19,7 @@ public class FileController : ControllerBase
     [HttpPost("upload-files")]
     [SwaggerOperation(Summary = "Upload files")]
     [Authorize(Roles = "User, Admin")]
-    public async Task<IActionResult> UploadFile([FromForm]List<IFormFile> files)
+    public async Task<IActionResult> UploadFile([FromForm] List<IFormFile> files)
     {
         string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
         object result = await _fileService.UploadFile(files, token);
@@ -40,14 +40,7 @@ public class FileController : ControllerBase
     public async Task<IActionResult> DeleteFile(string fileUrl)
     {
         string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        object result = await _fileService.DeleteFile(fileUrl,token);
-        if (result is bool)
-        {
-            return (bool)result ? Ok(result) : BadRequest(result);
-        }
-        else
-        {
-            return BadRequest(result);
-        }
+        object result = await _fileService.DeleteFile(fileUrl, token);
+        return result is bool ? (bool)result ? Ok(result) : BadRequest(result) : BadRequest(result);
     }
 }

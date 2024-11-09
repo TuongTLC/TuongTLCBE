@@ -3,7 +3,7 @@ using TuongTLCBE.Data.Entities;
 
 namespace TuongTLCBE.Data.Repositories;
 
-public class FileRepo: Repository<FileUpload>
+public class FileRepo : Repository<FileUpload>
 {
     public FileRepo(TuongTLCDBContext context) : base(context)
     {

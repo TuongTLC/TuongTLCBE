@@ -29,7 +29,7 @@ public class PostCategoryService
         {
             if (categoriesIds.Any())
             {
-                foreach (var cateId in categoriesIds)
+                foreach (Guid cateId in categoriesIds)
                 {
                     PostCategory postCategory = new()
                     {
@@ -37,7 +37,7 @@ public class PostCategoryService
                         PostId = postId,
                         CategoryId = cateId
                     };
-                    await _postCategoryRepo.Insert(postCategory);
+                    _ = await _postCategoryRepo.Insert(postCategory);
                 }
                 return _postCategoryRepo.GetPostCategories(postId);
             }
@@ -45,7 +45,7 @@ public class PostCategoryService
             {
                 return "Categories ID is empty!";
             }
-            
+
         }
         catch (Exception e)
         {
@@ -60,14 +60,7 @@ public class PostCategoryService
             if (categoriesIds.Any())
             {
                 bool result = await _postCategoryRepo.UpdatePostCategories(postId, categoriesIds);
-                if (result)
-                {
-                    return _postCategoryRepo.GetPostCategories(postId);
-                }
-                else
-                {
-                    return "Update post's categories failed!";
-                }
+                return result ? _postCategoryRepo.GetPostCategories(postId) : "Update post's categories failed!";
             }
             else
             {
@@ -85,14 +78,7 @@ public class PostCategoryService
         try
         {
             bool result = await _postCategoryRepo.DeletePostCategory(postId, categoryId);
-            if (result)
-            {
-                return _postCategoryRepo.GetPostCategories(postId);
-            }
-            else
-            {
-                return "Delete post category failed!";
-            }
+            return result ? _postCategoryRepo.GetPostCategories(postId) : "Delete post category failed!";
         }
         catch (Exception e)
         {

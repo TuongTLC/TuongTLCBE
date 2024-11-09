@@ -21,7 +21,7 @@ public class UserRepo : Repository<User>
                 join ur in context.UserRoles on u.RoleId equals ur.Id
                 where u.Id.Equals(userId)
                 select new { u, ur };
-            var userModel = await query
+            UserInfoModel? userModel = await query
                 .Select(
                     x =>
                         new UserInfoModel
@@ -55,7 +55,7 @@ public class UserRepo : Repository<User>
                 join ur in context.UserRoles on u.RoleId equals ur.Id
                 where u.Id.Equals(userId)
                 select new { u, ur };
-            var userModel = await query
+            PostAuthor? userModel = await query
                 .Select(
                     x =>
                         new PostAuthor
@@ -83,7 +83,7 @@ public class UserRepo : Repository<User>
                 join ur in context.UserRoles on u.RoleId equals ur.Id
                 where u.Username.Equals(username)
                 select new { u, ur };
-            var userModel = await query
+            UserModel? userModel = await query
                 .Select(
                     x =>
                         new UserModel
@@ -120,7 +120,7 @@ public class UserRepo : Repository<User>
                     from u in context.Users
                     join ur in context.UserRoles on u.RoleId equals ur.Id
                     select new { u, ur };
-                var userModel = await query
+                List<UserInfoModel> userModel = await query
                     .Select(
                         x =>
                             new UserInfoModel
@@ -141,15 +141,23 @@ public class UserRepo : Repository<User>
             }
             else
             {
-                var statusIn = true;
-                if (status.Equals("active")) statusIn = true;
-                if (status.Equals("inactive")) statusIn = false;
+                bool statusIn = true;
+                if (status.Equals("active"))
+                {
+                    statusIn = true;
+                }
+
+                if (status.Equals("inactive"))
+                {
+                    statusIn = false;
+                }
+
                 var query =
                     from u in context.Users
                     join ur in context.UserRoles on u.RoleId equals ur.Id
                     where u.Status.Equals(statusIn)
                     select new { u, ur };
-                var userModel = await query
+                List<UserInfoModel> userModel = await query
                     .Select(
                         x =>
                             new UserInfoModel
@@ -179,12 +187,10 @@ public class UserRepo : Repository<User>
     {
         try
         {
-            var user = await context.Users
+            User? user = await context.Users
                 .Where(x => x.Email.Equals(email))
                 .FirstOrDefaultAsync();
-            if (user != null)
-                return true;
-            return false;
+            return user != null;
         }
         catch
         {
@@ -199,7 +205,7 @@ public class UserRepo : Repository<User>
     {
         try
         {
-            var user = await context.Users
+            User? user = await context.Users
                 .Where(x => x.Username.Equals(username))
                 .FirstOrDefaultAsync();
             if (user != null)
@@ -208,21 +214,33 @@ public class UserRepo : Repository<User>
                     !userUpdateRequestModel.Fullname.IsNullOrEmpty()
                     && !userUpdateRequestModel.Fullname.Equals(user.FullName)
                 )
+                {
                     user.FullName = userUpdateRequestModel.Fullname;
+                }
+
                 if (
                     !userUpdateRequestModel.Email.IsNullOrEmpty()
                     && !userUpdateRequestModel.Email.Equals(user.Email)
                 )
+                {
                     user.Email = userUpdateRequestModel.Email;
+                }
+
                 if (
                     !userUpdateRequestModel.Phone.IsNullOrEmpty()
                     && !userUpdateRequestModel.Phone.Equals(user.Phone)
                 )
+                {
                     user.Phone = userUpdateRequestModel.Phone;
+                }
+
                 if (
                     !userUpdateRequestModel.Birthday.Equals(user.Birthday)
                 )
+                {
                     user.Birthday = userUpdateRequestModel.Birthday;
+                }
+
                 _ = await context.SaveChangesAsync();
                 return true;
             }
@@ -243,7 +261,7 @@ public class UserRepo : Repository<User>
     {
         try
         {
-            var user = await context.Users
+            User? user = await context.Users
                 .Where(x => x.Username.Equals(username))
                 .FirstOrDefaultAsync();
             if (user != null)
@@ -266,7 +284,7 @@ public class UserRepo : Repository<User>
     {
         try
         {
-            var user = await context.Users.Where(x => x.Id.Equals(userId)).FirstOrDefaultAsync();
+            User? user = await context.Users.Where(x => x.Id.Equals(userId)).FirstOrDefaultAsync();
             if (user != null)
             {
                 user.Ban = status;
@@ -286,7 +304,7 @@ public class UserRepo : Repository<User>
     {
         try
         {
-            var user = await context.Users.Where(x => x.Email.Equals(email)).FirstOrDefaultAsync();
+            User? user = await context.Users.Where(x => x.Email.Equals(email)).FirstOrDefaultAsync();
             if (user != null)
             {
                 user.Status = status;

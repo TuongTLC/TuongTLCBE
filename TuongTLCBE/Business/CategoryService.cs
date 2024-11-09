@@ -100,14 +100,7 @@ public class CategoryService
         try
         {
             bool result = await _categoryRepo.ChangeCategoryStatus(categoryId, status);
-            if (result)
-            {
-                return true;
-            }
-            else
-            {
-                return "Change category status failed!";
-            }
+            return result ? true : "Change category status failed!";
         }
         catch (Exception e)
         {
@@ -122,14 +115,7 @@ public class CategoryService
             if (getCate != null)
             {
                 int result = await _categoryRepo.Delete(getCate);
-                if (result>0)
-                {
-                    return true;
-                }
-                else
-                {
-                    return "Delete category failed!";
-                }
+                return result > 0 ? true : "Delete category failed!";
             }
             else
             {
@@ -147,14 +133,7 @@ public class CategoryService
         try
         {
             CategoryModel? categoryModel = await _categoryRepo.GetACategory(categoryId);
-            if (categoryModel != null)
-            {
-                return categoryModel;
-            }
-            else
-            {
-                return "Category not found!";
-            }
+            return categoryModel != null ? categoryModel : "Category not found!";
         }
         catch (Exception e)
         {
@@ -166,14 +145,7 @@ public class CategoryService
         try
         {
             List<CategoryModel>? categoryModel = await _categoryRepo.GetCategories(status);
-            if (categoryModel != null)
-            {
-                return categoryModel;
-            }
-            else
-            {
-                return "Error while getting categories!";
-            }
+            return categoryModel != null ? categoryModel : "Error while getting categories!";
         }
         catch (Exception e)
         {

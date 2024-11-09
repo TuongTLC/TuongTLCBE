@@ -8,7 +8,7 @@ namespace TuongTLCBE.API;
 
 [Route("post-tag/")]
 [ApiController]
-public class PostTagController: ControllerBase
+public class PostTagController : ControllerBase
 {
     private readonly PostTagService _postTagService;
 

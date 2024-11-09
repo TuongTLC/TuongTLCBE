@@ -46,7 +46,7 @@ public class CategoryController : Controller
     public async Task<ActionResult> GetACategory(Guid categoryId)
     {
         object result = await _categoryService.GetACategory(categoryId);
-        return (result.GetType()==typeof(CategoryModel)) ? Ok(result) : BadRequest(result);
+        return (result.GetType() == typeof(CategoryModel)) ? Ok(result) : BadRequest(result);
     }
     [HttpGet("get-categories")]
     [SwaggerOperation(Summary = "Get categories by status: active/inactive/all")]
@@ -55,7 +55,7 @@ public class CategoryController : Controller
     public async Task<ActionResult> GetCategories(string? status)
     {
         object result = await _categoryService.GetCategories(status);
-        return (result.GetType()==typeof(List<CategoryModel>)) ? Ok(result) : BadRequest(result);
+        return (result.GetType() == typeof(List<CategoryModel>)) ? Ok(result) : BadRequest(result);
     }
     [HttpDelete("delete-category")]
     [SwaggerOperation(Summary = "Admin delete category status")]

@@ -17,12 +17,8 @@ public class OTPCodeRepo : Repository<Otpcode>
 
     public async Task<bool> CheckOtpExist(string email)
     {
-        var otp = await context.Otpcodes.Where(x => x.Email.Equals(email))
+        Otpcode? otp = await context.Otpcodes.Where(x => x.Email.Equals(email))
             .FirstOrDefaultAsync();
-        if (otp == null)
-        {
-            return false;
-        }
-        return true;
+        return otp != null;
     }
 }

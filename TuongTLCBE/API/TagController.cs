@@ -46,7 +46,7 @@ public class TagController : Controller
     public async Task<ActionResult> GetATag(Guid tagId)
     {
         object result = await _tagService.GetATag(tagId);
-        return (result.GetType()==typeof(TagModel)) ? Ok(result) : BadRequest(result);
+        return (result.GetType() == typeof(TagModel)) ? Ok(result) : BadRequest(result);
     }
     [HttpGet("get-tags")]
     [SwaggerOperation(Summary = "Get tags by status: active/inactive/all")]
@@ -55,7 +55,7 @@ public class TagController : Controller
     public async Task<ActionResult> GateTags(string? status)
     {
         object result = await _tagService.GetTags(status);
-        return (result.GetType()==typeof(List<TagModel>)) ? Ok(result) : BadRequest(result);
+        return (result.GetType() == typeof(List<TagModel>)) ? Ok(result) : BadRequest(result);
     }
     [HttpDelete("delete-tag")]
     [SwaggerOperation(Summary = "Admin delete tag status")]

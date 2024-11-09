@@ -15,7 +15,7 @@ public class CategoryRepo : Repository<Category>
     {
         try
         {
-            var category = await context.Categories.Where(x => x.Id.Equals(categoryUpdateModel.Id))
+            Category? category = await context.Categories.Where(x => x.Id.Equals(categoryUpdateModel.Id))
                 .FirstOrDefaultAsync();
             if (category != null)
             {
@@ -37,7 +37,7 @@ public class CategoryRepo : Repository<Category>
     {
         try
         {
-            var category = await context.Categories.Where(x => x.Id.Equals(categoryId))
+            Category? category = await context.Categories.Where(x => x.Id.Equals(categoryId))
                 .FirstOrDefaultAsync();
             if (category != null)
             {
@@ -59,9 +59,9 @@ public class CategoryRepo : Repository<Category>
         try
         {
             var query = from c in context.Categories
-                where c.Id.Equals(categoryId)
-                select new { c };
-            var categoryModel = await query.Select(x => new CategoryModel
+                        where c.Id.Equals(categoryId)
+                        select new { c };
+            CategoryModel? categoryModel = await query.Select(x => new CategoryModel
             {
                 Id = x.c.Id,
                 CategoryName = x.c.CategoryName,
@@ -87,8 +87,8 @@ public class CategoryRepo : Repository<Category>
                 if (status != null && status.Trim().ToLower().Equals("all"))
                 {
                     var query = from c in context.Categories
-                        select new { c };
-                    var categoryModel = await query.Select(x => new CategoryModel
+                                select new { c };
+                    List<CategoryModel> categoryModel = await query.Select(x => new CategoryModel
                     {
                         Id = x.c.Id,
                         CategoryName = x.c.CategoryName,
@@ -101,13 +101,21 @@ public class CategoryRepo : Repository<Category>
                 }
                 else
                 {
-                    var statusIn = true;
-                    if (status != null && status.Trim().ToLower().Equals("active")) statusIn = true;
-                    if (status != null && status.Trim().ToLower().Equals("inactive")) statusIn = false;
+                    bool statusIn = true;
+                    if (status != null && status.Trim().ToLower().Equals("active"))
+                    {
+                        statusIn = true;
+                    }
+
+                    if (status != null && status.Trim().ToLower().Equals("inactive"))
+                    {
+                        statusIn = false;
+                    }
+
                     var query = from c in context.Categories
-                        where c.Status.Equals(statusIn)
-                        select new { c };
-                    var categoryModel = await query.Select(x => new CategoryModel
+                                where c.Status.Equals(statusIn)
+                                select new { c };
+                    List<CategoryModel> categoryModel = await query.Select(x => new CategoryModel
                     {
                         Id = x.c.Id,
                         CategoryName = x.c.CategoryName,
@@ -122,8 +130,8 @@ public class CategoryRepo : Repository<Category>
 
             {
                 var query = from c in context.Categories
-                    select new { c };
-                var categoryModel = await query.Select(x => new CategoryModel
+                            select new { c };
+                List<CategoryModel> categoryModel = await query.Select(x => new CategoryModel
                 {
                     Id = x.c.Id,
                     CategoryName = x.c.CategoryName,

@@ -1,9 +1,9 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using Microsoft.IdentityModel.Tokens;
 using TuongTLCBE.Data.Entities;
 using TuongTLCBE.Data.Models;
 using TuongTLCBE.Data.Repositories;
@@ -27,13 +27,11 @@ public class UserService
     {
         try
         {
-            var user = await _userRepo.Get(userId);
+            User? user = await _userRepo.Get(userId);
             if (user != null)
             {
-                var userInfoModel = await _userRepo.GetUserInfo(userId);
-                if (userInfoModel != null)
-                    return userInfoModel;
-                return "Get user failed!";
+                UserInfoModel? userInfoModel = await _userRepo.GetUserInfo(userId);
+                return userInfoModel != null ? userInfoModel : "Get user failed!";
             }
 
             return "User not exist!";
@@ -48,7 +46,7 @@ public class UserService
     {
         try
         {
-            var users = await _userRepo.GetUsers(status);
+            List<UserInfoModel>? users = await _userRepo.GetUsers(status);
             return users;
         }
         catch (Exception? e)
@@ -65,29 +63,49 @@ public class UserService
             || reqModel.Fullname.IsNullOrEmpty()
             || reqModel.Email.IsNullOrEmpty()
         )
+        {
             return "Please fill-in all the information!!";
+        }
 
-        var userCheck = await _userRepo.GetUserByUsername(reqModel.Username);
-        if (userCheck != null) return "Duplicated username!";
-        var emailDup = await _userRepo.CheckEmail(reqModel.Email);
-        if (emailDup) return "Duplicated email!";
+        UserModel? userCheck = await _userRepo.GetUserByUsername(reqModel.Username);
+        if (userCheck != null)
+        {
+            return "Duplicated username!";
+        }
 
-        if (reqModel.Username.Length < 6) return "Username length invalid!";
+        bool emailDup = await _userRepo.CheckEmail(reqModel.Email);
+        if (emailDup)
+        {
+            return "Duplicated email!";
+        }
+
+        if (reqModel.Username.Length < 6)
+        {
+            return "Username length invalid!";
+        }
+
         Regex validatePasswordRegex =
             new("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
-        if (!validatePasswordRegex.IsMatch(reqModel.Password)) return "Password invalid!";
+        if (!validatePasswordRegex.IsMatch(reqModel.Password))
+        {
+            return "Password invalid!";
+        }
 
         Regex validateEmailRegex =
             new(
                 "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
             );
-        if (!validateEmailRegex.IsMatch(reqModel.Email)) return "Email invalid!";
+        if (!validateEmailRegex.IsMatch(reqModel.Email))
+        {
+            return "Email invalid!";
+        }
+
         try
         {
             CreatePasswordHash(
                 reqModel.Password,
-                out var passwordHash,
-                out var passwordSalt
+                out byte[]? passwordHash,
+                out byte[]? passwordSalt
             );
             User userModel =
                 new()
@@ -103,12 +121,12 @@ public class UserService
                     Status = false,
                     Ban = false
                 };
-            var userInsert = await _userRepo.Insert(userModel);
+            User? userInsert = await _userRepo.Insert(userModel);
 
             if (userInsert != null)
             {
                 _ = await _emailService.SendConfirmEmail(userInsert.Id);
-                var user = await _userRepo.GetUserByUsername(userInsert.Username);
+                UserModel? user = await _userRepo.GetUserByUsername(userInsert.Username);
                 if (user != null)
                 {
                     UserInfoModel userLoginModel =
@@ -142,14 +160,33 @@ public class UserService
     {
         try
         {
-            var user = await _userRepo.GetUserByUsername(request.Username);
-            if (user == null) return "Username or password incorrect!";
-            if (user.Ban == true) return "User Banned!";
-            if (user.Status == false) return "User inactive!";
-            if (user.Status == null) return "User account is disabled!";
-            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            UserModel? user = await _userRepo.GetUserByUsername(request.Username);
+            if (user == null)
+            {
                 return "Username or password incorrect!";
-            var token = await CreateToken(user);
+            }
+
+            if (user.Ban == true)
+            {
+                return "User Banned!";
+            }
+
+            if (user.Status == false)
+            {
+                return "User inactive!";
+            }
+
+            if (user.Status == null)
+            {
+                return "User account is disabled!";
+            }
+
+            if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            {
+                return "Username or password incorrect!";
+            }
+
+            string token = await CreateToken(user);
             UserInfoModel userLoginModel =
                 new()
                 {
@@ -184,13 +221,21 @@ public class UserService
                 new(
                     "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
                 );
-            if (!validateEmailRegex.IsMatch(userUpdateRequestModel.Email)) return "Email invalid!";
-            if (userUpdateRequestModel.Birthday == DateTime.MinValue) return "Birthday invalid";
-            var username = _decodeToken.Decode(token, "username");
-            var update = await _userRepo.UpdateUser(userUpdateRequestModel, username);
+            if (!validateEmailRegex.IsMatch(userUpdateRequestModel.Email))
+            {
+                return "Email invalid!";
+            }
+
+            if (userUpdateRequestModel.Birthday == DateTime.MinValue)
+            {
+                return "Birthday invalid";
+            }
+
+            string username = _decodeToken.Decode(token, "username");
+            bool update = await _userRepo.UpdateUser(userUpdateRequestModel, username);
             if (update)
             {
-                var user = await _userRepo.GetUserByUsername(username);
+                UserModel? user = await _userRepo.GetUserByUsername(username);
                 if (user != null)
                 {
                     UserInfoModel userInfoModel =
@@ -227,9 +272,13 @@ public class UserService
     {
         try
         {
-            var username = _decodeToken.Decode(token, "username");
-            var user = await _userRepo.GetUserByUsername(passwordRequestModel.Username);
-            if (user == null || !username.Equals(user.Username)) return "Username or password incorrect!";
+            string username = _decodeToken.Decode(token, "username");
+            UserModel? user = await _userRepo.GetUserByUsername(passwordRequestModel.Username);
+            if (user == null || !username.Equals(user.Username))
+            {
+                return "Username or password incorrect!";
+            }
+
             if (
                 !VerifyPasswordHash(
                     passwordRequestModel.OldPassword,
@@ -237,16 +286,23 @@ public class UserService
                     user.PasswordSalt
                 )
             )
+            {
                 return "Username or password incorrect!";
+            }
+
             Regex validatePasswordRegex =
                 new("^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$");
-            if (!validatePasswordRegex.IsMatch(passwordRequestModel.NewPassword)) return "New password invalid!";
+            if (!validatePasswordRegex.IsMatch(passwordRequestModel.NewPassword))
+            {
+                return "New password invalid!";
+            }
+
             CreatePasswordHash(
                 passwordRequestModel.NewPassword,
-                out var newPasswordHash,
-                out var newPasswordSalt
+                out byte[]? newPasswordHash,
+                out byte[]? newPasswordSalt
             );
-            var update = await _userRepo.UpdatePassword(
+            bool update = await _userRepo.UpdatePassword(
                 username,
                 newPasswordHash,
                 newPasswordSalt
@@ -263,10 +319,8 @@ public class UserService
     {
         try
         {
-            var result = await _userRepo.ChangeAccountStatus(userId, status);
-            if (result)
-                return true;
-            return "Change account ban status failed!";
+            bool result = await _userRepo.ChangeAccountStatus(userId, status);
+            return result ? true : "Change account ban status failed!";
         }
         catch (Exception e)
         {
@@ -278,13 +332,11 @@ public class UserService
     {
         try
         {
-            var user = await _userRepo.Get(userId);
+            User? user = await _userRepo.Get(userId);
             if (user != null)
             {
-                var deleteResult = await _userRepo.Delete(user);
-                if (deleteResult > 0)
-                    return true;
-                return "Delete user failed!";
+                int deleteResult = await _userRepo.Delete(user);
+                return deleteResult > 0 ? true : "Delete user failed!";
             }
 
             return "User does not exist!";
@@ -309,7 +361,7 @@ public class UserService
     private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
     {
         using HMACSHA512 hmac = new(passwordSalt);
-        var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        byte[] computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         return computedHash.SequenceEqual(passwordHash);
     }
     private async Task<string> CreateToken(UserModel user)
@@ -327,7 +379,7 @@ public class UserService
             new(Encoding.UTF8.GetBytes(await VaultHelper.GetSecrets("jwt")));
 
         SigningCredentials creds = new(key, SecurityAlgorithms.HmacSha512Signature);
-        
+
         JwtSecurityToken token =
             new(
                 claims: claims,
@@ -337,7 +389,7 @@ public class UserService
                 signingCredentials: creds
             );
 
-        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+        string jwt = new JwtSecurityTokenHandler().WriteToken(token);
         return jwt;
     }
 }

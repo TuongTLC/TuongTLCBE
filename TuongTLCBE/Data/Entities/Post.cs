@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace TuongTLCBE.Data.Entities
+﻿namespace TuongTLCBE.Data.Entities
 {
     public partial class Post
     {

@@ -1,5 +1,5 @@
-using System.Text.Json;
 using StackExchange.Redis;
+using System.Text.Json;
 
 namespace TuongTLCBE.Business.CacheService;
 
@@ -8,25 +8,24 @@ public class CacheService : ICacheService
     private readonly IDatabase _database;
     private readonly IServer _server;
 
-    
+
     public CacheService()
     {
-        var redis = ConnectionMultiplexer.Connect("localhost:6379, password=itslocalhost, allowAdmin=true");
+        ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost:6379, password=itslocalhost, allowAdmin=true");
         _database = redis.GetDatabase();
         _server = redis.GetServer("localhost:6379");
     }
 
     public T? GetData<T>(string key)
     {
-        var value = _database.StringGet(key);
-        if (!string.IsNullOrWhiteSpace(value)) return JsonSerializer.Deserialize<T>(value);
-        return default;
+        RedisValue value = _database.StringGet(key);
+        return !string.IsNullOrWhiteSpace(value) ? JsonSerializer.Deserialize<T>(value) : default;
     }
 
     public bool SetData<T>(string key, T value, DateTimeOffset expirationTime)
     {
-        var expireTime = expirationTime.DateTime.Subtract(DateTime.Now);
-        var isSet = _database.StringSet(key, JsonSerializer.Serialize(value), expireTime);
+        TimeSpan expireTime = expirationTime.DateTime.Subtract(DateTime.Now);
+        bool isSet = _database.StringSet(key, JsonSerializer.Serialize(value), expireTime);
         return isSet;
     }
 
@@ -34,9 +33,8 @@ public class CacheService : ICacheService
     {
         try
         {
-            var exist = await _database.KeyExistsAsync(key);
-            if (exist) return await _database.KeyDeleteAsync(key);
-            return false;
+            bool exist = await _database.KeyExistsAsync(key);
+            return exist ? await _database.KeyDeleteAsync(key) : (object)false;
         }
         catch (Exception e)
         {
@@ -53,9 +51,17 @@ public class CacheService : ICacheService
     {
         try
         {
-            var keys = _server.Keys(pattern: prefix + "*").ToList();
-            if (!keys.Any()) return "No matching keys!";
-            foreach (var key in keys) await RemoveData(key);
+            List<RedisKey> keys = _server.Keys(pattern: prefix + "*").ToList();
+            if (!keys.Any())
+            {
+                return "No matching keys!";
+            }
+
+            foreach (RedisKey key in keys)
+            {
+                _ = await RemoveData(key);
+            }
+
             return true;
         }
         catch (Exception e)

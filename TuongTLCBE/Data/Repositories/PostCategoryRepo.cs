@@ -3,7 +3,7 @@ using TuongTLCBE.Data.Entities;
 
 namespace TuongTLCBE.Data.Repositories;
 
-public class PostCategoryRepo: Repository<PostCategory>
+public class PostCategoryRepo : Repository<PostCategory>
 {
     public PostCategoryRepo(TuongTLCDBContext context) : base(context)
     {
@@ -22,21 +22,21 @@ public class PostCategoryRepo: Repository<PostCategory>
                 await context.PostCategories.Where(x => x.PostId.Equals(postId)).ToListAsync();
             if (postCategories.Any())
             {
-                foreach (var pc in postCategories)
+                foreach (PostCategory pc in postCategories)
                 {
-                    context.Remove(pc);
+                    _ = context.Remove(pc);
                 }
             }
 
-            foreach (var cateId in categoriesIds)
+            foreach (Guid cateId in categoriesIds)
             {
-                context.Add(new PostCategory() { Id = Guid.NewGuid(), PostId = postId, CategoryId = cateId });
+                _ = context.Add(new PostCategory() { Id = Guid.NewGuid(), PostId = postId, CategoryId = cateId });
             }
 
             _ = await context.SaveChangesAsync();
             return true;
         }
-        catch 
+        catch
         {
             return false;
         }
@@ -50,8 +50,8 @@ public class PostCategoryRepo: Repository<PostCategory>
                 .Where(x => x.PostId.Equals(postId) && x.CategoryId.Equals(categoryId)).FirstOrDefaultAsync();
             if (postCategory != null)
             {
-                context.Remove(postCategory);
-                await context.SaveChangesAsync();
+                _ = context.Remove(postCategory);
+                _ = await context.SaveChangesAsync();
                 return true;
             }
             else

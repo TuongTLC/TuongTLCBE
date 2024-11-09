@@ -20,12 +20,13 @@ public class PostCommentRepo : Repository<PostComment>
     {
         try
         {
-            var postComments = await context.PostComments.Where(x => x.PostId.Equals(postId)).ToListAsync();
+            List<PostComment> postComments = await context.PostComments.Where(x => x.PostId.Equals(postId)).ToListAsync();
             List<PostCommentModel> postCommentModels = new();
             if (postComments.Any())
-                foreach (var postComment in postComments)
+            {
+                foreach (PostComment? postComment in postComments)
                 {
-                    var user = await _userRepo.Get(postComment.CommenterId);
+                    User? user = await _userRepo.Get(postComment.CommenterId);
                     if (user != null)
                     {
                         PostCommenter postCommenter = new()
@@ -49,6 +50,7 @@ public class PostCommentRepo : Repository<PostComment>
                         postCommentModels.Add(convertModel);
                     }
                 }
+            }
 
             return postCommentModels;
         }
@@ -63,15 +65,22 @@ public class PostCommentRepo : Repository<PostComment>
     {
         try
         {
-            var comment = await context.PostComments.Where(x => x.Id.Equals(commentUpdateModel.CommentId))
+            PostComment? comment = await context.PostComments.Where(x => x.Id.Equals(commentUpdateModel.CommentId))
                 .FirstOrDefaultAsync();
             if (comment != null)
             {
-                if (commentUpdateModel.Content != null) comment.Content = commentUpdateModel.Content;
-                if (commentUpdateModel.Status != null) comment.Status = commentUpdateModel.Status;
-                var update = await context.SaveChangesAsync();
-                if (update == 0) return false;
-                return true;
+                if (commentUpdateModel.Content != null)
+                {
+                    comment.Content = commentUpdateModel.Content;
+                }
+
+                if (commentUpdateModel.Status != null)
+                {
+                    comment.Status = commentUpdateModel.Status;
+                }
+
+                int update = await context.SaveChangesAsync();
+                return update != 0;
             }
 
             return false;
@@ -86,22 +95,28 @@ public class PostCommentRepo : Repository<PostComment>
     {
         try
         {
-            var checkInteraction = await context.UserInteractComments
+            UserInteractComment? checkInteraction = await context.UserInteractComments
                 .Where(x => x != null && x.UserId.Equals(Guid.Parse(userId)) &&
                             x.CommentId.Equals(Guid.Parse(commentId)))
                 .FirstOrDefaultAsync();
-            if (checkInteraction != null) return null;
-            var comment = await context.PostComments.Where(x => x.Id.Equals(Guid.Parse(commentId)))
+            if (checkInteraction != null)
+            {
+                return null;
+            }
+
+            PostComment? comment = await context.PostComments.Where(x => x.Id.Equals(Guid.Parse(commentId)))
                 .FirstOrDefaultAsync();
             if (comment != null)
             {
                 comment.Like += 1;
-                var update = await context.SaveChangesAsync();
+                int update = await context.SaveChangesAsync();
                 if (update > 0)
+                {
                     _ = await _userInteractCommentRepo.Insert(new UserInteractComment
-                        { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), CommentId = Guid.Parse(commentId) });
-                if (update == 0) return false;
-                return true;
+                    { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), CommentId = Guid.Parse(commentId) });
+                }
+
+                return update != 0;
             }
 
             return false;
@@ -116,22 +131,28 @@ public class PostCommentRepo : Repository<PostComment>
     {
         try
         {
-            var checkInteraction = await context.UserInteractComments
+            UserInteractComment? checkInteraction = await context.UserInteractComments
                 .Where(x => x != null && x.UserId.Equals(Guid.Parse(userId)) &&
                             x.CommentId.Equals(Guid.Parse(commentId)))
                 .FirstOrDefaultAsync();
-            if (checkInteraction != null) return null;
-            var comment = await context.PostComments.Where(x => x.Id.Equals(Guid.Parse(commentId)))
+            if (checkInteraction != null)
+            {
+                return null;
+            }
+
+            PostComment? comment = await context.PostComments.Where(x => x.Id.Equals(Guid.Parse(commentId)))
                 .FirstOrDefaultAsync();
             if (comment != null)
             {
                 comment.Dislike += 1;
-                var update = await context.SaveChangesAsync();
+                int update = await context.SaveChangesAsync();
                 if (update > 0)
+                {
                     _ = await _userInteractCommentRepo.Insert(new UserInteractComment
-                        { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), CommentId = Guid.Parse(commentId) });
-                if (update == 0) return false;
-                return true;
+                    { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), CommentId = Guid.Parse(commentId) });
+                }
+
+                return update != 0;
             }
 
             return false;
@@ -141,5 +162,5 @@ public class PostCommentRepo : Repository<PostComment>
             return false;
         }
     }
-    
+
 }

@@ -24,8 +24,8 @@ public class PostController : Controller
     [Authorize(Roles = "User, Admin")]
     public async Task<IActionResult> CreatePost(PostRequestModel postRequestModel)
     {
-        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        var result = await _postService.InsertPost(postRequestModel, token);
+        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        object result = await _postService.InsertPost(postRequestModel, token);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -34,7 +34,7 @@ public class PostController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> GetPost(Guid postId)
     {
-        var result = await _postService.GetPost(postId);
+        object? result = await _postService.GetPost(postId);
         return result?.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -45,14 +45,18 @@ public class PostController : Controller
         Guid? categoryId,
         Guid? tagId)
     {
-        var cacheData =
+        PostPagingResponseModel? cacheData =
             _cacheService.GetData<PostPagingResponseModel>("post" + pageNumber + pageSize + status + adminStatus +
                                                            categoryId +
                                                            tagId);
-        if (cacheData != null) return Ok(cacheData);
-        var result = await _postService.GetPosts(pageNumber, pageSize, status, adminStatus, categoryId, tagId);
-        var expireTime = DateTimeOffset.Now.AddHours(1);
-        _cacheService.SetData("post" + pageNumber + pageSize + status + adminStatus + categoryId +
+        if (cacheData != null)
+        {
+            return Ok(cacheData);
+        }
+
+        object result = await _postService.GetPosts(pageNumber, pageSize, status, adminStatus, categoryId, tagId);
+        DateTimeOffset expireTime = DateTimeOffset.Now.AddHours(1);
+        _ = _cacheService.SetData("post" + pageNumber + pageSize + status + adminStatus + categoryId +
                               tagId, result, expireTime);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
@@ -62,7 +66,7 @@ public class PostController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUserPostsByAdmin(int pageNumber, int pageSize, string userId)
     {
-        var result = await _postService.GetUserPostsByAdmin(pageNumber, pageSize, userId);
+        object result = await _postService.GetUserPostsByAdmin(pageNumber, pageSize, userId);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -71,8 +75,8 @@ public class PostController : Controller
     [Authorize(Roles = "User,Admin")]
     public async Task<IActionResult> GetPostsByUser(int pageNumber, int pageSize)
     {
-        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        var result = await _postService.GetPostsByUser(pageNumber, pageSize, token);
+        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        object result = await _postService.GetPostsByUser(pageNumber, pageSize, token);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -80,7 +84,7 @@ public class PostController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> GetTopLiked()
     {
-        var result = await _postService.GetTopLiked();
+        object result = await _postService.GetTopLiked();
         return result.GetType() == typeof(List<PostInfoModel>) ? Ok(result) : BadRequest(result);
     }
 
@@ -88,7 +92,7 @@ public class PostController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> GetRelatedPosts(string postId)
     {
-        var result = await _postService.GetRelatedPosts(postId);
+        object? result = await _postService.GetRelatedPosts(postId);
         return Ok(result);
     }
 
@@ -99,7 +103,7 @@ public class PostController : Controller
         string? adminStatus,
         Guid? categoryId, Guid? tagId)
     {
-        var result =
+        object result =
             await _postService.SearchPosts(pageNumber, pageSize, postName, status, adminStatus, categoryId, tagId);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
@@ -108,8 +112,8 @@ public class PostController : Controller
     [Authorize(Roles = "User, Admin")]
     public async Task<IActionResult> UpdatePost(PostUpdateModel postUpdateModel)
     {
-        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        var result = await _postService.UpdatePost(postUpdateModel, token);
+        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        object result = await _postService.UpdatePost(postUpdateModel, token);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -118,7 +122,7 @@ public class PostController : Controller
     [Authorize(Roles = "User,Admin")]
     public async Task<IActionResult> ChangePostStatus(ChangePostStatusModel changePostStatusModel)
     {
-        var result = await _postService.ChangePostStatus(changePostStatusModel.PostId, changePostStatusModel.Status);
+        object result = await _postService.ChangePostStatus(changePostStatusModel.PostId, changePostStatusModel.Status);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -127,9 +131,8 @@ public class PostController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> BanPost(string postId)
     {
-        var result = await _postService.BanPost(postId);
-        if ((bool)result) return Ok("Post banned!!!");
-        return BadRequest("Post ban failed!!!");
+        object result = await _postService.BanPost(postId);
+        return (bool)result ? Ok("Post banned!!!") : BadRequest("Post ban failed!!!");
     }
 
     [HttpPost("approve-post")]
@@ -137,9 +140,8 @@ public class PostController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> ApprovePost(string postId)
     {
-        var result = await _postService.ApprovePost(postId);
-        if ((bool)result) return Ok("Post approved!!!");
-        return BadRequest("Post approved failed!!!");
+        object result = await _postService.ApprovePost(postId);
+        return (bool)result ? Ok("Post approved!!!") : BadRequest("Post approved failed!!!");
     }
 
     [HttpPost("unban-post")]
@@ -147,51 +149,45 @@ public class PostController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> UnbanPost(string postId)
     {
-        var result = await _postService.UnbanPost(postId);
-        if ((bool)result) return Ok("Post unbanned!!!");
-        return BadRequest("Post unban failed!!!");
+        object result = await _postService.UnbanPost(postId);
+        return (bool)result ? Ok("Post unbanned!!!") : BadRequest("Post unban failed!!!");
     }
 
     [HttpDelete("delete-post")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeletePost(Guid postId)
     {
-        var result = await _postService.DeletePost(postId);
-        if (result is bool)
-            return (bool)result
+        object result = await _postService.DeletePost(postId);
+        return result is bool
+            ? (bool)result
                 ? Ok("Post deleted!")
-                : BadRequest("Failed to delete post.");
-        return BadRequest(result);
+                : BadRequest("Failed to delete post.")
+            : BadRequest(result);
     }
 
     [HttpPost("like-post")]
     [Authorize(Roles = "Admin, User")]
     public async Task<ActionResult> LikePost(string postId)
     {
-        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        var result = await _postService.LikePost(postId, token);
-        if (result == null) return Conflict("Already interact!");
-        if ((bool)result) return Ok("Post liked!!!");
-        return BadRequest("Post like failed!!!");
+        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        object? result = await _postService.LikePost(postId, token);
+        return result == null ? Conflict("Already interact!") : (bool)result ? Ok("Post liked!!!") : BadRequest("Post like failed!!!");
     }
 
     [HttpPost("dislike-post")]
     [Authorize(Roles = "Admin, User")]
     public async Task<ActionResult> DislikePost(string postId)
     {
-        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        var result = await _postService.DislikePost(postId, token);
-        if (result == null) return Conflict("Already interact!");
-        if ((bool)result) return Ok("Post disliked!!!");
-        return BadRequest("Post dislike failed!!!");
+        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        object? result = await _postService.DislikePost(postId, token);
+        return result == null ? Conflict("Already interact!") : (bool)result ? Ok("Post disliked!!!") : BadRequest("Post dislike failed!!!");
     }
 
     [HttpPost("delete-cache")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteCache(string prefix)
     {
-        var result = await _cacheService.RemoveOldCache(prefix);
-        if (result is bool) return Ok(result);
-        return BadRequest(result);
+        object result = await _cacheService.RemoveOldCache(prefix);
+        return result is bool ? Ok(result) : BadRequest(result);
     }
 }

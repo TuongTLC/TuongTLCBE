@@ -24,12 +24,12 @@ public class PostRepo : Repository<Post>
         try
         {
             var query = from p in context.Posts
-                join pc in context.PostCategories on p.Id equals pc.PostId
-                join c in context.Categories on pc.CategoryId equals c.Id
-                where c.Id.Equals(categoryIds) && p.Status == true && p.AdminStatus.Equals(Enums.POST_APPROVED)
-                orderby p.Like descending
-                select new { PostId = p.Id };
-            var posts = await query.Select(x => new string(x.PostId.ToString())).Take(6).ToListAsync();
+                        join pc in context.PostCategories on p.Id equals pc.PostId
+                        join c in context.Categories on pc.CategoryId equals c.Id
+                        where c.Id.Equals(categoryIds) && p.Status == true && p.AdminStatus.Equals(Enums.POST_APPROVED)
+                        orderby p.Like descending
+                        select new { PostId = p.Id };
+            List<string> posts = await query.Select(x => new string(x.PostId.ToString())).Take(6).ToListAsync();
             return posts;
         }
         catch
@@ -43,46 +43,37 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            if (adminStatus.Equals("all"))
-                switch (status)
+            return adminStatus.Equals("all")
+                ? status switch
                 {
-                    case "all":
-                        return await context.Posts
-                            .OrderByDescending(x => x.CreateDate)
-                            .ToListAsync();
-                    case "active":
-                        return await context.Posts.Where(x =>
-                                x.Status == true)
-                            .OrderByDescending(x => x.CreateDate)
-                            .ToListAsync();
-                    case "inactive":
-                        return await context.Posts.Where(x =>
-                                x.Status == false)
-                            .OrderByDescending(x => x.CreateDate)
-                            .ToListAsync();
-                    default:
-                        return await context.Posts.OrderByDescending(x => x.CreateDate).ToListAsync();
+                    "all" => await context.Posts
+                                                .OrderByDescending(x => x.CreateDate)
+                                                .ToListAsync(),
+                    "active" => await context.Posts.Where(x =>
+                                                    x.Status == true)
+                                                .OrderByDescending(x => x.CreateDate)
+                                                .ToListAsync(),
+                    "inactive" => await context.Posts.Where(x =>
+                                                    x.Status == false)
+                                                .OrderByDescending(x => x.CreateDate)
+                                                .ToListAsync(),
+                    _ => await context.Posts.OrderByDescending(x => x.CreateDate).ToListAsync(),
                 }
-
-            switch (status)
-            {
-                case "all":
-                    return await context.Posts.Where(y => y.AdminStatus.Equals(adminStatus.Trim().ToLower()))
-                        .OrderByDescending(x => x.CreateDate)
-                        .ToListAsync();
-                case "active":
-                    return await context.Posts.Where(x =>
-                            x.Status == true && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
-                        .OrderByDescending(x => x.CreateDate)
-                        .ToListAsync();
-                case "inactive":
-                    return await context.Posts.Where(x =>
-                            x.Status == false && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
-                        .OrderByDescending(x => x.CreateDate)
-                        .ToListAsync();
-                default:
-                    return await context.Posts.OrderByDescending(x => x.CreateDate).ToListAsync();
-            }
+                : status switch
+                {
+                    "all" => await context.Posts.Where(y => y.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                            .OrderByDescending(x => x.CreateDate)
+                                            .ToListAsync(),
+                    "active" => await context.Posts.Where(x =>
+                                                x.Status == true && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                            .OrderByDescending(x => x.CreateDate)
+                                            .ToListAsync(),
+                    "inactive" => await context.Posts.Where(x =>
+                                                x.Status == false && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                            .OrderByDescending(x => x.CreateDate)
+                                            .ToListAsync(),
+                    _ => await context.Posts.OrderByDescending(x => x.CreateDate).ToListAsync(),
+                };
         }
         catch
         {
@@ -94,27 +85,21 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            switch (status)
+            return status switch
             {
-                case "all":
-                    return await context.Posts.Where(x =>
-                            x.PostName.Contains(postName) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
-                        .OrderByDescending(x => x.CreateDate).ToListAsync();
-
-                case "active":
-                    return await context.Posts.Where(z => z.PostName.Contains(postName))
-                        .Where(x => x.Status.Equals(true) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
-                        .OrderByDescending(x => x.CreateDate).ToListAsync();
-
-                case "inactive":
-                    return await context.Posts.Where(z => z.PostName.Contains(postName))
-                        .Where(x => x.Status.Equals(false) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
-                        .OrderByDescending(x => x.CreateDate).ToListAsync();
-                default:
-                    return await context.Posts.Where(x =>
-                            x.PostName.Contains(postName) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
-                        .OrderByDescending(x => x.CreateDate).ToListAsync();
-            }
+                "all" => await context.Posts.Where(x =>
+                                            x.PostName.Contains(postName) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                        .OrderByDescending(x => x.CreateDate).ToListAsync(),
+                "active" => await context.Posts.Where(z => z.PostName.Contains(postName))
+                                        .Where(x => x.Status.Equals(true) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                        .OrderByDescending(x => x.CreateDate).ToListAsync(),
+                "inactive" => await context.Posts.Where(z => z.PostName.Contains(postName))
+                                        .Where(x => x.Status.Equals(false) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                        .OrderByDescending(x => x.CreateDate).ToListAsync(),
+                _ => await context.Posts.Where(x =>
+                                            x.PostName.Contains(postName) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                        .OrderByDescending(x => x.CreateDate).ToListAsync(),
+            };
         }
         catch
         {
@@ -153,7 +138,7 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            var post = await context.Posts.Where(x => x.Id.Equals(postId)).FirstOrDefaultAsync();
+            Post? post = await context.Posts.Where(x => x.Id.Equals(postId)).FirstOrDefaultAsync();
             if (post != null)
             {
                 post.Status = status;
@@ -173,31 +158,33 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            var post = await context.Posts.Where(x => x.Id.Equals(postUpdateModel.Id)).FirstOrDefaultAsync();
+            Post? post = await context.Posts.Where(x => x.Id.Equals(postUpdateModel.Id)).FirstOrDefaultAsync();
             if (post != null)
             {
-                var categoryUpdate = false;
-                var tagUpdate = false;
+                bool categoryUpdate = false;
+                bool tagUpdate = false;
                 if (postUpdateModel.CategoriesIds.Any())
+                {
                     categoryUpdate =
                         await _postCategoryRepo.UpdatePostCategories(postUpdateModel.Id, postUpdateModel.CategoriesIds);
+                }
 
                 if (postUpdateModel.TagsIds.Any())
+                {
                     tagUpdate = await _postTagRepo.UpdatePostTags(postUpdateModel.Id, postUpdateModel.TagsIds);
+                }
 
-                if (categoryUpdate == false || tagUpdate == false) return false;
+                if (categoryUpdate == false || tagUpdate == false)
+                {
+                    return false;
+                }
+
                 post.PostName = postUpdateModel.PostName;
                 post.Summary = postUpdateModel.Summary;
                 post.Content = postUpdateModel.Content;
                 post.Thumbnail = postUpdateModel.Thumbnail;
-                var postUpdate = await context.SaveChangesAsync();
-                if (postUpdate == 0)
-                {
-                    if (categoryUpdate || tagUpdate) return true;
-                    return false;
-                }
-
-                return true;
+                int postUpdate = await context.SaveChangesAsync();
+                return postUpdate != 0 || categoryUpdate || tagUpdate;
             }
 
             return false;
@@ -213,23 +200,28 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            var checkInteraction = await context.UserInteractPosts
+            UserInteractPost? checkInteraction = await context.UserInteractPosts
                 .Where(x => x.UserId.Equals(Guid.Parse(userId)) &&
                             x.PostId.Equals(Guid.Parse(postId)))
                 .FirstOrDefaultAsync();
-            if (checkInteraction != null) return null;
+            if (checkInteraction != null)
+            {
+                return null;
+            }
 
-            var post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+            Post? post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
                 .FirstOrDefaultAsync();
             if (post != null)
             {
                 post.Like += 1;
-                var update = await context.SaveChangesAsync();
+                int update = await context.SaveChangesAsync();
                 if (update > 0)
+                {
                     _ = await _userInteractPostRepo.Insert(new UserInteractPost
-                        { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), PostId = Guid.Parse(postId) });
-                if (update == 0) return false;
-                return true;
+                    { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), PostId = Guid.Parse(postId) });
+                }
+
+                return update != 0;
             }
 
             return false;
@@ -244,23 +236,28 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            var checkInteraction = await context.UserInteractPosts
+            UserInteractPost? checkInteraction = await context.UserInteractPosts
                 .Where(x => x.UserId.Equals(Guid.Parse(userId)) &&
                             x.PostId.Equals(Guid.Parse(postId)))
                 .FirstOrDefaultAsync();
-            if (checkInteraction != null) return null;
+            if (checkInteraction != null)
+            {
+                return null;
+            }
 
-            var comment = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+            Post? comment = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
                 .FirstOrDefaultAsync();
             if (comment != null)
             {
                 comment.Dislike += 1;
-                var update = await context.SaveChangesAsync();
+                int update = await context.SaveChangesAsync();
                 if (update > 0)
+                {
                     _ = await _userInteractPostRepo.Insert(new UserInteractPost
-                        { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), PostId = Guid.Parse(postId) });
-                if (update == 0) return false;
-                return true;
+                    { Id = Guid.NewGuid(), UserId = Guid.Parse(userId), PostId = Guid.Parse(postId) });
+                }
+
+                return update != 0;
             }
 
             return false;
@@ -275,15 +272,14 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            var post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+            Post? post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
                 .FirstOrDefaultAsync();
             if (post != null)
             {
                 post.AdminStatus = Enums.POST_BANNED;
                 post.Status = false;
-                var update = await context.SaveChangesAsync();
-                if (update == 0) return false;
-                return true;
+                int update = await context.SaveChangesAsync();
+                return update != 0;
             }
 
             return false;
@@ -298,15 +294,14 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            var post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+            Post? post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
                 .FirstOrDefaultAsync();
             if (post != null)
             {
                 post.AdminStatus = Enums.POST_APPROVED;
                 post.Status = true;
-                var update = await context.SaveChangesAsync();
-                if (update == 0) return false;
-                return true;
+                int update = await context.SaveChangesAsync();
+                return update != 0;
             }
 
             return false;
@@ -321,14 +316,13 @@ public class PostRepo : Repository<Post>
     {
         try
         {
-            var post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
+            Post? post = await context.Posts.Where(x => x.Id.Equals(Guid.Parse(postId)))
                 .FirstOrDefaultAsync();
             if (post != null)
             {
                 post.AdminStatus = Enums.POST_APPROVED;
-                var update = await context.SaveChangesAsync();
-                if (update == 0) return false;
-                return true;
+                int update = await context.SaveChangesAsync();
+                return update != 0;
             }
 
             return false;

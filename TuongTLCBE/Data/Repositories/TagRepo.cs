@@ -15,7 +15,7 @@ public class TagRepo : Repository<Tag>
     {
         try
         {
-            var tag = await context.Tags.Where(x => x.Id.Equals(tagUpdateModel.Id))
+            Tag? tag = await context.Tags.Where(x => x.Id.Equals(tagUpdateModel.Id))
                 .FirstOrDefaultAsync();
             if (tag != null)
             {
@@ -37,7 +37,7 @@ public class TagRepo : Repository<Tag>
     {
         try
         {
-            var tag = await context.Tags.Where(x => x.Id.Equals(tagId))
+            Tag? tag = await context.Tags.Where(x => x.Id.Equals(tagId))
                 .FirstOrDefaultAsync();
             if (tag != null)
             {
@@ -59,9 +59,9 @@ public class TagRepo : Repository<Tag>
         try
         {
             var query = from c in context.Tags
-                where c.Id.Equals(tagId)
-                select new { c };
-            var tagModel = await query.Select(x => new TagModel
+                        where c.Id.Equals(tagId)
+                        select new { c };
+            TagModel? tagModel = await query.Select(x => new TagModel
             {
                 Id = x.c.Id,
                 TagName = x.c.TagName,
@@ -87,8 +87,8 @@ public class TagRepo : Repository<Tag>
                 if (status != null && status.Trim().ToLower().Equals("all"))
                 {
                     var query = from c in context.Tags
-                        select new { c };
-                    var tagModel = await query.Select(x => new TagModel
+                                select new { c };
+                    List<TagModel> tagModel = await query.Select(x => new TagModel
                     {
                         Id = x.c.Id,
                         TagName = x.c.TagName,
@@ -101,13 +101,21 @@ public class TagRepo : Repository<Tag>
                 }
                 else
                 {
-                    var statusIn = true;
-                    if (status != null && status.Trim().ToLower().Equals("active")) statusIn = true;
-                    if (status != null && status.Trim().ToLower().Equals("inactive")) statusIn = false;
+                    bool statusIn = true;
+                    if (status != null && status.Trim().ToLower().Equals("active"))
+                    {
+                        statusIn = true;
+                    }
+
+                    if (status != null && status.Trim().ToLower().Equals("inactive"))
+                    {
+                        statusIn = false;
+                    }
+
                     var query = from c in context.Tags
-                        where c.Status.Equals(statusIn)
-                        select new { c };
-                    var tagModel = await query.Select(x => new TagModel
+                                where c.Status.Equals(statusIn)
+                                select new { c };
+                    List<TagModel> tagModel = await query.Select(x => new TagModel
                     {
                         Id = x.c.Id,
                         TagName = x.c.TagName,
@@ -122,8 +130,8 @@ public class TagRepo : Repository<Tag>
 
             {
                 var query = from c in context.Tags
-                    select new { c };
-                var tagModel = await query.Select(x => new TagModel
+                            select new { c };
+                List<TagModel> tagModel = await query.Select(x => new TagModel
                 {
                     Id = x.c.Id,
                     TagName = x.c.TagName,

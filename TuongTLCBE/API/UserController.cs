@@ -23,7 +23,7 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<object>> Register(UserRegisterRequestModel request)
     {
-        var result = await _userService.Register(request);
+        object result = await _userService.Register(request);
         return result.GetType() == typeof(UserInfoModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -31,7 +31,7 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<object>> Login(UserLoginRequestModel request)
     {
-        var result = await _userService.Login(request);
+        object result = await _userService.Login(request);
         return result.GetType() == typeof(UserLoginResponseModel)
             ? Ok(result)
             : BadRequest(result);
@@ -42,8 +42,8 @@ public class UserController : ControllerBase
     [Authorize(Roles = "User, Admin")]
     public async Task<ActionResult<object>> Update(UserUpdateRequestModel request)
     {
-        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        var result = await _userService.Update(request, token);
+        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        object result = await _userService.Update(request, token);
         return result.GetType() == typeof(UserInfoModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -54,13 +54,13 @@ public class UserController : ControllerBase
         UserChangePasswordRequestModel request
     )
     {
-        var token = Request.Headers["Authorization"].ToString().Split(" ")[1];
-        var result = await _userService.UpdatePassword(request, token);
-        if (result is bool)
-            return (bool)result
+        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        object result = await _userService.UpdatePassword(request, token);
+        return result is bool
+            ? (bool)result
                 ? Ok("Change password success.")
-                : BadRequest("Change password failed.");
-        return BadRequest(result);
+                : BadRequest("Change password failed.")
+            : (ActionResult<object>)BadRequest(result);
     }
 
     [HttpPost("change-account-status")]
@@ -68,7 +68,7 @@ public class UserController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<object>> DisableAccount(BanUserModel userModel)
     {
-        var result = await _userService.ChangeAccountStatus(userModel.UserId, userModel.Status);
+        object result = await _userService.ChangeAccountStatus(userModel.UserId, userModel.Status);
         return result is bool ? Ok("User status changed!") : BadRequest(result);
     }
 
@@ -77,7 +77,7 @@ public class UserController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<object>> GetUser(Guid userId)
     {
-        var result = await _userService.GetUser(userId);
+        object result = await _userService.GetUser(userId);
         return result.GetType() == typeof(UserInfoModel) ? Ok(result) : BadRequest(result);
     }
 
@@ -86,7 +86,7 @@ public class UserController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<object>> GetUsers(string? status)
     {
-        var result = await _userService.GetUsers(status);
+        object? result = await _userService.GetUsers(status);
         return result?.GetType() == typeof(List<UserInfoModel>) ? Ok(result) : BadRequest(result);
     }
 
@@ -95,7 +95,7 @@ public class UserController : ControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<object>> DeleteAccount(Guid userId)
     {
-        var result = await _userService.DeleteAccount(userId);
+        object result = await _userService.DeleteAccount(userId);
         return result is bool ? Ok("User account deleted!") : BadRequest(result);
     }
 
@@ -103,7 +103,7 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<object>> VerifyEmail(EmailVerifyModel request)
     {
-        var result = request.Username != null && request.Code != null &&
+        bool result = request.Username != null && request.Code != null &&
                      await _emailService.VerifyCode(request.Code, request.Username);
         return result ? Ok("User verified!") : BadRequest("User verified failed!");
     }
@@ -112,7 +112,7 @@ public class UserController : ControllerBase
     [AllowAnonymous]
     public async Task<ActionResult<object>> SendNewOtp([FromBody] string username)
     {
-        var result = await _emailService.SendNewOtpCode(username);
+        object result = await _emailService.SendNewOtpCode(username);
         return result is bool ? Ok("New OTP code sent!") : BadRequest(result);
-    } 
+    }
 }

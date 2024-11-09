@@ -16,21 +16,21 @@ public static class VaultHelper
     private static readonly string Endpoint =
         Environment.GetEnvironmentVariable("VaultEndPoint", EnvironmentVariableTarget.Process)
         ?? throw new ArgumentException("Environment variable VaultEndPoint not found.");
-     
+
     public static async Task<string> GetSecrets(string secretType)
     {
         try
         {
             IAuthMethodInfo authMethod = new TokenAuthMethodInfo(Token);
 
-            VaultClientSettings vaultClientSettings = new(Endpoint , authMethod);
+            VaultClientSettings vaultClientSettings = new(Endpoint, authMethod);
 
             IVaultClient vaultClient = new VaultClient(vaultClientSettings);
 
             Secret<SecretData> kv2Secret =
                 await vaultClient.V1.Secrets.KeyValue.V2.ReadSecretAsync("tuongtlc");
 
-            var secret =
+            string secret =
                 kv2Secret.Data.Data[secretType].ToString()
                 ?? throw new ArgumentException("Failed to retrieve secret.");
 
@@ -38,13 +38,11 @@ public static class VaultHelper
         }
         catch
         {
-            var unseal = await UnsealVaultAsync();
-            if (unseal)
-                return await GetSecrets(secretType);
-            throw new ArgumentException("Environment variable "+secretType+" not found.");
+            bool unseal = await UnsealVaultAsync();
+            return unseal ? await GetSecrets(secretType) : throw new ArgumentException("Environment variable " + secretType + " not found.");
         }
     }
-    
+
     public static async Task<EmailSecretModel> GetEmailSecrets()
     {
         try
@@ -52,7 +50,7 @@ public static class VaultHelper
             EmailSecretModel emailSecretModel = new();
             IAuthMethodInfo authMethod = new TokenAuthMethodInfo(Token);
 
-            VaultClientSettings vaultClientSettings = new(Endpoint , authMethod);
+            VaultClientSettings vaultClientSettings = new(Endpoint, authMethod);
 
             IVaultClient vaultClient = new VaultClient(vaultClientSettings);
 
@@ -67,17 +65,15 @@ public static class VaultHelper
         }
         catch
         {
-            var unseal = await UnsealVaultAsync();
-            if (unseal)
-                return await GetEmailSecrets();
-            throw new ArgumentException("Email environment variable not found.");
+            bool unseal = await UnsealVaultAsync();
+            return unseal ? await GetEmailSecrets() : throw new ArgumentException("Email environment variable not found.");
         }
     }
 
     private static async Task<bool> UnsealVaultAsync()
     {
-        var unsealEndpoint = $"{Endpoint}/v1/sys/unseal";
-        var unsealKeys = new[]
+        string unsealEndpoint = $"{Endpoint}/v1/sys/unseal";
+        string[] unsealKeys = new[]
         {
             Environment.GetEnvironmentVariable("VaultKey1", EnvironmentVariableTarget.Process)
             ?? throw new ArgumentException("Environment variable VaultKey1 not found."),
@@ -86,14 +82,17 @@ public static class VaultHelper
             Environment.GetEnvironmentVariable("VaultKey3", EnvironmentVariableTarget.Process)
             ?? throw new ArgumentException("Environment variable VaultKey3 not found.")
         };
-        var success = false;
-        foreach (var key in unsealKeys)
+        bool success = false;
+        foreach (string? key in unsealKeys)
         {
-            using var httpClient = new HttpClient();
-            var requestData = $"{{ \"key\": \"{key}\" }}";
-            var content = new StringContent(requestData, Encoding.UTF8, "application/json");
-            var response = await httpClient.PostAsync(unsealEndpoint, content);
-            if (response.IsSuccessStatusCode) success = true;
+            using HttpClient httpClient = new();
+            string requestData = $"{{ \"key\": \"{key}\" }}";
+            StringContent content = new(requestData, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await httpClient.PostAsync(unsealEndpoint, content);
+            if (response.IsSuccessStatusCode)
+            {
+                success = true;
+            }
         }
 
         return success;
