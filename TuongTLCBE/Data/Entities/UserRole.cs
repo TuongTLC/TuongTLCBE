@@ -8,7 +8,7 @@
         }
 
         public Guid Id { get; set; }
-        public string RoleName { get; set; } = null!;
+        public string? RoleName { get; set; }
         public string? Desctiption { get; set; }
 
         public virtual ICollection<User> Users { get; set; }

@@ -24,22 +24,22 @@ public class PostCommentService
             PostComment? result = await _postCommentRepo.Get(postCommentId);
             if (result != null)
             {
-                User? user = await _userRepo.Get(result.CommenterId);
+                User? user = await _userRepo.Get(result.CommenterId ?? Guid.Empty);
                 if (user != null)
                 {
                     PostCommenter postCommenter = new()
                     {
                         Id = user.Id,
-                        CommenterName = user.FullName,
-                        Username = user.Username
+                        CommenterName = user.FullName ?? string.Empty,
+                        Username = user.Username ?? string.Empty
                     };
                     PostCommentModel responseModel = new()
                     {
                         Id = result.Id,
                         Commenter = postCommenter,
-                        PostId = result.PostId,
+                        PostId = result.PostId ?? Guid.Empty,
                         ParentCommentId = result.ParentCommentId,
-                        Content = result.Content,
+                        Content = result.Content ?? string.Empty,
                         CommentDate = result.CommentDate,
                         Like = result.Like,
                         Dislike = result.Dislike,

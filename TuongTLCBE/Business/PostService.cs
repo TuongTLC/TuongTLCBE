@@ -135,20 +135,20 @@ public class PostService
             Post? post = await _postRepo.Get(postId);
             if (post != null)
             {
-                PostAuthor? author = await _userRepo.GetAuthor(post.Author);
+                PostAuthor? author = await _userRepo.GetAuthor(post.Author ?? Guid.Empty);
                 PostModel postModel = new()
                 {
                     Id = post.Id,
-                    PostName = post.PostName,
+                    PostName = post.PostName ?? string.Empty,
                     Summary = post.Summary,
-                    Content = post.Content,
-                    CreateDate = post.CreateDate,
+                    Content = post.Content ?? string.Empty,
+                    CreateDate = post.CreateDate ?? DateTime.MinValue,
                     Author = author,
                     Like = post.Like,
                     Dislike = post.Dislike,
                     Thumbnail = post.Thumbnail,
-                    Status = post.Status,
-                    AdminStatus = post.AdminStatus
+                    Status = post.Status ?? false,
+                    AdminStatus = post.AdminStatus ?? string.Empty
                 };
                 List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(postId);
                 List<PostCategoryModel> postCategoryModels = new();
@@ -156,13 +156,13 @@ public class PostService
                 {
                     foreach (PostCategory cate in postCategories)
                     {
-                        Category? category = await _categoryRepo.Get(cate.CategoryId);
+                        Category? category = await _categoryRepo.Get(cate.CategoryId ?? Guid.Empty);
                         if (category != null)
                         {
                             PostCategoryModel model = new()
                             {
                                 Id = category.Id,
-                                CategoryName = category.CategoryName,
+                                CategoryName = category.CategoryName ?? string.Empty,
                                 Description = category.Description
                             };
                             postCategoryModels.Add(model);
@@ -176,13 +176,13 @@ public class PostService
                 {
                     foreach (PostTag postTag in postTags)
                     {
-                        Tag? tag = await _tagRepo.Get(postTag.TagId);
+                        Tag? tag = await _tagRepo.Get(postTag.TagId ?? Guid.Empty);
                         if (tag != null)
                         {
                             PostTagModel model = new()
                             {
                                 Id = tag.Id,
-                                TagName = tag.TagName,
+                                TagName = tag.TagName ?? string.Empty,
                                 Description = tag.Description
                             };
                             postTagModels.Add(model);
@@ -222,20 +222,20 @@ public class PostService
             {
                 foreach (Post post in posts)
                 {
-                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author ?? Guid.Empty);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
-                        PostName = post.PostName,
+                        PostName = post.PostName ?? string.Empty,
                         Summary = post.Summary,
-                        Content = post.Content,
-                        CreateDate = post.CreateDate,
+                        Content = post.Content ?? string.Empty,
+                        CreateDate = post.CreateDate ?? DateTime.MinValue,
                         Author = author,
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status,
-                        AdminStatus = post.AdminStatus
+                        Status = post.Status ?? false,
+                        AdminStatus = post.AdminStatus ?? string.Empty
                     };
                     List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -243,13 +243,13 @@ public class PostService
                     {
                         foreach (PostCategory cate in postCategories)
                         {
-                            Category? category = await _categoryRepo.Get(cate.CategoryId);
+                            Category? category = await _categoryRepo.Get(cate.CategoryId ?? Guid.Empty);
                             if (category != null)
                             {
                                 PostCategoryModel postCategoryModel = new()
                                 {
                                     Id = category.Id,
-                                    CategoryName = category.CategoryName,
+                                    CategoryName = category.CategoryName ?? string.Empty,
                                     Description = category.Description
                                 };
                                 postCategoryModels.Add(postCategoryModel);
@@ -263,13 +263,13 @@ public class PostService
                     {
                         foreach (PostTag postTag in postTags)
                         {
-                            Tag? tag = await _tagRepo.Get(postTag.TagId);
+                            Tag? tag = await _tagRepo.Get(postTag.TagId ?? Guid.Empty);
                             if (tag != null)
                             {
                                 PostTagModel postTagModel = new()
                                 {
                                     Id = tag.Id,
-                                    TagName = tag.TagName,
+                                    TagName = tag.TagName ?? string.Empty,
                                     Description = tag.Description
                                 };
                                 postTagModels.Add(postTagModel);
@@ -348,20 +348,20 @@ public class PostService
                 List<PostInfoModel> listPosts = new();
                 foreach (Post post in posts)
                 {
-                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author ?? Guid.Empty);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
-                        PostName = post.PostName,
+                        PostName = post.PostName ?? string.Empty,
                         Summary = post.Summary,
-                        Content = post.Content,
-                        CreateDate = post.CreateDate,
+                        Content = post.Content ?? string.Empty,
+                        CreateDate = post.CreateDate ?? DateTime.MinValue,
                         Author = author,
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status,
-                        AdminStatus = post.AdminStatus
+                        Status = post.Status ?? false,
+                        AdminStatus = post.AdminStatus ?? string.Empty
                     };
                     List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -369,13 +369,13 @@ public class PostService
                     {
                         foreach (PostCategory cate in postCategories)
                         {
-                            Category? category = await _categoryRepo.Get(cate.CategoryId);
+                            Category? category = await _categoryRepo.Get(cate.CategoryId ?? Guid.Empty);
                             if (category != null)
                             {
                                 PostCategoryModel postCategoryModel = new()
                                 {
                                     Id = category.Id,
-                                    CategoryName = category.CategoryName,
+                                    CategoryName = category.CategoryName ?? string.Empty,
                                     Description = category.Description
                                 };
                                 postCategoryModels.Add(postCategoryModel);
@@ -389,7 +389,7 @@ public class PostService
                     {
                         foreach (PostTag postTag in postTags)
                         {
-                            Tag? tag = await _tagRepo.Get(postTag.TagId);
+                            Tag? tag = await _tagRepo.Get(postTag.TagId ?? Guid.Empty);
                             if (tag != null)
                             {
                                 PostTagModel postTagModel = new()
@@ -441,20 +441,20 @@ public class PostService
                 List<PostInfoModel> listPosts = new();
                 foreach (Post post in posts)
                 {
-                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author ?? Guid.Empty);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
-                        PostName = post.PostName,
+                        PostName = post.PostName ?? string.Empty,
                         Summary = post.Summary,
-                        Content = post.Content,
-                        CreateDate = post.CreateDate,
+                        Content = post.Content ?? string.Empty,
+                        CreateDate = post.CreateDate ?? DateTime.MinValue,
                         Author = author,
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status,
-                        AdminStatus = post.AdminStatus
+                        Status = post.Status ?? false,
+                        AdminStatus = post.AdminStatus ?? string.Empty
                     };
                     List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -462,13 +462,13 @@ public class PostService
                     {
                         foreach (PostCategory cate in postCategories)
                         {
-                            Category? category = await _categoryRepo.Get(cate.CategoryId);
+                            Category? category = await _categoryRepo.Get(cate.CategoryId ?? Guid.Empty);
                             if (category != null)
                             {
                                 PostCategoryModel postCategoryModel = new()
                                 {
                                     Id = category.Id,
-                                    CategoryName = category.CategoryName,
+                                    CategoryName = category.CategoryName ?? string.Empty,
                                     Description = category.Description
                                 };
                                 postCategoryModels.Add(postCategoryModel);
@@ -482,13 +482,13 @@ public class PostService
                     {
                         foreach (PostTag postTag in postTags)
                         {
-                            Tag? tag = await _tagRepo.Get(postTag.TagId);
+                            Tag? tag = await _tagRepo.Get(postTag.TagId ?? Guid.Empty);
                             if (tag != null)
                             {
                                 PostTagModel postTagModel = new()
                                 {
                                     Id = tag.Id,
-                                    TagName = tag.TagName,
+                                    TagName = tag.TagName ?? string.Empty,
                                     Description = tag.Description
                                 };
                                 postTagModels.Add(postTagModel);
@@ -532,20 +532,20 @@ public class PostService
             {
                 foreach (Post post in posts)
                 {
-                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author ?? Guid.Empty);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
-                        PostName = post.PostName,
+                        PostName = post.PostName ?? string.Empty,
                         Summary = post.Summary,
-                        Content = post.Content,
-                        CreateDate = post.CreateDate,
+                        Content = post.Content ?? string.Empty,
+                        CreateDate = post.CreateDate ?? DateTime.MinValue,
                         Author = author,
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status,
-                        AdminStatus = post.AdminStatus
+                        Status = post.Status ?? false,
+                        AdminStatus = post.AdminStatus ?? string.Empty
                     };
                     List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -553,13 +553,13 @@ public class PostService
                     {
                         foreach (PostCategory cate in postCategories)
                         {
-                            Category? category = await _categoryRepo.Get(cate.CategoryId);
+                            Category? category = await _categoryRepo.Get(cate.CategoryId ?? Guid.Empty);
                             if (category != null)
                             {
                                 PostCategoryModel postCategoryModel = new()
                                 {
                                     Id = category.Id,
-                                    CategoryName = category.CategoryName,
+                                    CategoryName = category.CategoryName ?? string.Empty,
                                     Description = category.Description
                                 };
                                 postCategoryModels.Add(postCategoryModel);
@@ -573,13 +573,13 @@ public class PostService
                     {
                         foreach (PostTag postTag in postTags)
                         {
-                            Tag? tag = await _tagRepo.Get(postTag.TagId);
+                            Tag? tag = await _tagRepo.Get(postTag.TagId ?? Guid.Empty);
                             if (tag != null)
                             {
                                 PostTagModel postTagModel = new()
                                 {
                                     Id = tag.Id,
-                                    TagName = tag.TagName,
+                                    TagName = tag.TagName ?? string.Empty,
                                     Description = tag.Description
                                 };
                                 postTagModels.Add(postTagModel);
@@ -620,20 +620,20 @@ public class PostService
                 List<PostInfoModel> listPosts = new();
                 foreach (Post post in posts)
                 {
-                    PostAuthor? author = await _userRepo.GetAuthor(post.Author);
+                    PostAuthor? author = await _userRepo.GetAuthor(post.Author ?? Guid.Empty);
                     PostModel postModel = new()
                     {
                         Id = post.Id,
-                        PostName = post.PostName,
+                        PostName = post.PostName ?? string.Empty,
                         Summary = post.Summary,
-                        Content = post.Content,
-                        CreateDate = post.CreateDate,
+                        Content = post.Content ?? string.Empty,
+                        CreateDate = post.CreateDate ?? DateTime.MinValue,
                         Author = author,
                         Like = post.Like,
                         Dislike = post.Dislike,
                         Thumbnail = post.Thumbnail,
-                        Status = post.Status,
-                        AdminStatus = post.AdminStatus
+                        Status = post.Status ?? false,
+                        AdminStatus = post.AdminStatus ?? string.Empty
                     };
                     List<PostCategory> postCategories = await _postCategoryRepo.GetPostCategories(post.Id);
                     List<PostCategoryModel> postCategoryModels = new();
@@ -641,13 +641,13 @@ public class PostService
                     {
                         foreach (PostCategory cate in postCategories)
                         {
-                            Category? category = await _categoryRepo.Get(cate.CategoryId);
+                            Category? category = await _categoryRepo.Get(cate.CategoryId ?? Guid.Empty);
                             if (category != null)
                             {
                                 PostCategoryModel postCategoryModel = new()
                                 {
                                     Id = category.Id,
-                                    CategoryName = category.CategoryName,
+                                    CategoryName = category.CategoryName ?? string.Empty,
                                     Description = category.Description
                                 };
                                 postCategoryModels.Add(postCategoryModel);
@@ -661,13 +661,13 @@ public class PostService
                     {
                         foreach (PostTag postTag in postTags)
                         {
-                            Tag? tag = await _tagRepo.Get(postTag.TagId);
+                            Tag? tag = await _tagRepo.Get(postTag.TagId ?? Guid.Empty);
                             if (tag != null)
                             {
                                 PostTagModel postTagModel = new()
                                 {
                                     Id = tag.Id,
-                                    TagName = tag.TagName,
+                                    TagName = tag.TagName ?? string.Empty,
                                     Description = tag.Description
                                 };
                                 postTagModels.Add(postTagModel);
@@ -872,13 +872,13 @@ public class PostService
             {
                 foreach (PostCategory cate in postCategories)
                 {
-                    Category? category = await _categoryRepo.Get(cate.CategoryId);
+                    Category? category = await _categoryRepo.Get(cate.CategoryId ?? Guid.Empty);
                     if (category != null)
                     {
                         PostCategoryModel postCategoryModel = new()
                         {
                             Id = category.Id,
-                            CategoryName = category.CategoryName,
+                            CategoryName = category.CategoryName ?? string.Empty,
                             Description = category.Description
                         };
                         postCategoryModels.Add(postCategoryModel);

@@ -37,13 +37,15 @@ public class CategoryService
             Category? insert = await _categoryRepo.Insert(insertCategory);
             if (insert != null)
             {
+
+
                 CategoryModel res = new()
                 {
                     Id = insert.Id,
-                    CategoryName = insert.CategoryName,
+                    CategoryName = insert.CategoryName ?? string.Empty,
                     Description = insert.Description,
-                    CreatedBy = insert.CreatedBy,
-                    CreatedDate = insert.CreatedDate,
+                    CreatedBy = insert.CreatedBy ?? Guid.Empty,
+                    CreatedDate = insert.CreatedDate ?? DateTime.MinValue,
                     Status = insert.Status
                 };
                 return res;
@@ -68,13 +70,14 @@ public class CategoryService
                 Category? res = await _categoryRepo.Get(categoryUpdateModel.Id);
                 if (res != null)
                 {
+
                     CategoryModel resCate = new()
                     {
                         Id = res.Id,
-                        CategoryName = res.CategoryName,
+                        CategoryName = res.CategoryName ?? string.Empty,
                         Description = res.Description,
-                        CreatedBy = res.CreatedBy,
-                        CreatedDate = res.CreatedDate,
+                        CreatedBy = res.CreatedBy ?? Guid.Empty,
+                        CreatedDate = res.CreatedDate ?? DateTime.MinValue, 
                         Status = res.Status
                     };
                     return resCate;

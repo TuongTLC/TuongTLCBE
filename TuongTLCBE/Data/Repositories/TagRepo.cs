@@ -64,10 +64,10 @@ public class TagRepo : Repository<Tag>
             TagModel? tagModel = await query.Select(x => new TagModel
             {
                 Id = x.c.Id,
-                TagName = x.c.TagName,
+                TagName = x.c.TagName ?? string.Empty,
                 Description = x.c.Description,
-                CreatedBy = x.c.CreatedBy,
-                CreatedDate = x.c.CreatedDate,
+                CreatedBy = x.c.CreatedBy ?? Guid.Empty,
+                CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
                 Status = x.c.Status
             }).FirstOrDefaultAsync();
             return tagModel;
@@ -91,10 +91,10 @@ public class TagRepo : Repository<Tag>
                     List<TagModel> tagModel = await query.Select(x => new TagModel
                     {
                         Id = x.c.Id,
-                        TagName = x.c.TagName,
+                        TagName = x.c.TagName ?? string.Empty,
                         Description = x.c.Description,
-                        CreatedBy = x.c.CreatedBy,
-                        CreatedDate = x.c.CreatedDate,
+                        CreatedBy = x.c.CreatedBy ?? Guid.Empty,
+                        CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
                         Status = x.c.Status
                     }).ToListAsync();
                     return tagModel;
@@ -118,10 +118,10 @@ public class TagRepo : Repository<Tag>
                     List<TagModel> tagModel = await query.Select(x => new TagModel
                     {
                         Id = x.c.Id,
-                        TagName = x.c.TagName,
+                        TagName = x.c.TagName ?? string.Empty,
                         Description = x.c.Description,
-                        CreatedBy = x.c.CreatedBy,
-                        CreatedDate = x.c.CreatedDate,
+                        CreatedBy = x.c.CreatedBy ?? Guid.Empty,
+                        CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
                         Status = x.c.Status
                     }).ToListAsync();
                     return tagModel;
@@ -134,10 +134,10 @@ public class TagRepo : Repository<Tag>
                 List<TagModel> tagModel = await query.Select(x => new TagModel
                 {
                     Id = x.c.Id,
-                    TagName = x.c.TagName,
+                    TagName = x.c.TagName ?? string.Empty,
                     Description = x.c.Description,
-                    CreatedBy = x.c.CreatedBy,
-                    CreatedDate = x.c.CreatedDate,
+                    CreatedBy = x.c.CreatedBy ?? Guid.Empty,
+                    CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
                     Status = x.c.Status
                 }).ToListAsync();
                 return tagModel;

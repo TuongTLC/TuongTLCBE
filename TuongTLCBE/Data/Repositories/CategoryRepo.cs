@@ -66,8 +66,8 @@ public class CategoryRepo : Repository<Category>
                 Id = x.c.Id,
                 CategoryName = x.c.CategoryName,
                 Description = x.c.Description,
-                CreatedBy = x.c.CreatedBy,
-                CreatedDate = x.c.CreatedDate,
+                CreatedBy = x.c.CreatedBy ?? Guid.Empty,
+                CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
                 Status = x.c.Status
             }).FirstOrDefaultAsync();
             return categoryModel;
@@ -93,8 +93,8 @@ public class CategoryRepo : Repository<Category>
                         Id = x.c.Id,
                         CategoryName = x.c.CategoryName,
                         Description = x.c.Description,
-                        CreatedBy = x.c.CreatedBy,
-                        CreatedDate = x.c.CreatedDate,
+                        CreatedBy = x.c.CreatedBy ?? Guid.Empty,
+                        CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
                         Status = x.c.Status
                     }).ToListAsync();
                     return categoryModel;
@@ -120,8 +120,8 @@ public class CategoryRepo : Repository<Category>
                         Id = x.c.Id,
                         CategoryName = x.c.CategoryName,
                         Description = x.c.Description,
-                        CreatedBy = x.c.CreatedBy,
-                        CreatedDate = x.c.CreatedDate,
+                        CreatedBy = x.c.CreatedBy ?? Guid.Empty,
+                        CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
                         Status = x.c.Status
                     }).ToListAsync();
                     return categoryModel;
@@ -136,8 +136,8 @@ public class CategoryRepo : Repository<Category>
                     Id = x.c.Id,
                     CategoryName = x.c.CategoryName,
                     Description = x.c.Description,
-                    CreatedBy = x.c.CreatedBy,
-                    CreatedDate = x.c.CreatedDate,
+                    CreatedBy = x.c.CreatedBy ??Guid.Empty,
+                    CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
                     Status = x.c.Status
                 }).ToListAsync();
                 return categoryModel;

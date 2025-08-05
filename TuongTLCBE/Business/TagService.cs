@@ -40,10 +40,10 @@ public class TagService
                 TagModel res = new()
                 {
                     Id = insert.Id,
-                    TagName = insert.TagName,
+                    TagName = insert.TagName ?? string.Empty,
                     Description = insert.Description,
-                    CreatedBy = insert.CreatedBy,
-                    CreatedDate = insert.CreatedDate,
+                    CreatedBy = insert.CreatedBy ?? Guid.Empty,
+                    CreatedDate = insert.CreatedDate ?? DateTime.MinValue,
                     Status = insert.Status
                 };
                 return res;
@@ -71,10 +71,10 @@ public class TagService
                     TagModel resCate = new()
                     {
                         Id = res.Id,
-                        TagName = res.TagName,
+                        TagName = res.TagName ?? string.Empty,
                         Description = res.Description,
-                        CreatedBy = res.CreatedBy,
-                        CreatedDate = res.CreatedDate,
+                        CreatedBy = res.CreatedBy ?? Guid.Empty,
+                        CreatedDate = res.CreatedDate ?? DateTime.MinValue,
                         Status = res.Status
                     };
                     return resCate;

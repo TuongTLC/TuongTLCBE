@@ -26,7 +26,7 @@ public class PostCommentRepo : Repository<PostComment>
             {
                 foreach (PostComment? postComment in postComments)
                 {
-                    User? user = await _userRepo.Get(postComment.CommenterId);
+                    User? user = await _userRepo.Get(postComment.CommenterId ?? Guid.Empty);
                     if (user != null)
                     {
                         PostCommenter postCommenter = new()
@@ -39,7 +39,7 @@ public class PostCommentRepo : Repository<PostComment>
                         {
                             Id = postComment.Id,
                             Commenter = postCommenter,
-                            PostId = postComment.PostId,
+                            PostId = postComment.PostId ?? Guid.Empty,
                             ParentCommentId = postComment.ParentCommentId,
                             Content = postComment.Content,
                             CommentDate = postComment.CommentDate,
