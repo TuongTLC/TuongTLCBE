@@ -126,7 +126,9 @@ public class UserService
             if (userInsert != null)
             {
                 _ = await _emailService.SendConfirmEmail(userInsert.Id);
-                UserModel? user = await _userRepo.GetUserByUsername(userInsert.Username);
+                UserModel? user = userInsert.Username != null
+                    ? await _userRepo.GetUserByUsername(userInsert.Username)
+                    : null;
                 if (user != null)
                 {
                     UserInfoModel userLoginModel =

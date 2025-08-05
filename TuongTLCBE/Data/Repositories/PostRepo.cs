@@ -26,7 +26,7 @@ public class PostRepo : Repository<Post>
             var query = from p in context.Posts
                         join pc in context.PostCategories on p.Id equals pc.PostId
                         join c in context.Categories on pc.CategoryId equals c.Id
-                        where c.Id.Equals(categoryIds) && p.Status == true && p.AdminStatus.Equals(Enums.POST_APPROVED)
+                        where c.Id.Equals(categoryIds) && p.Status == true && p.AdminStatus != null && p.AdminStatus.Equals(Enums.POST_APPROVED)
                         orderby p.Like descending
                         select new { PostId = p.Id };
             List<string> posts = await query.Select(x => new string(x.PostId.ToString())).Take(6).ToListAsync();
@@ -61,15 +61,15 @@ public class PostRepo : Repository<Post>
                 }
                 : status switch
                 {
-                    "all" => await context.Posts.Where(y => y.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                    "all" => await context.Posts.Where(y => (y.AdminStatus != null && y.AdminStatus.Equals(adminStatus.Trim().ToLower())))
                                             .OrderByDescending(x => x.CreateDate)
                                             .ToListAsync(),
                     "active" => await context.Posts.Where(x =>
-                                                x.Status == true && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                                x.Status == true && (x.AdminStatus != null && x.AdminStatus.Equals(adminStatus.Trim().ToLower())))
                                             .OrderByDescending(x => x.CreateDate)
                                             .ToListAsync(),
                     "inactive" => await context.Posts.Where(x =>
-                                                x.Status == false && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                                x.Status == false && (x.AdminStatus != null && x.AdminStatus.Equals(adminStatus.Trim().ToLower())))
                                             .OrderByDescending(x => x.CreateDate)
                                             .ToListAsync(),
                     _ => await context.Posts.OrderByDescending(x => x.CreateDate).ToListAsync(),
@@ -88,16 +88,16 @@ public class PostRepo : Repository<Post>
             return status switch
             {
                 "all" => await context.Posts.Where(x =>
-                                            x.PostName.Contains(postName) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                            x.PostName != null && x.PostName.Contains(postName) && (x.AdminStatus != null && x.AdminStatus.Equals(adminStatus.Trim().ToLower())))
                                         .OrderByDescending(x => x.CreateDate).ToListAsync(),
-                "active" => await context.Posts.Where(z => z.PostName.Contains(postName))
-                                        .Where(x => x.Status.Equals(true) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                "active" => await context.Posts.Where(z => z.PostName != null && z.PostName.Contains(postName))
+                                        .Where(x => x.Status.Equals(true) && (x.AdminStatus != null && x.AdminStatus.Equals(adminStatus.Trim().ToLower())))
                                         .OrderByDescending(x => x.CreateDate).ToListAsync(),
-                "inactive" => await context.Posts.Where(z => z.PostName.Contains(postName))
-                                        .Where(x => x.Status.Equals(false) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                "inactive" => await context.Posts.Where(z => z.PostName != null && z.PostName.Contains(postName))
+                                        .Where(x => x.Status.Equals(false) && (x.AdminStatus != null && x.AdminStatus.Equals(adminStatus.Trim().ToLower())))
                                         .OrderByDescending(x => x.CreateDate).ToListAsync(),
                 _ => await context.Posts.Where(x =>
-                                            x.PostName.Contains(postName) && x.AdminStatus.Equals(adminStatus.Trim().ToLower()))
+                                            x.PostName != null && x.PostName.Contains(postName) && (x.AdminStatus != null && x.AdminStatus.Equals(adminStatus.Trim().ToLower())))
                                         .OrderByDescending(x => x.CreateDate).ToListAsync(),
             };
         }

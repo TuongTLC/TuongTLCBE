@@ -5,16 +5,10 @@ using TuongTLCBE.Data.Repositories;
 
 namespace TuongTLCBE.Business;
 
-public class CategoryService
+public class CategoryService(CategoryRepo categoryRepo, DecodeToken decodeToken)
 {
-    private readonly CategoryRepo _categoryRepo;
-    private readonly DecodeToken _decodeToken;
-
-    public CategoryService(CategoryRepo categoryRepo, DecodeToken decodeToken)
-    {
-        _categoryRepo = categoryRepo;
-        _decodeToken = decodeToken;
-    }
+    private readonly CategoryRepo _categoryRepo = categoryRepo;
+    private readonly DecodeToken _decodeToken = decodeToken;
 
     public async Task<object> CreateCategory(CategoryInsertModel categoryInsertModel, string token)
     {
@@ -37,8 +31,6 @@ public class CategoryService
             Category? insert = await _categoryRepo.Insert(insertCategory);
             if (insert != null)
             {
-
-
                 CategoryModel res = new()
                 {
                     Id = insert.Id,
@@ -70,14 +62,13 @@ public class CategoryService
                 Category? res = await _categoryRepo.Get(categoryUpdateModel.Id);
                 if (res != null)
                 {
-
                     CategoryModel resCate = new()
                     {
                         Id = res.Id,
                         CategoryName = res.CategoryName ?? string.Empty,
                         Description = res.Description,
                         CreatedBy = res.CreatedBy ?? Guid.Empty,
-                        CreatedDate = res.CreatedDate ?? DateTime.MinValue, 
+                        CreatedDate = res.CreatedDate ?? DateTime.MinValue,
                         Status = res.Status
                     };
                     return resCate;

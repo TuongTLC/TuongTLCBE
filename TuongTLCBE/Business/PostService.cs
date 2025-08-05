@@ -395,7 +395,7 @@ public class PostService
                                 PostTagModel postTagModel = new()
                                 {
                                     Id = tag.Id,
-                                    TagName = tag.TagName,
+                                    TagName = tag.TagName ?? string.Empty,
                                     Description = tag.Description
                                 };
                                 postTagModels.Add(postTagModel);

@@ -64,7 +64,7 @@ public class CategoryRepo : Repository<Category>
             CategoryModel? categoryModel = await query.Select(x => new CategoryModel
             {
                 Id = x.c.Id,
-                CategoryName = x.c.CategoryName,
+                CategoryName = x.c.CategoryName ?? string.Empty,
                 Description = x.c.Description,
                 CreatedBy = x.c.CreatedBy ?? Guid.Empty,
                 CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
@@ -91,7 +91,7 @@ public class CategoryRepo : Repository<Category>
                     List<CategoryModel> categoryModel = await query.Select(x => new CategoryModel
                     {
                         Id = x.c.Id,
-                        CategoryName = x.c.CategoryName,
+                        CategoryName = x.c.CategoryName ?? string.Empty,
                         Description = x.c.Description,
                         CreatedBy = x.c.CreatedBy ?? Guid.Empty,
                         CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
@@ -118,7 +118,7 @@ public class CategoryRepo : Repository<Category>
                     List<CategoryModel> categoryModel = await query.Select(x => new CategoryModel
                     {
                         Id = x.c.Id,
-                        CategoryName = x.c.CategoryName,
+                        CategoryName = x.c.CategoryName ?? string.Empty,
                         Description = x.c.Description,
                         CreatedBy = x.c.CreatedBy ?? Guid.Empty,
                         CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
@@ -134,7 +134,7 @@ public class CategoryRepo : Repository<Category>
                 List<CategoryModel> categoryModel = await query.Select(x => new CategoryModel
                 {
                     Id = x.c.Id,
-                    CategoryName = x.c.CategoryName,
+                    CategoryName = x.c.CategoryName ?? string.Empty,
                     Description = x.c.Description,
                     CreatedBy = x.c.CreatedBy ??Guid.Empty,
                     CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,

@@ -27,10 +27,10 @@ public class UserRepo : Repository<User>
                         new UserInfoModel
                         {
                             Id = x.u.Id,
-                            Username = x.u.Username,
-                            RoleName = x.ur.RoleName,
-                            Fullname = x.u.FullName,
-                            Email = x.u.Email,
+                            Username = x.u.Username ?? string.Empty,
+                            RoleName = x.ur.RoleName ?? string.Empty,
+                            Fullname = x.u.FullName ?? string.Empty,
+                            Email = x.u.Email ?? string.Empty,
                             Birthday = x.u.Birthday,
                             Phone = x.u.Phone,
                             Status = x.u.Status,
@@ -61,8 +61,8 @@ public class UserRepo : Repository<User>
                         new PostAuthor
                         {
                             Id = x.u.Id,
-                            RoleName = x.ur.RoleName,
-                            Fullname = x.u.FullName
+                            RoleName = x.ur.RoleName ?? string.Empty,
+                            Fullname = x.u.FullName ?? string.Empty
                         }
                 )
                 .FirstOrDefaultAsync();
@@ -81,7 +81,7 @@ public class UserRepo : Repository<User>
             var query =
                 from u in context.Users
                 join ur in context.UserRoles on u.RoleId equals ur.Id
-                where u.Username.Equals(username)
+                where u.Username != null && u.Username.Equals(username)
                 select new { u, ur };
             UserModel? userModel = await query
                 .Select(
@@ -89,12 +89,12 @@ public class UserRepo : Repository<User>
                         new UserModel
                         {
                             Id = x.u.Id,
-                            Username = x.u.Username,
-                            PasswordHash = x.u.PasswordHash,
-                            PasswordSalt = x.u.PasswordSalt,
-                            RoleName = x.ur.RoleName,
-                            Fullname = x.u.FullName,
-                            Email = x.u.Email,
+                            Username = x.u.Username ?? string.Empty,
+                            PasswordHash = x.u.PasswordHash ?? Array.Empty<byte>(),
+                            PasswordSalt = x.u.PasswordSalt ?? Array.Empty<byte>(),
+                            RoleName = x.ur.RoleName ?? string.Empty,
+                            Fullname = x.u.FullName ?? string.Empty,
+                            Email = x.u.Email ?? string.Empty,
                             Birthday = x.u.Birthday,
                             Phone = x.u.Phone,
                             Status = x.u.Status,
@@ -126,10 +126,10 @@ public class UserRepo : Repository<User>
                             new UserInfoModel
                             {
                                 Id = x.u.Id,
-                                Username = x.u.Username,
-                                RoleName = x.ur.RoleName,
-                                Fullname = x.u.FullName,
-                                Email = x.u.Email,
+                                Username = x.u.Username ?? string.Empty,
+                                RoleName = x.ur.RoleName ?? string.Empty,
+                                Fullname = x.u.FullName ?? string.Empty,
+                                Email = x.u.Email ?? string.Empty,
                                 Birthday = x.u.Birthday,
                                 Phone = x.u.Phone,
                                 Status = x.u.Status,
@@ -163,10 +163,10 @@ public class UserRepo : Repository<User>
                             new UserInfoModel
                             {
                                 Id = x.u.Id,
-                                Username = x.u.Username,
-                                RoleName = x.ur.RoleName,
-                                Fullname = x.u.FullName,
-                                Email = x.u.Email,
+                                Username = x.u.Username ?? string.Empty,
+                                RoleName = x.ur.RoleName ?? string.Empty,
+                                Fullname = x.u.FullName ?? string.Empty,
+                                Email = x.u.Email ?? string.Empty,
                                 Birthday = x.u.Birthday,
                                 Phone = x.u.Phone,
                                 Status = x.u.Status,
@@ -188,7 +188,7 @@ public class UserRepo : Repository<User>
         try
         {
             User? user = await context.Users
-                .Where(x => x.Email.Equals(email))
+                .Where(x => x.Email != null && x.Email.Equals(email))
                 .FirstOrDefaultAsync();
             return user != null;
         }
@@ -206,7 +206,7 @@ public class UserRepo : Repository<User>
         try
         {
             User? user = await context.Users
-                .Where(x => x.Username.Equals(username))
+                .Where(x => x.Username != null && x.Username.Equals(username))
                 .FirstOrDefaultAsync();
             if (user != null)
             {
@@ -262,7 +262,7 @@ public class UserRepo : Repository<User>
         try
         {
             User? user = await context.Users
-                .Where(x => x.Username.Equals(username))
+                .Where(x => x.Username != null && x.Username.Equals(username))
                 .FirstOrDefaultAsync();
             if (user != null)
             {
@@ -304,7 +304,7 @@ public class UserRepo : Repository<User>
     {
         try
         {
-            User? user = await context.Users.Where(x => x.Email.Equals(email)).FirstOrDefaultAsync();
+            User? user = await context.Users.Where(x => x.Email != null && x.Email.Equals(email)).FirstOrDefaultAsync();
             if (user != null)
             {
                 user.Status = status;

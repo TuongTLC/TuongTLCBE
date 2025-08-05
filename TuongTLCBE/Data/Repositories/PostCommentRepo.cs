@@ -32,8 +32,8 @@ public class PostCommentRepo : Repository<PostComment>
                         PostCommenter postCommenter = new()
                         {
                             Id = user.Id,
-                            CommenterName = user.FullName,
-                            Username = user.Username
+                            CommenterName = user.FullName ?? string.Empty,
+                            Username = user.Username ?? string.Empty
                         };
                         PostCommentModel convertModel = new()
                         {
@@ -41,7 +41,7 @@ public class PostCommentRepo : Repository<PostComment>
                             Commenter = postCommenter,
                             PostId = postComment.PostId ?? Guid.Empty,
                             ParentCommentId = postComment.ParentCommentId,
-                            Content = postComment.Content,
+                            Content = postComment.Content ?? string.Empty,
                             CommentDate = postComment.CommentDate,
                             Like = postComment.Like,
                             Dislike = postComment.Dislike,
