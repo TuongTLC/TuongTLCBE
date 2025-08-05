@@ -28,316 +28,255 @@ namespace TuongTLCBE.Data.Entities
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            _ = modelBuilder.Entity<Category>(entity =>
+            modelBuilder.Entity<Category>(entity =>
             {
-                _ = entity.ToTable("Category");
+                entity.ToTable("Category");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.Property(e => e.CategoryName).HasMaxLength(200);
+                entity.Property(e => e.CategoryName).HasMaxLength(200);
 
-                _ = entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                _ = entity.Property(e => e.Description).HasMaxLength(500);
-
-                _ = entity.Property(e => e.Status).HasDefaultValueSql("((1))");
-
-                _ = entity.HasOne(d => d.CreatedByNavigation)
-                    .WithMany(p => p.Categories)
-                    .HasForeignKey(d => d.CreatedBy)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Category_User_ID_fk");
+                entity.Property(e => e.Description).HasMaxLength(500);
             });
 
-            _ = modelBuilder.Entity<FileUpload>(entity =>
+            modelBuilder.Entity<FileUpload>(entity =>
             {
-                _ = entity.ToTable("FileUpload");
+                entity.ToTable("FileUpload");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.Property(e => e.Path).HasMaxLength(2048);
+                entity.Property(e => e.Path).HasMaxLength(2048);
 
-                _ = entity.Property(e => e.UploadDate).HasColumnType("datetime");
+                entity.Property(e => e.UploadDate).HasColumnType("datetime");
 
-                _ = entity.HasOne(d => d.UploadedByNavigation)
+                entity.HasOne(d => d.UploadedByNavigation)
                     .WithMany(p => p.FileUploads)
                     .HasForeignKey(d => d.UploadedBy)
-                    .HasConstraintName("File_User_ID_fk");
+                    .HasConstraintName("FK_FileUpload_User");
             });
 
-            _ = modelBuilder.Entity<Otpcode>(entity =>
+            modelBuilder.Entity<Otpcode>(entity =>
             {
-                _ = entity.ToTable("OTPCode");
+                entity.ToTable("OTPCode");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.Property(e => e.Code).HasMaxLength(6);
+                entity.Property(e => e.Code).HasMaxLength(6);
 
-                _ = entity.Property(e => e.CreatedTime)
-                    .HasColumnType("datetime")
-                    .HasDefaultValueSql("(getdate())");
+                entity.Property(e => e.CreatedTime).HasColumnType("datetime");
 
-                _ = entity.Property(e => e.Email).HasMaxLength(200);
+                entity.Property(e => e.Email).HasMaxLength(200);
             });
 
-            _ = modelBuilder.Entity<Post>(entity =>
+            modelBuilder.Entity<Post>(entity =>
             {
-                _ = entity.ToTable("Post");
+                entity.ToTable("Post");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.Property(e => e.AdminStatus)
-                    .HasMaxLength(10)
-                    .HasDefaultValueSql("('review')");
+                entity.Property(e => e.AdminStatus).HasMaxLength(10);
 
-                _ = entity.Property(e => e.CreateDate).HasColumnType("datetime");
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
 
-                _ = entity.Property(e => e.Dislike).HasDefaultValueSql("((0))");
+                entity.Property(e => e.PostName).HasMaxLength(200);
 
-                _ = entity.Property(e => e.Like).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Summary).HasMaxLength(200);
 
-                _ = entity.Property(e => e.PostName).HasMaxLength(200);
+                entity.Property(e => e.Thumbnail).HasMaxLength(2048);
 
-                _ = entity.Property(e => e.Summary).HasMaxLength(200);
-
-                _ = entity.Property(e => e.Thumbnail).HasMaxLength(2048);
-
-                _ = entity.HasOne(d => d.AuthorNavigation)
+                entity.HasOne(d => d.AuthorNavigation)
                     .WithMany(p => p.Posts)
                     .HasForeignKey(d => d.Author)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Post_User_ID_fk");
+                    .HasConstraintName("FK_Post_User");
             });
 
-            _ = modelBuilder.Entity<PostCategory>(entity =>
+            modelBuilder.Entity<PostCategory>(entity =>
             {
-                _ = entity.ToTable("PostCategory");
+                entity.ToTable("PostCategory");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
+                entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
 
-                _ = entity.Property(e => e.PostId).HasColumnName("PostID");
+                entity.Property(e => e.PostId).HasColumnName("PostID");
 
-                _ = entity.HasOne(d => d.Category)
+                entity.HasOne(d => d.Category)
                     .WithMany(p => p.PostCategories)
                     .HasForeignKey(d => d.CategoryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("PostCategory_Category_ID_fk");
+                    .HasConstraintName("FK_PostCategory_Category");
 
-                _ = entity.HasOne(d => d.Post)
+                entity.HasOne(d => d.Post)
                     .WithMany(p => p.PostCategories)
                     .HasForeignKey(d => d.PostId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("PostCategory_Post_ID_fk");
+                    .HasConstraintName("FK_PostCategory_Post");
             });
 
-            _ = modelBuilder.Entity<PostComment>(entity =>
+            modelBuilder.Entity<PostComment>(entity =>
             {
-                _ = entity.ToTable("PostComment");
+                entity.ToTable("PostComment");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.Property(e => e.CommentDate).HasColumnType("datetime");
+                entity.Property(e => e.CommentDate).HasColumnType("datetime");
 
-                _ = entity.Property(e => e.CommenterId).HasColumnName("CommenterID");
+                entity.Property(e => e.CommenterId).HasColumnName("CommenterID");
 
-                _ = entity.Property(e => e.Content).HasMaxLength(500);
+                entity.Property(e => e.Content).HasMaxLength(500);
 
-                _ = entity.Property(e => e.Dislike).HasDefaultValueSql("((0))");
+                entity.Property(e => e.ParentCommentId).HasColumnName("ParentCommentID");
 
-                _ = entity.Property(e => e.Like).HasDefaultValueSql("((0))");
+                entity.Property(e => e.PostId).HasColumnName("PostID");
 
-                _ = entity.Property(e => e.ParentCommentId).HasColumnName("ParentCommentID");
-
-                _ = entity.Property(e => e.PostId).HasColumnName("PostID");
-
-                _ = entity.Property(e => e.Status).HasDefaultValueSql("((0))");
-
-                _ = entity.HasOne(d => d.Commenter)
+                entity.HasOne(d => d.Commenter)
                     .WithMany(p => p.PostComments)
                     .HasForeignKey(d => d.CommenterId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("PostComment_User_ID_fk");
+                    .HasConstraintName("FK_PostComment_User");
 
-                _ = entity.HasOne(d => d.ParentComment)
+                entity.HasOne(d => d.ParentComment)
                     .WithMany(p => p.InverseParentComment)
                     .HasForeignKey(d => d.ParentCommentId)
-                    .HasConstraintName("PostComment_PostComment_ID_fk");
+                    .HasConstraintName("FK_PostComment_PostComment1");
 
-                _ = entity.HasOne(d => d.Post)
+                entity.HasOne(d => d.Post)
                     .WithMany(p => p.PostComments)
                     .HasForeignKey(d => d.PostId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("PostComment_Post_ID_fk");
+                    .HasConstraintName("FK_PostComment_Post");
             });
 
-            _ = modelBuilder.Entity<PostTag>(entity =>
+            modelBuilder.Entity<PostTag>(entity =>
             {
-                _ = entity.ToTable("PostTag");
+                entity.ToTable("PostTag");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.Property(e => e.PostId).HasColumnName("PostID");
+                entity.Property(e => e.PostId).HasColumnName("PostID");
 
-                _ = entity.Property(e => e.TagId).HasColumnName("TagID");
+                entity.Property(e => e.TagId).HasColumnName("TagID");
 
-                _ = entity.HasOne(d => d.Post)
+                entity.HasOne(d => d.Post)
                     .WithMany(p => p.PostTags)
                     .HasForeignKey(d => d.PostId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("PostTag_Post_ID_fk");
+                    .HasConstraintName("FK_PostTag_Post");
 
-                _ = entity.HasOne(d => d.Tag)
+                entity.HasOne(d => d.Tag)
                     .WithMany(p => p.PostTags)
                     .HasForeignKey(d => d.TagId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("PostTag_Tag_ID_fk");
+                    .HasConstraintName("FK_PostTag_Tag");
             });
 
-            _ = modelBuilder.Entity<Tag>(entity =>
+            modelBuilder.Entity<Tag>(entity =>
             {
-                _ = entity.ToTable("Tag");
+                entity.ToTable("Tag");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+                entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
-                _ = entity.Property(e => e.Description).HasMaxLength(500);
+                entity.Property(e => e.Description).HasMaxLength(500);
 
-                _ = entity.Property(e => e.Status).HasDefaultValueSql("((1))");
+                entity.Property(e => e.TagName).HasMaxLength(200);
 
-                _ = entity.Property(e => e.TagName).HasMaxLength(200);
+                entity.HasOne(d => d.CreatedByNavigation)
+                    .WithMany(p => p.Tags)
+                    .HasForeignKey(d => d.CreatedBy)
+                    .HasConstraintName("FK_Tag_User");
             });
 
-            _ = modelBuilder.Entity<User>(entity =>
+            modelBuilder.Entity<User>(entity =>
             {
-                _ = entity.ToTable("User");
+                entity.ToTable("User");
 
-                _ = entity.HasIndex(e => e.Email, "EmailUnique")
-                    .IsUnique();
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Birthday).HasColumnType("date");
 
-                _ = entity.Property(e => e.Ban).HasDefaultValueSql("((0))");
+                entity.Property(e => e.Email).HasMaxLength(200);
 
-                _ = entity.Property(e => e.Birthday).HasColumnType("date");
+                entity.Property(e => e.FullName).HasMaxLength(200);
 
-                _ = entity.Property(e => e.Email).HasMaxLength(200);
+                entity.Property(e => e.PasswordHash).HasMaxLength(2048);
 
-                _ = entity.Property(e => e.FullName).HasMaxLength(200);
+                entity.Property(e => e.PasswordSalt).HasMaxLength(2048);
 
-                _ = entity.Property(e => e.PasswordHash).HasMaxLength(2048);
+                entity.Property(e => e.Phone).HasMaxLength(30);
 
-                _ = entity.Property(e => e.PasswordSalt).HasMaxLength(2048);
+                entity.Property(e => e.RoleId).HasColumnName("RoleID");
 
-                _ = entity.Property(e => e.Phone).HasMaxLength(30);
+                entity.Property(e => e.Username).HasMaxLength(50);
 
-                _ = entity.Property(e => e.RoleId)
-                    .HasColumnName("RoleID")
-                    .HasDefaultValueSql("('38b3d081-a7bc-4ed2-a394-f47d01263e0e')");
-
-                _ = entity.Property(e => e.Username)
-                    .HasMaxLength(50)
-                    .UseCollation("Latin1_General_BIN");
-
-                _ = entity.HasOne(d => d.Role)
+                entity.HasOne(d => d.Role)
                     .WithMany(p => p.Users)
                     .HasForeignKey(d => d.RoleId)
                     .HasConstraintName("FK_User_UserRole");
             });
 
-            _ = modelBuilder.Entity<UserInteractComment>(entity =>
+            modelBuilder.Entity<UserInteractComment>(entity =>
             {
-                _ = entity.HasKey(e => e.Id)
-                    .HasName("UserInteractComment_pk")
-                    .IsClustered(false);
+                entity.ToTable("UserInteractComment");
 
-                _ = entity.ToTable("UserInteractComment");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.HasIndex(e => new { e.UserId, e.CommentId }, "UserInteractComment_UserID_CommentID_index")
-                    .IsClustered();
+                entity.Property(e => e.CommentId).HasColumnName("CommentID");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.UserId).HasColumnName("UserID");
 
-                _ = entity.Property(e => e.CommentId).HasColumnName("CommentID");
-
-                _ = entity.Property(e => e.UserId).HasColumnName("UserID");
-
-                _ = entity.HasOne(d => d.Comment)
+                entity.HasOne(d => d.Comment)
                     .WithMany(p => p.UserInteractComments)
                     .HasForeignKey(d => d.CommentId)
-                    .HasConstraintName("UserInteractComment_PostComment_ID_fk");
+                    .HasConstraintName("FK_UserInteractComment_PostComment");
 
-                _ = entity.HasOne(d => d.User)
+                entity.HasOne(d => d.User)
                     .WithMany(p => p.UserInteractComments)
                     .HasForeignKey(d => d.UserId)
-                    .HasConstraintName("UserInteractComment_User_ID_fk");
+                    .HasConstraintName("FK_UserInteractComment_User");
             });
 
-            _ = modelBuilder.Entity<UserInteractPost>(entity =>
+            modelBuilder.Entity<UserInteractPost>(entity =>
             {
-                _ = entity.HasKey(e => e.Id)
-                    .HasName("UserInteractPost_pk")
-                    .IsClustered(false);
+                entity.ToTable("UserInteractPost");
 
-                _ = entity.ToTable("UserInteractPost");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.HasIndex(e => new { e.UserId, e.PostId }, "UserInteractPost_UserID_PostID_index")
-                    .IsClustered();
+                entity.Property(e => e.PostId).HasColumnName("PostID");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
-
-                _ = entity.Property(e => e.PostId).HasColumnName("PostID");
-
-                _ = entity.Property(e => e.UserId).HasColumnName("UserID");
-
-                _ = entity.HasOne(d => d.Post)
-                    .WithMany(p => p.UserInteractPosts)
-                    .HasForeignKey(d => d.PostId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("UserInteractPost_Post_ID_fk");
-
-                _ = entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserInteractPosts)
-                    .HasForeignKey(d => d.UserId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("UserInteractPost_User_ID_fk");
+                entity.Property(e => e.UserId).HasColumnName("UserID");
             });
 
-            _ = modelBuilder.Entity<UserRole>(entity =>
+            modelBuilder.Entity<UserRole>(entity =>
             {
-                _ = entity.ToTable("UserRole");
+                entity.ToTable("UserRole");
 
-                _ = entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .HasDefaultValueSql("(newid())");
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("ID");
 
-                _ = entity.Property(e => e.Desctiption).HasMaxLength(200);
+                entity.Property(e => e.Desctiption).HasMaxLength(200);
 
-                _ = entity.Property(e => e.RoleName).HasMaxLength(200);
+                entity.Property(e => e.RoleName).HasMaxLength(200);
             });
 
             OnModelCreatingPartial(modelBuilder);
