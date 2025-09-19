@@ -72,7 +72,7 @@ public static class VaultHelper
 
     private static async Task<bool> UnsealVaultAsync()
     {
-        string unsealEndpoint = $"{Endpoint}/v2/sys/unseal";
+        string unsealEndpoint = $"{Endpoint}/v1/sys/unseal";
         string[] unsealKeys = new[]
         {
             Environment.GetEnvironmentVariable("VaultKey1", EnvironmentVariableTarget.Process)
