@@ -83,8 +83,8 @@ builder.Services
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "https://tuongtlc.site",
-            ValidAudience = "https://tuongtlc.site",
+            ValidIssuer = "https://tuongtlc.com",
+            ValidAudience = "https://tuongtlc.com",
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtToken))
         };
     });
