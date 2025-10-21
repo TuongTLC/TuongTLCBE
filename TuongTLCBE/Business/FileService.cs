@@ -83,7 +83,7 @@ public class FileService
 
             foreach (IFormFile file in files)
             {
-                string urlPath = "https://statics.tuongtlc.site/FileStorage/Pictures/"; // Update with your actual domain
+                string urlPath = "https://statics.tuongtlc.com/FileStorage/Pictures/"; // Update with your actual domain
                 Guid id = Guid.NewGuid();
                 string filename = id + Path.GetExtension(file.FileName);
                 urls.Add(urlPath + userId + "/" + filename);
@@ -157,7 +157,7 @@ public class FileService
         try
         {
             var userid = _decodeToken.Decode(token, "userid");
-            var deletePath = "https://statics.tuongtlc.site/FileStorage/Pictures/" + userid.ToLower() + "/";
+            var deletePath = "https://statics.tuongtlc.com/FileStorage/Pictures/" + userid.ToLower() + "/";
             var startIndex = imgUrl.IndexOf(deletePath, StringComparison.Ordinal);
 
             if (startIndex >= 0)
@@ -187,7 +187,7 @@ public class FileService
         try
         {
             string userid = _decodeToken.Decode(token, "userid");
-            string deletePath = "https://statics.tuongtlc.site/FileStorage/Pictures/" + userid.ToLower() + "/";
+            string deletePath = "https://statics.tuongtlc.com/FileStorage/Pictures/" + userid.ToLower() + "/";
             int startIndex = imgUrl.IndexOf(deletePath, StringComparison.Ordinal);
 
             if (startIndex >= 0)
