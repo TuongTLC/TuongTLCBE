@@ -41,10 +41,23 @@ public class PostService
             {
                 return "Post name too short!";
             }
+            if (postRequestModel.PostName.Length >= 200)
+            {
+                return "Post name too Long!";
+            }
+            if (postRequestModel.Summary != null && postRequestModel.Summary.Length >= 200)
+            {
+                return "Post name too Long!";
+            }
+
 
             if (postRequestModel.Content.Length <= 50)
             {
                 return "Content too short!";
+            }
+            if (postRequestModel.Content.Length > 500000)
+            {
+                return "Content too long!";
             }
 
             if (!postRequestModel.CategoriesIds.Any() && !postRequestModel.TagsIds.Any())

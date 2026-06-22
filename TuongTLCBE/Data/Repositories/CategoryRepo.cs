@@ -136,7 +136,7 @@ public class CategoryRepo : Repository<Category>
                     Id = x.c.Id,
                     CategoryName = x.c.CategoryName ?? string.Empty,
                     Description = x.c.Description,
-                    CreatedBy = x.c.CreatedBy ??Guid.Empty,
+                    CreatedBy = x.c.CreatedBy ?? Guid.Empty,
                     CreatedDate = x.c.CreatedDate ?? DateTime.MinValue,
                     Status = x.c.Status
                 }).ToListAsync();
