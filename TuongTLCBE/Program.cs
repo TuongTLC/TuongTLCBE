@@ -100,9 +100,10 @@ builder.Services.AddCors(p =>
     p.AddPolicy("AllowOrigin", policyBuilder =>
     {
         policyBuilder
-            .AllowAnyOrigin()
+            .SetIsOriginAllowed(_ => true)
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .AllowCredentials();
     })
 );
 
@@ -112,12 +113,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
-else
-{
-    // Only enable Swagger in non-production if explicitly needed; otherwise keep disabled for security
-    // app.UseSwagger();
-    // app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
