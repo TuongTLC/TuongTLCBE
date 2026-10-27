@@ -3,8 +3,9 @@ using System.Text.Json;
 
 namespace TuongTLCBE.Business.CacheService;
 
-public class CacheService : ICacheService
+public class CacheService : ICacheService, IDisposable
 {
+    private readonly ConnectionMultiplexer _redis;
     private readonly IDatabase _database;
     private readonly IServer _server;
 
@@ -13,9 +14,22 @@ public class CacheService : ICacheService
         string redisConnection = configuration["Redis:ConnectionString"] 
             ?? Environment.GetEnvironmentVariable("RedisConnectionString") 
             ?? "localhost:6379";
-        ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(redisConnection);
-        _database = redis.GetDatabase();
-        _server = redis.GetServer(redisConnection.Split(',')[0]);
+
+        if (string.IsNullOrWhiteSpace(redisConnection))
+        {
+            redisConnection = "localhost:6379";
+        }
+
+        // abortConnect=false so a temporarily unavailable Redis won't crash startup;
+        // StackExchange.Redis will keep retrying in the background.
+        ConfigurationOptions options = ConfigurationOptions.Parse(redisConnection);
+        options.AbortOnConnectFail = false;
+        _redis = ConnectionMultiplexer.Connect(options);
+
+        _database = _redis.GetDatabase();
+        // Resolve the server from the actual connected endpoints instead of
+        // re-parsing the (possibly password-bearing) connection string.
+        _server = _redis.GetServer(_redis.GetEndPoints().First());
     }
 
     public T? GetData<T>(string key)
@@ -85,5 +99,10 @@ public class CacheService : ICacheService
         {
             return e;
         }
+    }
+
+    public void Dispose()
+    {
+        _redis.Dispose();
     }
 }
