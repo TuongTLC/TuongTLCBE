@@ -13,11 +13,11 @@ public class CacheService : ICacheService, IDisposable
     {
         string redisConnection = configuration["Redis:ConnectionString"] 
             ?? Environment.GetEnvironmentVariable("RedisConnectionString") 
-            ?? "localhost:6379";
+            ?? "localhost:6379,password=itslocalhost";
 
         if (string.IsNullOrWhiteSpace(redisConnection))
         {
-            redisConnection = "localhost:6379";
+            redisConnection = "localhost:6379,password=itslocalhost";
         }
 
         // abortConnect=false so a temporarily unavailable Redis won't crash startup;
