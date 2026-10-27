@@ -33,6 +33,7 @@ public class EmailService
             string otp = rnd.Next(000000, 999999).ToString("D6");
             Otpcode otpcode = new()
             {
+                Id = Guid.NewGuid(),
                 Code = otp,
                 Email = user.Email
             };

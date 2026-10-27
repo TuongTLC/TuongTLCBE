@@ -8,23 +8,40 @@ public class CacheService : ICacheService
     private readonly IDatabase _database;
     private readonly IServer _server;
 
-
-    public CacheService()
+    public CacheService(IConfiguration configuration)
     {
-        ConnectionMultiplexer redis = ConnectionMultiplexer.Connect("localhost:6379, password=itslocalhost, allowAdmin=true");
+        string redisConnection = configuration["Redis:ConnectionString"] 
+            ?? Environment.GetEnvironmentVariable("RedisConnectionString") 
+            ?? "localhost:6379";
+        ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(redisConnection);
         _database = redis.GetDatabase();
-        _server = redis.GetServer("localhost:6379");
+        _server = redis.GetServer(redisConnection.Split(',')[0]);
     }
 
     public T? GetData<T>(string key)
     {
         RedisValue value = _database.StringGet(key);
-        return !string.IsNullOrWhiteSpace(value) ? JsonSerializer.Deserialize<T>(value) : default;
+        if (value.IsNullOrEmpty)
+        {
+            return default;
+        }
+        try
+        {
+            return JsonSerializer.Deserialize<T>(value.ToString());
+        }
+        catch
+        {
+            return default;
+        }
     }
 
     public bool SetData<T>(string key, T value, DateTimeOffset expirationTime)
     {
-        TimeSpan expireTime = expirationTime.DateTime.Subtract(DateTime.Now);
+        TimeSpan expireTime = expirationTime.UtcDateTime.Subtract(DateTime.UtcNow);
+        if (expireTime < TimeSpan.Zero)
+        {
+            expireTime = TimeSpan.FromMinutes(1);
+        }
         bool isSet = _database.StringSet(key, JsonSerializer.Serialize(value), expireTime);
         return isSet;
     }

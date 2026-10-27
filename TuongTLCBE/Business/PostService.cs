@@ -37,20 +37,27 @@ public class PostService
     {
         try
         {
-            if (postRequestModel.PostName.Length < 6)
+            if (string.IsNullOrWhiteSpace(postRequestModel.PostName))
+            {
+                return "Post name is required!";
+            }
+            if (postRequestModel.PostName.Trim().Length < 6)
             {
                 return "Post name too short!";
             }
-            if (postRequestModel.PostName.Length >= 200)
+            if (postRequestModel.PostName.Trim().Length >= 200)
             {
                 return "Post name too Long!";
             }
-            if (postRequestModel.Summary != null && postRequestModel.Summary.Length >= 200)
+            if (postRequestModel.Summary != null && postRequestModel.Summary.Trim().Length >= 200)
             {
-                return "Post name too Long!";
+                return "Summary too Long!";
             }
 
-
+            if (string.IsNullOrWhiteSpace(postRequestModel.Content))
+            {
+                return "Content is required!";
+            }
             if (postRequestModel.Content.Length <= 50)
             {
                 return "Content too short!";
@@ -60,9 +67,13 @@ public class PostService
                 return "Content too long!";
             }
 
-            if (!postRequestModel.CategoriesIds.Any() && !postRequestModel.TagsIds.Any())
+            if (postRequestModel.CategoriesIds == null || !postRequestModel.CategoriesIds.Any())
             {
-                return "Categories id or tag id is empty!";
+                return "Categories id is empty!";
+            }
+            if (postRequestModel.TagsIds == null || !postRequestModel.TagsIds.Any())
+            {
+                return "Tag id is empty!";
             }
 
             foreach (Guid cateId in postRequestModel.CategoriesIds)
@@ -87,14 +98,14 @@ public class PostService
             Post post = new()
             {
                 Id = Guid.NewGuid(),
-                PostName = postRequestModel.PostName,
-                Summary = postRequestModel.Summary,
+                PostName = postRequestModel.PostName.Trim(),
+                Summary = string.IsNullOrWhiteSpace(postRequestModel.Summary) ? null : postRequestModel.Summary.Trim(),
                 Content = postRequestModel.Content,
                 CreateDate = DateTime.Now,
                 Author = Guid.Parse(userId),
                 Like = 0,
                 Dislike = 0,
-                Thumbnail = postRequestModel.Thumbnail,
+                Thumbnail = string.IsNullOrWhiteSpace(postRequestModel.Thumbnail) ? null : postRequestModel.Thumbnail.Trim(),
                 Status = false,
                 AdminStatus = Enums.POST_REVIEW
             };
@@ -802,12 +813,12 @@ public class PostService
         try
         {
             bool result = false;
-            if (status.Trim().ToLower().Equals("active"))
+            if (!string.IsNullOrWhiteSpace(status) && status.Trim().ToLower().Equals("active"))
             {
                 result = await _postRepo.ChangePostStatus(postId, true);
             }
 
-            if (status.Trim().ToLower().Equals("inactive"))
+            if (!string.IsNullOrWhiteSpace(status) && status.Trim().ToLower().Equals("inactive"))
             {
                 result = await _postRepo.ChangePostStatus(postId, false);
             }

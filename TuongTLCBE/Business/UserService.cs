@@ -58,28 +58,28 @@ public class UserService
     public async Task<object> Register(UserRegisterRequestModel reqModel)
     {
         if (
-            reqModel.Username.IsNullOrEmpty()
-            || reqModel.Password.IsNullOrEmpty()
-            || reqModel.Fullname.IsNullOrEmpty()
-            || reqModel.Email.IsNullOrEmpty()
+            string.IsNullOrWhiteSpace(reqModel.Username)
+            || string.IsNullOrWhiteSpace(reqModel.Password)
+            || string.IsNullOrWhiteSpace(reqModel.Fullname)
+            || string.IsNullOrWhiteSpace(reqModel.Email)
         )
         {
             return "Please fill-in all the information!!";
         }
 
-        UserModel? userCheck = await _userRepo.GetUserByUsername(reqModel.Username);
+        UserModel? userCheck = await _userRepo.GetUserByUsername(reqModel.Username.Trim());
         if (userCheck != null)
         {
             return "Duplicated username!";
         }
 
-        bool emailDup = await _userRepo.CheckEmail(reqModel.Email);
+        bool emailDup = await _userRepo.CheckEmail(reqModel.Email.Trim());
         if (emailDup)
         {
             return "Duplicated email!";
         }
 
-        if (reqModel.Username.Length < 6)
+        if (reqModel.Username.Trim().Length < 6)
         {
             return "Username length invalid!";
         }
@@ -92,10 +92,8 @@ public class UserService
         }
 
         Regex validateEmailRegex =
-            new(
-                "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
-            );
-        if (!validateEmailRegex.IsMatch(reqModel.Email))
+            new("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
+        if (!validateEmailRegex.IsMatch(reqModel.Email.Trim()))
         {
             return "Email invalid!";
         }
@@ -111,13 +109,13 @@ public class UserService
                 new()
                 {
                     Id = Guid.NewGuid(),
-                    Username = reqModel.Username,
+                    Username = reqModel.Username.Trim(),
                     PasswordHash = passwordHash,
                     PasswordSalt = passwordSalt,
-                    FullName = reqModel.Fullname,
-                    Email = reqModel.Email,
+                    FullName = reqModel.Fullname.Trim(),
+                    Email = reqModel.Email.Trim(),
                     Birthday = reqModel.Birthdate,
-                    Phone = reqModel.Phone,
+                    Phone = string.IsNullOrWhiteSpace(reqModel.Phone) ? null : reqModel.Phone.Trim(),
                     Status = false,
                     Ban = false
                 };
@@ -220,10 +218,8 @@ public class UserService
         try
         {
             Regex validateEmailRegex =
-                new(
-                    "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
-                );
-            if (!validateEmailRegex.IsMatch(userUpdateRequestModel.Email))
+                new("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$");
+            if (!validateEmailRegex.IsMatch(userUpdateRequestModel.Email.Trim()))
             {
                 return "Email invalid!";
             }
@@ -234,6 +230,9 @@ public class UserService
             }
 
             string username = _decodeToken.Decode(token, "username");
+            userUpdateRequestModel.Email = userUpdateRequestModel.Email.Trim();
+            userUpdateRequestModel.Fullname = string.IsNullOrWhiteSpace(userUpdateRequestModel.Fullname) ? userUpdateRequestModel.Fullname : userUpdateRequestModel.Fullname.Trim();
+            userUpdateRequestModel.Phone = string.IsNullOrWhiteSpace(userUpdateRequestModel.Phone) ? null : userUpdateRequestModel.Phone.Trim();
             bool update = await _userRepo.UpdateUser(userUpdateRequestModel, username);
             if (update)
             {

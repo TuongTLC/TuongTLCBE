@@ -82,11 +82,13 @@ public static class VaultHelper
             Environment.GetEnvironmentVariable("VaultKey3", EnvironmentVariableTarget.Process)
             ?? throw new ArgumentException("Environment variable VaultKey3 not found.")
         };
+
         bool success = false;
-        foreach (string? key in unsealKeys)
+        using HttpClient httpClient = new();
+        foreach (string key in unsealKeys)
         {
-            using HttpClient httpClient = new();
-            string requestData = $"{{ \"key\": \"{key}\" }}";
+            var payload = new { key };
+            string requestData = System.Text.Json.JsonSerializer.Serialize(payload);
             StringContent content = new(requestData, Encoding.UTF8, "application/json");
             HttpResponseMessage response = await httpClient.PostAsync(unsealEndpoint, content);
             if (response.IsSuccessStatusCode)

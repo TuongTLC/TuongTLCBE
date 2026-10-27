@@ -18,16 +18,21 @@ public class PostCommentController : ControllerBase
 
     [HttpPost("insert-comment")]
     [Authorize(Roles = "Admin, User")]
-    public async Task<ActionResult> InsertComment(PostCommentInsertModel postCommentInsertModel)
+    public async Task<ActionResult> InsertComment([FromBody] PostCommentInsertModel postCommentInsertModel)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object result = await _postCommentService.InsertPostComment(postCommentInsertModel, token);
         return result.GetType() == typeof(PostCommentModel) ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("get-post-comments")]
     [AllowAnonymous]
-    public async Task<ActionResult> GetPostComment(Guid postId)
+    public async Task<ActionResult> GetPostComment([FromQuery] Guid postId)
     {
         object result = await _postCommentService.GetPostComments(postId);
         return result.GetType() == typeof(List<PostCommentModel>) ? Ok(result) : BadRequest(result);
@@ -35,9 +40,14 @@ public class PostCommentController : ControllerBase
 
     [HttpPost("update-comment")]
     [Authorize(Roles = "Admin, User")]
-    public async Task<ActionResult> UpdateComment(PostCommentUpdateModel commentUpdateModel)
+    public async Task<ActionResult> UpdateComment([FromBody] PostCommentUpdateModel commentUpdateModel)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object result = await _postCommentService.UpdateComment(commentUpdateModel, token);
         if (result is bool)
         {
@@ -46,10 +56,7 @@ public class PostCommentController : ControllerBase
                 return Ok("Comment updated!!!");
             }
 
-            if ((bool)result == false)
-            {
-                return BadRequest("Comment update failed!!!");
-            }
+            return BadRequest("Comment update failed!!!");
         }
 
         return BadRequest(result);
@@ -57,21 +64,31 @@ public class PostCommentController : ControllerBase
 
     [HttpPost("like-comment")]
     [Authorize(Roles = "Admin, User")]
-    public async Task<ActionResult> LikeComment(string commentId)
+    public async Task<ActionResult> LikeComment([FromQuery] string commentId)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object? result = await _postCommentService.LikeComment(commentId, token);
-        return result == null ? Conflict("Already interact!") : (bool)result ? Ok("Comment liked!!!") : BadRequest("Comment like failed!!!");
+        return result == null ? Conflict("Already interact!") : (result is bool && (bool)result) ? Ok("Comment liked!!!") : BadRequest("Comment like failed!!!");
     }
 
     [HttpPost("dislike-comment")]
     [Authorize(Roles = "Admin, User")]
-    public async Task<ActionResult> DislikeComment(string commentId)
+    public async Task<ActionResult> DislikeComment([FromQuery] string commentId)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object? result = await _postCommentService.DislikeComment(commentId, token);
         return result == null
             ? Conflict("Already interact!")
-            : (bool)result ? Ok("Comment disliked!!!") : BadRequest("Comment dislike failed!!!");
+            : (result is bool && (bool)result) ? Ok("Comment disliked!!!") : BadRequest("Comment dislike failed!!!");
     }
 }

@@ -163,28 +163,48 @@ public class PostRepo : Repository<Post>
             {
                 bool categoryUpdate = false;
                 bool tagUpdate = false;
-                if (postUpdateModel.CategoriesIds.Any())
+                if (postUpdateModel.CategoriesIds != null && postUpdateModel.CategoriesIds.Any())
                 {
                     categoryUpdate =
                         await _postCategoryRepo.UpdatePostCategories(postUpdateModel.Id, postUpdateModel.CategoriesIds);
                 }
+                else
+                {
+                    categoryUpdate = true;
+                }
 
-                if (postUpdateModel.TagsIds.Any())
+                if (postUpdateModel.TagsIds != null && postUpdateModel.TagsIds.Any())
                 {
                     tagUpdate = await _postTagRepo.UpdatePostTags(postUpdateModel.Id, postUpdateModel.TagsIds);
                 }
+                else
+                {
+                    tagUpdate = true;
+                }
 
-                if (categoryUpdate == false || tagUpdate == false)
+                if (!categoryUpdate || !tagUpdate)
                 {
                     return false;
                 }
 
-                post.PostName = postUpdateModel.PostName;
-                post.Summary = postUpdateModel.Summary;
-                post.Content = postUpdateModel.Content;
-                post.Thumbnail = postUpdateModel.Thumbnail;
+                if (!string.IsNullOrWhiteSpace(postUpdateModel.PostName))
+                {
+                    post.PostName = postUpdateModel.PostName.Trim();
+                }
+                if (postUpdateModel.Summary != null)
+                {
+                    post.Summary = string.IsNullOrWhiteSpace(postUpdateModel.Summary) ? null : postUpdateModel.Summary.Trim();
+                }
+                if (!string.IsNullOrWhiteSpace(postUpdateModel.Content))
+                {
+                    post.Content = postUpdateModel.Content;
+                }
+                if (postUpdateModel.Thumbnail != null)
+                {
+                    post.Thumbnail = string.IsNullOrWhiteSpace(postUpdateModel.Thumbnail) ? null : postUpdateModel.Thumbnail.Trim();
+                }
                 int postUpdate = await context.SaveChangesAsync();
-                return postUpdate != 0 || categoryUpdate || tagUpdate;
+                return postUpdate >= 0 || categoryUpdate || tagUpdate;
             }
 
             return false;

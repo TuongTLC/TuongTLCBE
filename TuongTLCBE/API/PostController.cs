@@ -22,9 +22,14 @@ public class PostController : Controller
 
     [HttpPost("create-post")]
     [Authorize(Roles = "User, Admin")]
-    public async Task<IActionResult> CreatePost(PostRequestModel postRequestModel)
+    public async Task<IActionResult> CreatePost([FromBody] PostRequestModel postRequestModel)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object result = await _postService.InsertPost(postRequestModel, token);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
     }
@@ -32,7 +37,7 @@ public class PostController : Controller
     [HttpGet("get-post")]
     [SwaggerOperation(Summary = "Get a post info")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetPost(Guid postId)
+    public async Task<IActionResult> GetPost([FromQuery] Guid postId)
     {
         object? result = await _postService.GetPost(postId);
         return result?.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
@@ -41,9 +46,9 @@ public class PostController : Controller
     [HttpGet("get-posts")]
     [SwaggerOperation(Summary = "Get posts info, status:active/inactive, adminStatus:banned/review/approved")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetPosts(int pageNumber, int pageSize, string? status, string? adminStatus,
-        Guid? categoryId,
-        Guid? tagId)
+    public async Task<IActionResult> GetPosts([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] string? status, [FromQuery] string? adminStatus,
+        [FromQuery] Guid? categoryId,
+        [FromQuery] Guid? tagId)
     {
         PostPagingResponseModel? cacheData =
             _cacheService.GetData<PostPagingResponseModel>("post" + pageNumber + pageSize + status + adminStatus +
@@ -64,7 +69,7 @@ public class PostController : Controller
     [HttpGet("get-user-posts-admin")]
     [SwaggerOperation(Summary = "Admin get user's posts")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> GetUserPostsByAdmin(int pageNumber, int pageSize, string userId)
+    public async Task<IActionResult> GetUserPostsByAdmin([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] string userId)
     {
         object result = await _postService.GetUserPostsByAdmin(pageNumber, pageSize, userId);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
@@ -73,9 +78,14 @@ public class PostController : Controller
     [HttpGet("get-user-posts")]
     [SwaggerOperation(Summary = "User get their own posts")]
     [Authorize(Roles = "User,Admin")]
-    public async Task<IActionResult> GetPostsByUser(int pageNumber, int pageSize)
+    public async Task<IActionResult> GetPostsByUser([FromQuery] int pageNumber, [FromQuery] int pageSize)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object result = await _postService.GetPostsByUser(pageNumber, pageSize, token);
         return result.GetType() == typeof(PostPagingResponseModel) ? Ok(result) : BadRequest(result);
     }
@@ -90,7 +100,7 @@ public class PostController : Controller
 
     [HttpGet("get-related-posts")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetRelatedPosts(string postId)
+    public async Task<IActionResult> GetRelatedPosts([FromQuery] string postId)
     {
         object? result = await _postService.GetRelatedPosts(postId);
         return Ok(result);
@@ -99,9 +109,9 @@ public class PostController : Controller
     [HttpGet("search-post")]
     [SwaggerOperation(Summary = "Search posts, status:active/inactive, adminStatus:banned/review/approved")]
     [AllowAnonymous]
-    public async Task<IActionResult> SearchPost(int pageNumber, int pageSize, string postName, string? status,
-        string? adminStatus,
-        Guid? categoryId, Guid? tagId)
+    public async Task<IActionResult> SearchPost([FromQuery] int pageNumber, [FromQuery] int pageSize, [FromQuery] string postName, [FromQuery] string? status,
+        [FromQuery] string? adminStatus,
+        [FromQuery] Guid? categoryId, [FromQuery] Guid? tagId)
     {
         object result =
             await _postService.SearchPosts(pageNumber, pageSize, postName, status, adminStatus, categoryId, tagId);
@@ -110,9 +120,14 @@ public class PostController : Controller
 
     [HttpPost("update-post")]
     [Authorize(Roles = "User, Admin")]
-    public async Task<IActionResult> UpdatePost(PostUpdateModel postUpdateModel)
+    public async Task<IActionResult> UpdatePost([FromBody] PostUpdateModel postUpdateModel)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object result = await _postService.UpdatePost(postUpdateModel, token);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
     }
@@ -120,7 +135,7 @@ public class PostController : Controller
     [HttpPost("change-post-status")]
     [SwaggerOperation(Summary = "Active/Inactive")]
     [Authorize(Roles = "User,Admin")]
-    public async Task<IActionResult> ChangePostStatus(ChangePostStatusModel changePostStatusModel)
+    public async Task<IActionResult> ChangePostStatus([FromBody] ChangePostStatusModel changePostStatusModel)
     {
         object result = await _postService.ChangePostStatus(changePostStatusModel.PostId, changePostStatusModel.Status);
         return result.GetType() == typeof(PostInfoModel) ? Ok(result) : BadRequest(result);
@@ -129,33 +144,33 @@ public class PostController : Controller
     [HttpPost("ban-post")]
     [SwaggerOperation(Summary = "Admin ban post")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> BanPost(string postId)
+    public async Task<ActionResult> BanPost([FromQuery] string postId)
     {
         object result = await _postService.BanPost(postId);
-        return (bool)result ? Ok("Post banned!!!") : BadRequest("Post ban failed!!!");
+        return result is bool && (bool)result ? Ok("Post banned!!!") : BadRequest("Post ban failed!!!");
     }
 
     [HttpPost("approve-post")]
     [SwaggerOperation(Summary = "Admin approve post")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> ApprovePost(string postId)
+    public async Task<ActionResult> ApprovePost([FromQuery] string postId)
     {
         object result = await _postService.ApprovePost(postId);
-        return (bool)result ? Ok("Post approved!!!") : BadRequest("Post approved failed!!!");
+        return result is bool && (bool)result ? Ok("Post approved!!!") : BadRequest("Post approved failed!!!");
     }
 
     [HttpPost("unban-post")]
     [SwaggerOperation(Summary = "Admin unban post")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> UnbanPost(string postId)
+    public async Task<ActionResult> UnbanPost([FromQuery] string postId)
     {
         object result = await _postService.UnbanPost(postId);
-        return (bool)result ? Ok("Post unbanned!!!") : BadRequest("Post unban failed!!!");
+        return result is bool && (bool)result ? Ok("Post unbanned!!!") : BadRequest("Post unban failed!!!");
     }
 
     [HttpDelete("delete-post")]
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> DeletePost(Guid postId)
+    public async Task<IActionResult> DeletePost([FromQuery] Guid postId)
     {
         object result = await _postService.DeletePost(postId);
         return result is bool
@@ -167,25 +182,35 @@ public class PostController : Controller
 
     [HttpPost("like-post")]
     [Authorize(Roles = "Admin, User")]
-    public async Task<ActionResult> LikePost(string postId)
+    public async Task<ActionResult> LikePost([FromQuery] string postId)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object? result = await _postService.LikePost(postId, token);
-        return result == null ? Conflict("Already interact!") : (bool)result ? Ok("Post liked!!!") : BadRequest("Post like failed!!!");
+        return result == null ? Conflict("Already interact!") : (result is bool && (bool)result) ? Ok("Post liked!!!") : BadRequest("Post like failed!!!");
     }
 
     [HttpPost("dislike-post")]
     [Authorize(Roles = "Admin, User")]
-    public async Task<ActionResult> DislikePost(string postId)
+    public async Task<ActionResult> DislikePost([FromQuery] string postId)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object? result = await _postService.DislikePost(postId, token);
-        return result == null ? Conflict("Already interact!") : (bool)result ? Ok("Post disliked!!!") : BadRequest("Post dislike failed!!!");
+        return result == null ? Conflict("Already interact!") : (result is bool && (bool)result) ? Ok("Post disliked!!!") : BadRequest("Post dislike failed!!!");
     }
 
     [HttpPost("delete-cache")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult> DeleteCache(string prefix)
+    public async Task<ActionResult> DeleteCache([FromQuery] string prefix)
     {
         object result = await _cacheService.RemoveOldCache(prefix);
         return result is bool ? Ok(result) : BadRequest(result);

@@ -83,28 +83,31 @@ public class FileService
 
             foreach (IFormFile file in files)
             {
-                string urlPath = "https://statics.tuongtlc.com/FileStorage/Pictures/"; // Update with your actual domain
+                if (file == null || file.Length == 0)
+                {
+                    continue;
+                }
+
+                string urlPath = "https://statics.tuongtlc.com/FileStorage/Pictures/";
                 Guid id = Guid.NewGuid();
-                string filename = id + Path.GetExtension(file.FileName);
+                string extension = Path.GetExtension(file.FileName);
+                string filename = id + extension;
                 urls.Add(urlPath + userId + "/" + filename);
 
                 string userFolder = Path.Combine("/var/www/statics/WebStatics/FileStorage/Pictures/", userId);
                 string desPath = Path.Combine(userFolder, filename);
 
-                // Check if the user's folder exists, and create it if it does not
                 if (!Directory.Exists(userFolder))
                 {
-                    _ = Directory.CreateDirectory(userFolder);
+                    Directory.CreateDirectory(userFolder);
                 }
 
-                // Save the file to the specified destination
                 using (Stream sourceStream = file.OpenReadStream())
                 using (FileStream destinationStream = new(desPath, FileMode.Create))
                 {
                     await sourceStream.CopyToAsync(destinationStream);
                 }
 
-                // Create a new FileUpload object to store metadata
                 FileUpload fileIn = new()
                 {
                     Id = id,
@@ -136,12 +139,13 @@ public class FileService
                     return "This file isn't your to delete!";
                 }
 
-                bool deleteInDb = DeleteImgInStorage(url, token);
-                if (deleteInDb)
+                bool deleteInStorage = DeleteImgInStorage(url, token);
+                if (deleteInStorage)
                 {
                     return (await _fileRepo.Delete(fileUploadGet)) > 0;
                 }
-                //return await _fileRepo.Delete(fileUploadGet) > 0;
+                // If file already deleted from storage, still try to remove from DB
+                return (await _fileRepo.Delete(fileUploadGet)) > 0;
             }
 
             return "File not found!";

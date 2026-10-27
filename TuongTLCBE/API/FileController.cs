@@ -21,7 +21,12 @@ public class FileController : ControllerBase
     [Authorize(Roles = "User, Admin")]
     public async Task<IActionResult> UploadFile([FromForm] List<IFormFile> files)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object result = await _fileService.UploadFile(files, token);
         return result.GetType() == typeof(List<string>) ? Ok(result) : BadRequest(result);
     }
@@ -30,16 +35,26 @@ public class FileController : ControllerBase
     [Authorize(Roles = "User, Admin")]
     public async Task<IActionResult> GetFiles()
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object result = await _fileService.GetFilesByUser(token);
         return result.GetType() == typeof(List<FileUpload>) ? Ok(result) : BadRequest(result);
     }
     [HttpDelete("delete-file")]
     [SwaggerOperation(Summary = "Delete user file")]
     [Authorize(Roles = "User, Admin")]
-    public async Task<IActionResult> DeleteFile(string fileUrl)
+    public async Task<IActionResult> DeleteFile([FromQuery] string fileUrl)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object result = await _fileService.DeleteFile(fileUrl, token);
         return result is bool ? (bool)result ? Ok(result) : BadRequest(result) : BadRequest(result);
     }

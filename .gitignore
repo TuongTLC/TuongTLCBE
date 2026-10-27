@@ -10,6 +10,10 @@ autom4te.cache/
 *.tar.gz
 tarballs/
 test-results/
+TestResults/
+coverage-report/
+*.coverage
+*.coveragexml
 
 # Mac bundle stuff
 *.dmg

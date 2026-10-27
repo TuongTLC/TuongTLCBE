@@ -187,8 +187,9 @@ public class UserRepo : Repository<User>
     {
         try
         {
+            string normalizedEmail = email.Trim().ToLower();
             User? user = await context.Users
-                .Where(x => x.Email != null && x.Email.Equals(email))
+                .Where(x => x.Email != null && x.Email.ToLower().Equals(normalizedEmail))
                 .FirstOrDefaultAsync();
             return user != null;
         }
@@ -211,31 +212,31 @@ public class UserRepo : Repository<User>
             if (user != null)
             {
                 if (
-                    !userUpdateRequestModel.Fullname.IsNullOrEmpty()
+                    !string.IsNullOrWhiteSpace(userUpdateRequestModel.Fullname)
                     && !userUpdateRequestModel.Fullname.Equals(user.FullName)
                 )
                 {
-                    user.FullName = userUpdateRequestModel.Fullname;
+                    user.FullName = userUpdateRequestModel.Fullname.Trim();
                 }
 
                 if (
-                    !userUpdateRequestModel.Email.IsNullOrEmpty()
+                    !string.IsNullOrWhiteSpace(userUpdateRequestModel.Email)
                     && !userUpdateRequestModel.Email.Equals(user.Email)
                 )
                 {
-                    user.Email = userUpdateRequestModel.Email;
+                    user.Email = userUpdateRequestModel.Email.Trim();
                 }
 
                 if (
-                    !userUpdateRequestModel.Phone.IsNullOrEmpty()
+                    userUpdateRequestModel.Phone != null
                     && !userUpdateRequestModel.Phone.Equals(user.Phone)
                 )
                 {
-                    user.Phone = userUpdateRequestModel.Phone;
+                    user.Phone = string.IsNullOrWhiteSpace(userUpdateRequestModel.Phone) ? null : userUpdateRequestModel.Phone.Trim();
                 }
 
                 if (
-                    !userUpdateRequestModel.Birthday.Equals(user.Birthday)
+                    userUpdateRequestModel.Birthday != user.Birthday
                 )
                 {
                     user.Birthday = userUpdateRequestModel.Birthday;

@@ -21,16 +21,24 @@ public class UserController : ControllerBase
 
     [HttpPost("register")]
     [AllowAnonymous]
-    public async Task<ActionResult<object>> Register(UserRegisterRequestModel request)
+    public async Task<ActionResult<object>> Register([FromBody] UserRegisterRequestModel request)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         object result = await _userService.Register(request);
         return result.GetType() == typeof(UserInfoModel) ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("login")]
     [AllowAnonymous]
-    public async Task<ActionResult<object>> Login(UserLoginRequestModel request)
+    public async Task<ActionResult<object>> Login([FromBody] UserLoginRequestModel request)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         object result = await _userService.Login(request);
         return result.GetType() == typeof(UserLoginResponseModel)
             ? Ok(result)
@@ -40,9 +48,14 @@ public class UserController : ControllerBase
     [HttpPost("update")]
     [SwaggerOperation(Summary = "Update user information except password")]
     [Authorize(Roles = "User, Admin")]
-    public async Task<ActionResult<object>> Update(UserUpdateRequestModel request)
+    public async Task<ActionResult<object>> Update([FromBody] UserUpdateRequestModel request)
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object result = await _userService.Update(request, token);
         return result.GetType() == typeof(UserInfoModel) ? Ok(result) : BadRequest(result);
     }
@@ -51,10 +64,15 @@ public class UserController : ControllerBase
     [SwaggerOperation(Summary = "Change user password")]
     [Authorize(Roles = "User, Admin")]
     public async Task<ActionResult<object>> ChangePassword(
-        UserChangePasswordRequestModel request
+        [FromBody] UserChangePasswordRequestModel request
     )
     {
-        string token = Request.Headers["Authorization"].ToString().Split(" ")[1];
+        string authHeader = Request.Headers["Authorization"].ToString();
+        if (string.IsNullOrWhiteSpace(authHeader) || !authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+        {
+            return Unauthorized();
+        }
+        string token = authHeader.Split(" ")[1];
         object result = await _userService.UpdatePassword(request, token);
         return result is bool
             ? (bool)result
@@ -66,7 +84,7 @@ public class UserController : ControllerBase
     [HttpPost("change-account-status")]
     [SwaggerOperation(Summary = "Admin ban/unban account")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<object>> DisableAccount(BanUserModel userModel)
+    public async Task<ActionResult<object>> DisableAccount([FromBody] BanUserModel userModel)
     {
         object result = await _userService.ChangeAccountStatus(userModel.UserId, userModel.Status);
         return result is bool ? Ok("User status changed!") : BadRequest(result);
@@ -75,7 +93,7 @@ public class UserController : ControllerBase
     [HttpGet("get-user")]
     [SwaggerOperation(Summary = "Admin get a account")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<object>> GetUser(Guid userId)
+    public async Task<ActionResult<object>> GetUser([FromQuery] Guid userId)
     {
         object result = await _userService.GetUser(userId);
         return result.GetType() == typeof(UserInfoModel) ? Ok(result) : BadRequest(result);
@@ -84,7 +102,7 @@ public class UserController : ControllerBase
     [HttpGet("get-users")]
     [SwaggerOperation(Summary = "Admin get account by status: active/inactive/all")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<object>> GetUsers(string? status)
+    public async Task<ActionResult<object>> GetUsers([FromQuery] string? status)
     {
         object? result = await _userService.GetUsers(status);
         return result?.GetType() == typeof(List<UserInfoModel>) ? Ok(result) : BadRequest(result);
@@ -93,7 +111,7 @@ public class UserController : ControllerBase
     [HttpDelete("delete-account")]
     [SwaggerOperation(Summary = "Admin delete account")]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<object>> DeleteAccount(Guid userId)
+    public async Task<ActionResult<object>> DeleteAccount([FromQuery] Guid userId)
     {
         object result = await _userService.DeleteAccount(userId);
         return result is bool ? Ok("User account deleted!") : BadRequest(result);
@@ -101,10 +119,10 @@ public class UserController : ControllerBase
 
     [HttpPost("verify-user")]
     [AllowAnonymous]
-    public async Task<ActionResult<object>> VerifyEmail(EmailVerifyModel request)
+    public async Task<ActionResult<object>> VerifyEmail([FromBody] EmailVerifyModel request)
     {
-        bool result = request.Username != null && request.Code != null &&
-                     await _emailService.VerifyCode(request.Code, request.Username);
+        bool result = !string.IsNullOrWhiteSpace(request.Username) && !string.IsNullOrWhiteSpace(request.Code) &&
+                     await _emailService.VerifyCode(request.Code.Trim(), request.Username.Trim());
         return result ? Ok("User verified!") : BadRequest("User verified failed!");
     }
 
